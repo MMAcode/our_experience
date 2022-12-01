@@ -34,4 +34,7 @@ npm-debug.log
 
 # Ignore secrets file
 /config/*.secret.exs
-/priv/static/
+/priv/static/assets/ # Ignore assets compiled by 'mix assets.deploy'
+
+# Ignore Mac OS X files (about how to display folders)
+*.DS_Store
