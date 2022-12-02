@@ -6,7 +6,8 @@
 
 # General application configuration
 import Config
-
+IO.inspect("miro in config.exs")
+IO.inspect(["miro in config.exs config_env():", config_env()])
 config :our_experience,
   ecto_repos: [OurExperience.Repo]
 
