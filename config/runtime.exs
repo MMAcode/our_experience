@@ -119,7 +119,7 @@ if config_env() == :prod do
 #
 # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
 
-maybe_ipv6 = if System.get_env("ECTO_IPV6"), do: [:inet6], else: []
+# maybe_ipv6 = if System.get_env("ECTO_IPV6"), do: [:inet6], else: []
 
 # config :our_experience, OurExperience.Repo,
 #   # mm settings taken from working nginx project
