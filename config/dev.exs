@@ -1,5 +1,5 @@
 import Config
-IO.inspect("miro in dev.exs")
+dbg()
 
 # Configure your database
 config :our_experience, OurExperience.Repo,
