@@ -121,22 +121,22 @@ if config_env() == :prod do
 
 maybe_ipv6 = if System.get_env("ECTO_IPV6"), do: [:inet6], else: []
 
-config :our_experience, OurExperience.Repo,
-  # mm settings taken from working nginx project
-  username: "mmremot",
-  password: "hesloJE25",
-  database: "my_app",
-  hostname: "localhost",
-  ssl: true,
-  # ssl: false,
-  # username: "postgres",
-  # password: "postgres",
-  # hostname: "localhost",
-  # database: "our_experience_dev",
+# config :our_experience, OurExperience.Repo,
+#   # mm settings taken from working nginx project
+#     # ssl: false,
+#   # username: "postgres",
+#   # password: "postgres",
+#   # hostname: "localhost",
+#   # database: "our_experience_dev",
 
-  pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
-  socket_options: maybe_ipv6,
-  show_sensitive_data_on_connection_error: true
+#   username: "mmremot",
+#   password: "hesloJE25",
+#   database: "my_app",
+#   hostname: "localhost",
+#   ssl: true,
+#   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
+#   socket_options: maybe_ipv6,
+#   show_sensitive_data_on_connection_error: true
 
 # config :our_experience, OurExperienceWeb.Endpoint,
 #   server: true,
