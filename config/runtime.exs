@@ -147,9 +147,9 @@ config :our_experience, OurExperience.Repo,
 #     transport_options: [socket_opts: [:inet6]]
 #   ]
 
-# host = System.get_env("PHX_HOST") || "ourexperience.info"
-host = "35.209.120.231"
-# host = "localhost"
+# host = System.get_env("PHX_HOST") || "ourexperience.info" # works in prod with dodgy socket
+# host = "35.209.120.231" # works in prod!
+host = "localhost"
 port = String.to_integer(System.get_env("PORT") || "4000")
 
 config :our_experience, OurExperienceWeb.Endpoint,
