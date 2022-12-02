@@ -128,20 +128,28 @@ config :our_experience, OurExperience.Repo,
   database: "my_app",
   hostname: "localhost",
   ssl: true,
+  # ssl: false,
+  # username: "postgres",
+  # password: "postgres",
+  # hostname: "localhost",
+  # database: "our_experience_dev",
+
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
   socket_options: maybe_ipv6,
   show_sensitive_data_on_connection_error: true
 
-config :our_experience, OurExperienceWeb.Endpoint,
-  server: true,
-  secret_key_base: "f8MVhmeSUq4qW1POObdVHJCbU8xqld5747SRY6LYXRgu1ZO9JRUurtyQL5LLYz54",
-  http: [
-    # default value, overridden in config/runtime.exs
-    port: 4000,
-    transport_options: [socket_opts: [:inet6]]
-  ]
+# config :our_experience, OurExperienceWeb.Endpoint,
+#   server: true,
+#   secret_key_base: "f8MVhmeSUq4qW1POObdVHJCbU8xqld5747SRY6LYXRgu1ZO9JRUurtyQL5LLYz54",
+#   http: [
+#     # default value, overridden in config/runtime.exs
+#     port: 4000,
+#     transport_options: [socket_opts: [:inet6]]
+#   ]
 
 host = System.get_env("PHX_HOST") || "ourexperience.info"
+# host = "35.209.120.231"
+# host = "localhost"
 port = String.to_integer(System.get_env("PORT") || "4000")
 
 config :our_experience, OurExperienceWeb.Endpoint,
@@ -157,7 +165,7 @@ config :our_experience, OurExperienceWeb.Endpoint,
     ip: {0, 0, 0, 0, 0, 0, 0, 0},
     port: port,
     transport_options: [socket_opts: [:inet6]]
-  ],
+  ]
   # secret_key_base: secret_key_base
 
 
