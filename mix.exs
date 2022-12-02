@@ -1,5 +1,7 @@
 defmodule OurExperience.MixProject do
   use Mix.Project
+IO.inspect("miro in mix.exs")
+IO.inspect(["miro in mix.exs Mix.env():", Mix.env()])
 
   def project do
     [
