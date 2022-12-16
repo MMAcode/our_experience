@@ -2,6 +2,7 @@ defmodule OurExperienceWeb.Pages.WelcomeLive do
   use OurExperienceWeb, :live_view
 
   def mount(_params, _session, socket) do
+    dbg ["mount welcome",socket]
     {:ok, socket}
   end
 

@@ -6,7 +6,7 @@
 
 # General application configuration
 import Config
-dbg(config_env())
+# dbg(config_env())
 config :our_experience,
   ecto_repos: [OurExperience.Repo]
 
@@ -59,6 +59,17 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+
+# Configures Ueberauth
+config :ueberauth, Ueberauth,
+  providers: [
+    auth0: { Ueberauth.Strategy.Auth0, [] },
+  ]
+import_config "secrets/auth0.secret.exs"
+
+
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
+dbg(config_env())
