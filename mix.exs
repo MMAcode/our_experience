@@ -1,6 +1,6 @@
 defmodule OurExperience.MixProject do
   use Mix.Project
-dbg(Mix.env())
+  dbg(Mix.env())
 
   def project do
     [
@@ -20,7 +20,7 @@ dbg(Mix.env())
   def application do
     [
       mod: {OurExperience.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:ueberauth, :ueberauth_auth0, :logger, :runtime_tools]
     ]
   end
 
@@ -51,7 +51,9 @@ dbg(Mix.env())
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
-      {:plug_cowboy, "~> 2.5"}
+      {:plug_cowboy, "~> 2.5"},
+      {:ueberauth, "~> 0.10"},
+      {:ueberauth_auth0, "~> 2.1"}
     ]
   end
 
