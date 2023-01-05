@@ -3,9 +3,12 @@ defmodule OurExperienceWeb.Pages.WelcomeLive do
 
   on_mount {OurExperienceWeb.Auth.AuthForLive, :matchThisInner}
 
-  def mount(_params, _session, socket) do
-    dbg ["mount welcome",socket]
-    {:ok, socket}
+  def mount(_params, session, socket) do
+    # dbg ["mount welcome",socket]
+    # {:ok, socket}
+    user = Map.get(session, "current_user")
+    dbg(["user in private live mount: ", user])
+    {:ok, assign(socket, :current_user, Map.get(session, "current_user"))}
   end
 
   def render(assigns) do
@@ -13,9 +16,8 @@ defmodule OurExperienceWeb.Pages.WelcomeLive do
     <div class="container text-center">
       <h2 class="">Welcome to <strong>Our Experience</strong> project</h2>
       <p class="">(Created by Miroslav Makarov)</p>
-      <br/>
+      <br />
       <p>...work in progress...</p>
-
     </div>
     """
   end

@@ -22,15 +22,13 @@
           Home <span aria-hidden="true">&rarr;</span>
         </a>
       </li>
-      <li> <a href="/auth/logout">logout </a> </li>
-      <li> <a href="/private">private </a> </li>
-      <%!-- <%= if @current_user do %>
+      <%= if @current_user do %>
+        <li><a href="/private">private </a></li>
         <li>you are logged in as <%= @current_user.name %></li>
-        <li><a href="/private">Private</a></li>
         <li class="active"><a href="/auth/logout">Logout</a></li>
       <% else %>
-        <li><a href="/auth/auth0">Login</a></li>
-      <% end %> --%>
+        <li><a href="/auth/auth0">Login/Register</a></li>
+      <% end %>
     </ul>
   </div>
 </header>

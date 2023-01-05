@@ -84,7 +84,7 @@ defmodule OurExperienceWeb.Auth.AuthController do
     case UserFromAuth.find_or_create(auth) do
       {:ok, user} ->
         conn
-        |> put_flash(:info, "Successfully authenticated as " <> user.name <> ".")
+        # |> put_flash(:info, "Successfully authenticated as " <> user.name <> ".")
         |> put_session(:current_user, user)
         # |> configure_session(renew: true)
         |> redirect(to: "/")
