@@ -16,7 +16,8 @@ config :our_experience, Miro,
 
 config :our_experience, OurExperienceWeb.Endpoint,
   url: [host: "ourexperience.info", port: 80],
-  cache_static_manifest: "priv/static/cache_manifest.json"
+  cache_static_manifest: "priv/static/cache_manifest.json",
+  check_origin: ["https://www.ourexperience.info", "https://ourexperience.info", "ourexperience.info", "http://www.ourexperience.info", "http://ourexperience.info"]
 
 # Configures Swoosh API Client
 config :swoosh, :api_client, OurExperience.Finch
