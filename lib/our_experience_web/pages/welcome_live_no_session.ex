@@ -3,9 +3,12 @@ defmodule OurExperienceWeb.Pages.WelcomeLiveNoSession do
 
   # on_mount {OurExperienceWeb.Auth.AuthForLive, :matchThisInner}
 
-  def mount(_params, _session, socket) do
+  def mount(_params, session, socket) do
     # dbg [socket]
-    {:ok, socket}
+    # {:ok, socket}
+    user = Map.get(session, "current_user")
+    dbg(["user in private live mount: ", user])
+    {:ok, assign(socket, :current_user,  Map.get(session, "current_user"))}
   end
 
   def render(assigns) do

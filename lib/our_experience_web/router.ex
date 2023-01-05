@@ -80,7 +80,7 @@ defmodule OurExperienceWeb.Router do
 
   def secure(conn, _params) do
     user = get_session(conn, :current_user)
-    dbg(user)
+    dbg(["secure plug running; user from conn.session:", user])
 
     case user do
       nil ->
@@ -90,20 +90,19 @@ defmodule OurExperienceWeb.Router do
         |> halt
 
       _ ->
-        dbg(user)
         assign(conn, :current_user, user)
     end
   end
 
   def fetch_current_user_or_nil(conn, _opts) do
+    dbg(["fetch_current_user_or_nil plug running; user from conn.session: ", get_session(conn, :current_user)])
     user = get_session(conn, :current_user)
     # userName = if user, do: user.name, else: ""
-    dbg ["conn :current_user", user]
     conn
     |> assign(:current_user, user)
     |> assign(:miro_plug_browser, "set")
     |> (fn con ->
-          # dbg(["browserPlug - fetch_current_user_or_nil:", con.assigns, con])
+          dbg(["fetch_current_user_or_nil, conn.assigns to return:", con.assigns])
           con
         end).()
   end

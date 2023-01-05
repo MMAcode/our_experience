@@ -12,7 +12,7 @@ defmodule OurExperienceWeb.Pages.WelcomePrivateLiveNoSession do
 
   def render(assigns) do
     ~H"""
-    <% dbg assigns%>
+    <%!-- <% dbg assigns%> --%>
     <div class="container text-center">
       <h2 class="">Welcome to <strong>Our Experience</strong> project</h2>
       <p class="">(Created by Miroslav Makarov)</p>
