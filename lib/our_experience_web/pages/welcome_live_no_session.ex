@@ -1,10 +1,10 @@
-defmodule OurExperienceWeb.Pages.WelcomeLive do
+defmodule OurExperienceWeb.Pages.WelcomeLiveNoSession do
   use OurExperienceWeb, :live_view
 
-  on_mount {OurExperienceWeb.Auth.AuthForLive, :matchThisInner}
+  # on_mount {OurExperienceWeb.Auth.AuthForLive, :matchThisInner}
 
   def mount(_params, _session, socket) do
-    dbg ["mount welcome",socket]
+    # dbg [socket]
     {:ok, socket}
   end
 
@@ -15,6 +15,10 @@ defmodule OurExperienceWeb.Pages.WelcomeLive do
       <p class="">(Created by Miroslav Makarov)</p>
       <br/>
       <p>...work in progress...</p>
+
+
+
+      <p> This is public live page without live session wrapper</p>
 
     </div>
     """

@@ -1,7 +1,7 @@
 defmodule OurExperienceWeb.Router do
   use OurExperienceWeb, :router
   require Ueberauth
-  alias OurExperienceWeb.Auth.LiveAuth
+  alias OurExperienceWeb.Auth.AuthForLive
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -10,6 +10,7 @@ defmodule OurExperienceWeb.Router do
     plug :put_root_layout, {OurExperienceWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug OurExperienceWeb.Auth.CSRFtokenFix
     plug :fetch_current_user_or_nil
   end
 
@@ -17,16 +18,31 @@ defmodule OurExperienceWeb.Router do
     plug :accepts, ["json"]
   end
 
+    #  get "/orig", OurExperienceWeb.PageController, :home   # probably not allowed 'out of scope'
   scope "/", OurExperienceWeb do
     pipe_through :browser
-    live "/", Pages.WelcomeLive
+    live "/", Pages.WelcomeLiveNoSession  # does pipe through plugs
     get "/orig", PageController, :home
+  end
+
+  scope "/private", OurExperienceWeb do
+    pipe_through [:browser, :secure]
+    live "/", Pages.WelcomePrivateLiveNoSession  # does pipe through plugs
+  end
+
+  scope "/live" do #live but not session
+   pipe_through :browser
+   live "/ls", OurExperienceWeb.Pages.WelcomeLive
   end
 
   live_session :dummy,
     root_layout: {OurExperienceWeb.Layouts, :root},
-    on_mount: {LiveAuth, :matchThis} do
-    live "/li", OurExperienceWeb.Pages.WelcomeLive
+    # root_layout: {OurExperienceWeb.Layouts, :app},
+    on_mount: {AuthForLive, :matchThis}
+    do
+    # pipe_through :browser
+
+    live "/ls", OurExperienceWeb.Pages.WelcomeLive
     # live "/li", Pages.WelcomeLive, :edit
     # live "/cohorts/new", CohortsLive.Index, :new
   end
@@ -47,7 +63,6 @@ defmodule OurExperienceWeb.Router do
 
     scope "/dev" do
       pipe_through :browser
-
       live_dashboard "/dashboard", metrics: OurExperienceWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
@@ -56,10 +71,11 @@ defmodule OurExperienceWeb.Router do
   scope "/auth", OurExperienceWeb.Auth do
     pipe_through :browser
 
+    # delete "/logout", AuthController, :logout
+    get "/logout", AuthController, :logout
     get "/:provider", AuthController, :request
     get "/:provider/callback", AuthController, :callback
     post "/:provider/callback", AuthController, :callback
-    get "/logout", AuthController, :logout
   end
 
   def secure(conn, _params) do
@@ -81,13 +97,14 @@ defmodule OurExperienceWeb.Router do
 
   def fetch_current_user_or_nil(conn, _opts) do
     user = get_session(conn, :current_user)
-    userName = if user, do: user.name, else: ""
-    dbg(userName)
-
-    assign(conn, :current_user, user)
-    |> (fn x ->
-          dbg(["miro25", x.assigns])
-          x
+    # userName = if user, do: user.name, else: ""
+    dbg ["conn :current_user", user]
+    conn
+    |> assign(:current_user, user)
+    |> assign(:miro_plug_browser, "set")
+    |> (fn con ->
+          # dbg(["browserPlug - fetch_current_user_or_nil:", con.assigns, con])
+          con
         end).()
   end
 end
