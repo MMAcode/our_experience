@@ -6,7 +6,7 @@ defmodule OurExperienceWeb.Auth.Ueberauth.UserFromAuth do
   alias Ueberauth.Auth
 
   def find_or_create(%Auth{provider: :identity} = auth) do
-    dbg "miro in find_or_create 1"
+    dbg ["miro in find_or_create 1", auth]
     case validate_pass(auth.credentials) do
       :ok ->
         {:ok, basic_info(auth)}

@@ -6,9 +6,9 @@ defmodule OurExperienceWeb.Auth.AuthController do
   def logout(conn, _params) do
     dbg "miro1234"
     conn
-    |> put_flash(:info, "You have been logged out!")
     |> configure_session(drop: true)
     |> clear_session()
+    |> put_flash(:info, "You have been logged out!")
     |> redirect(to: "/")
   end
 
