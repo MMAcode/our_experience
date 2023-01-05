@@ -6,10 +6,14 @@ defmodule OurExperienceWeb.Auth.AuthController do
   def logout(conn, _params) do
     # dbg(["mm logout f1.:", Application.loaded_applications()], printable_limit: :infinity, limit: :infinity) #get names of all apps
     # dbg(["mm logout f2.:", Application.get_all_env(:ueberauth)], printable_limit: :infinity, limit: :infinity) #get all env vars in specific app
+    # dbg(["mm logout f2.:", Application.get_all_env(:our_experience)], printable_limit: :infinity, limit: :infinity) #get all env vars in specific app
     # dbg(["mm logout f3.:", Application.get_env(:ueberauth, Ueberauth.Strategy.Auth0.OAuth)], printable_limit: :infinity, limit: :infinity)
     auth0_secrets = Application.get_env(:ueberauth, Ueberauth.Strategy.Auth0.OAuth)
+
+    # endpoint = Application.get_env(:our_experience, OurExperienceWeb.Endpoint)[:url][:host] |> dbg
+    return_url = Application.get_env(:our_experience, Miro)[:logout_url]
     query = %{
-      "returnTo" => "http://localhost:4000",
+      "returnTo" => return_url,
       "client_id" => auth0_secrets[:client_id]
     }
     encoded_query = URI.encode_query(query)

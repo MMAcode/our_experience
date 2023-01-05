@@ -10,6 +10,10 @@ import Config
 config :our_experience,
   ecto_repos: [OurExperience.Repo]
 
+# Miro config
+config :our_experience, Miro,
+  logout_url: "http://localhost:4000"
+
 # Configures the endpoint
 config :our_experience, OurExperienceWeb.Endpoint,
   url: [host: "localhost"],
