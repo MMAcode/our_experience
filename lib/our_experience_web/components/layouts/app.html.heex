@@ -24,7 +24,7 @@
       </li>
       <%= if @current_user do %>
         <li><a href="/private">private </a></li>
-        <li>you are logged in as <%= @current_user.name %></li>
+        <li>you are logged in as <%= @current_user.email %></li>
         <li class="active"><a href="/auth/logout">Logout</a></li>
       <% else %>
         <li><a href="/auth/auth0">Login/Register</a></li>

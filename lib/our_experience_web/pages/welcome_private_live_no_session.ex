@@ -20,7 +20,7 @@ defmodule OurExperienceWeb.Pages.WelcomePrivateLiveNoSession do
       <p>...work in progress...</p>
       <p> This is private live page without live session wrapper</p>
       <h3> current user:
-      <%= if (@current_user != nil), do: @current_user.name, else: "no user" %>
+      <%= if (@current_user != nil), do: @current_user.email, else: "no user" %>
       </h3>
 
     </div>
