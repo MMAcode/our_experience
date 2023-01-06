@@ -107,5 +107,4 @@ defmodule OurExperienceWeb.Router do
         end).()
   end
 
-  # defp persist_new_user()
 end

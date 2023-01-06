@@ -36,6 +36,7 @@ defmodule OurExperience.Users do
 
   """
   def get_user!(id), do: Repo.get!(User, id)
+  def get_user_by_email(email), do: Repo.get_by(User, email: email)
 
   @doc """
   Creates a user.
@@ -49,9 +50,14 @@ defmodule OurExperience.Users do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_user(attrs \\ %{}) do
+  # def create_user(attrs \\ %{}) do
+  #   %User{}
+  #   |> User.changeset(attrs)
+  #   |> Repo.insert()
+  # end
+    def create_user(email) do
     %User{}
-    |> User.changeset(attrs)
+    |> User.changeset(%{email: email})
     |> Repo.insert()
   end
 

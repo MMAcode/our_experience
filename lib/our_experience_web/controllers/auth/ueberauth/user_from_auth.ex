@@ -4,6 +4,7 @@ defmodule OurExperienceWeb.Auth.Ueberauth.UserFromAuth do
   """
   require Logger
   alias Ueberauth.Auth
+  alias OurExperience.Users
 
   def find_or_create(%Auth{provider: :identity} = auth) do
     dbg ["miro in find_or_create 1", auth]
@@ -33,7 +34,11 @@ defmodule OurExperienceWeb.Auth.Ueberauth.UserFromAuth do
   end
 
   defp basic_info(auth) do
-    %{id: auth.uid, name: name_from_auth(auth), avatar: avatar_from_auth(auth), email: auth |> Map.get(:info) |> Map.get(:email)}
+    email = auth |> Map.get(:info) |> Map.get(:email)
+    Users.create_user(email)
+    # Users.get_user_by_email(email) #works
+    %{id: auth.uid, name: name_from_auth(auth), avatar: avatar_from_auth(auth), email: email}
+    # %{email: email}
   end
 
   defp name_from_auth(auth) do
