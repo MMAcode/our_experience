@@ -35,25 +35,32 @@ defmodule OurExperienceWeb.Auth.Ueberauth.UserFromAuth do
 
   defp basic_info(auth) do
     email = auth |> Map.get(:info) |> Map.get(:email)
-    Users.create_user(email)
-    # Users.get_user_by_email(email) #works
-    %{id: auth.uid, name: name_from_auth(auth), avatar: avatar_from_auth(auth), email: email}
-    # %{email: email}
-  end
 
-  defp name_from_auth(auth) do
-    if auth.info.name do
-      auth.info.name
-    else
-      name = [auth.info.first_name, auth.info.last_name]
-      |> Enum.filter(&(&1 != nil and &1 != ""))
-
-      cond do
-        length(name) == 0 -> auth.info.nickname
-        true -> Enum.join(name, " ")
+    if (!Users.get_user_by_email(email)) do
+      case Users.create_user(email)  do
+        {:ok,_} -> dbg("user #{email} created")
+        error -> dbg(["error creating user:", error])
       end
+    else
+      dbg "user #{email} already exists"
     end
+    # %{id: auth.uid, name: name_from_auth(auth), avatar: avatar_from_auth(auth), email: email}
+    %{email: email}
   end
+
+  # defp name_from_auth(auth) do
+  #   if auth.info.name do
+  #     auth.info.name
+  #   else
+  #     name = [auth.info.first_name, auth.info.last_name]
+  #     |> Enum.filter(&(&1 != nil and &1 != ""))
+
+  #     cond do
+  #       length(name) == 0 -> auth.info.nickname
+  #       true -> Enum.join(name, " ")
+  #     end
+  #   end
+  # end
 
   defp validate_pass(%{other: %{password: ""}}) do
     {:error, "Password required"}
