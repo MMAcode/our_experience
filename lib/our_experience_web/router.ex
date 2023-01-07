@@ -21,7 +21,7 @@ defmodule OurExperienceWeb.Router do
     #  get "/orig", OurExperienceWeb.PageController, :home   # probably not allowed 'out of scope'
   scope "/", OurExperienceWeb do
     pipe_through :browser
-    live "/", Pages.WelcomeLiveNoSession  # does pipe through plugs
+    live "/", Pages.WelcomeLive  # does pipe through plugs
     get "/orig", PageController, :home
   end
 
