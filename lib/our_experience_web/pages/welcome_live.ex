@@ -1,10 +1,12 @@
 defmodule OurExperienceWeb.Pages.WelcomeLive do
   use OurExperienceWeb, :live_view
-  alias OurExperienceWeb.Pages.Public.Intro.DocsAsFuncs
+  alias OurExperienceWeb.Pages.Public.Intro.InformationTexts
+  alias OurExperienceWeb.MiroComponents
 
   on_mount {OurExperienceWeb.Auth.AuthForLive, :matchThisInner}
 
   def mount(_params, session, socket) do
+    dbg Map.get(session, "current_user")
     {:ok, assign(socket, :current_user, Map.get(session, "current_user"))}
   end
 
@@ -15,7 +17,10 @@ defmodule OurExperienceWeb.Pages.WelcomeLive do
       <p class="">(Created by Miroslav Makarov)</p>
       <p>...work in progress...</p>
     </div>
-      <DocsAsFuncs.introduction/>
+    <MiroComponents.admin_level current_user={@current_user}>
+      <p>inner text</p>
+    </MiroComponents.admin_level>
+    <InformationTexts.introduction/>
     """
   end
 end

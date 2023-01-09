@@ -1,4 +1,4 @@
-defmodule OurExperienceWeb.Pages.Public.Intro.DocsAsFuncs do
+defmodule OurExperienceWeb.Pages.Public.Intro.InformationTexts do
   use Phoenix.Component
 
   def introduction(assigns) do
@@ -21,7 +21,7 @@ defmodule OurExperienceWeb.Pages.Public.Intro.DocsAsFuncs do
     <p>
       To break this project into smaller parts, for now this website will focus only on strategies whose purpose is to improve the
       <strong>quality of experience</strong>
-      (happiness, life satisfaction, meaning and so on). Even though the theme of happiness is rather fuzzy (it's easier to measure one's body weight, then one's happiness), it is a passion of mine and if I would pick a different topic I would never be motivated to work on it.
+      (happiness, life satisfaction, meaning and so on).
     </p>
     <br />
     <p>
