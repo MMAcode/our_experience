@@ -4,6 +4,7 @@ defmodule OurExperience.Users.User do
 
   schema "users" do
     field :email, :string
+    field :admin_level, :integer
 
     timestamps()
   end

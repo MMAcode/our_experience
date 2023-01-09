@@ -36,16 +36,40 @@ defmodule OurExperienceWeb.Auth.Ueberauth.UserFromAuth do
   defp basic_info(auth) do
     email = auth |> Map.get(:info) |> Map.get(:email)
 
-    if (!Users.get_user_by_email(email)) do
+    # user_from_db = Users.get_user_by_email(email)
+
+    # if (!user_from_db) do
+    #   case Users.create_user(email)  do
+    #     {:ok, _new_user} ->
+    #       dbg("user #{email} created")
+    #       # user_from_db = new_user
+    #     error -> dbg(["error creating user:", error])
+    #   end
+    # else
+    #   dbg "user #{email} already exists"
+    # end
+    # # %{id: auth.uid, name: name_from_auth(auth), avatar: avatar_from_auth(auth), email: email}
+    # %{email: email}
+
+
+    user_from_db = Users.get_user_by_email(email)
+
+    user = if (!user_from_db) do
       case Users.create_user(email)  do
-        {:ok,_} -> dbg("user #{email} created")
-        error -> dbg(["error creating user:", error])
+        {:ok, new_user} ->
+          dbg("user #{email} created")
+          new_user
+        error ->
+          dbg(["error creating user:", error])
+          nil
       end
     else
-      dbg "user #{email} already exists"
+      dbg "user #{email} retrieved from database"
+      user_from_db
     end
+ dbg(["miromm", user])
     # %{id: auth.uid, name: name_from_auth(auth), avatar: avatar_from_auth(auth), email: email}
-    %{email: email}
+    %{email: user.email, admin_level: user.admin_level}
   end
 
   # defp name_from_auth(auth) do
