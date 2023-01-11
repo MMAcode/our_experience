@@ -2,12 +2,11 @@ defmodule OurExperienceWeb.Pages.WelcomeLive do
   use OurExperienceWeb, :live_view
   alias OurExperienceWeb.Pages.Public.Intro.InformationTexts
   alias OurExperienceWeb.MiroComponents
+  # on_mount {OurExperienceWeb.Auth.AuthForLive, :matchThisInner}
+  on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
 
-  on_mount {OurExperienceWeb.Auth.AuthForLive, :matchThisInner}
-
-  def mount(_params, session, socket) do
-    dbg Map.get(session, "current_user")
-    {:ok, assign(socket, :current_user, Map.get(session, "current_user"))}
+  def mount(_params, _session, socket) do
+    {:ok, socket}
   end
 
   def render(assigns) do

@@ -2,6 +2,7 @@ defmodule OurExperienceWeb.Router do
   use OurExperienceWeb, :router
   require Ueberauth
   alias OurExperienceWeb.Auth.AuthForLive
+  # alias OurExperienceWeb.RichTextEditors.Quill
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -23,6 +24,7 @@ defmodule OurExperienceWeb.Router do
     pipe_through :browser
     live "/", Pages.WelcomeLive  # does pipe through plugs
     get "/orig", PageController, :home
+    live "quill", RichTextEditors.Quill
   end
 
   scope "/private", OurExperienceWeb do
