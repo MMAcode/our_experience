@@ -49,15 +49,7 @@ defmodule OurExperienceWeb.RichTextEditors.Quill do
       <div id="editor" phx-hook="TextEditor" />
     </div>
     <.button phx-click="save" phx-disable-with="Saving...">Save</.button>
-    <.button phx-click="inc">inc <%= @count %></.button>
     """
-  end
-
-  @impl true
-  def handle_event("inc", _, socket) do
-    {:noreply,
-     assign(socket, count: socket.assigns.count + 1)
-     |> push_event("miroFromServer", %{savedQuills: nil})}
   end
 
   @impl true
