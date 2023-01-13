@@ -24,13 +24,22 @@ defmodule OurExperienceWeb.Router do
     pipe_through :browser
     live "/", Pages.WelcomeLive  # does pipe through plugs
     get "/orig", PageController, :home
-    live "quill", RichTextEditors.Quill
   end
 
   scope "/private", OurExperienceWeb do
     pipe_through [:browser, :secure]
     live "/", Pages.WelcomePrivateLiveNoSession  # does pipe through plugs
+    live "/quill", RichTextEditors.Quill
   end
+
+  scope "/admin", OurExperienceWeb do
+    pipe_through [:browser, :secure, :admin_only]
+    live "/weekly_topics", WeeklyTopicLive.Index, :index
+    live "/weekly_topics/new", WeeklyTopicLive.Index, :new
+    live "/weekly_topics/:id/edit", WeeklyTopicLive.Index, :edit
+    live "/weekly_topics/:id", WeeklyTopicLive.Show, :show
+    live "/weekly_topics/:id/show/edit", WeeklyTopicLive.Show, :edit
+end
 
   scope "/live" do #live but not session
    pipe_through :browser
@@ -85,15 +94,31 @@ defmodule OurExperienceWeb.Router do
     dbg(["secure plug running; user from conn.session:", user])
 
     case user do
-      nil ->
-        conn
-        |> redirect(to: "/auth/auth0")
-        # |> fn x -> dbg(["miro025", x]); x end.()
-        |> halt
-
+      nil -> to_auth(conn)
       _ ->
         assign(conn, :current_user, user)
     end
+  end
+
+  def admin_only(conn, _params) do
+    case conn.assigns[:current_user][:admin_level] do
+      nil ->
+            dbg ["admin_only f :current_user:", conn.assigns[:current_user]]
+            to_auth(conn)
+      level -> if level < 1000, do: to_home(conn), else: conn
+    end
+  end
+
+  defp to_auth(conn) do
+        conn
+        |> redirect(to: "/auth/auth0")
+        |> halt
+  end
+
+  defp to_home(conn) do
+        conn
+        |> redirect(to: "/")
+        |> halt
   end
 
   def fetch_current_user_or_nil(conn, _opts) do

@@ -1,0 +1,42 @@
+<.header>
+  Listing Weekly topics
+  <:actions>
+    <.link patch={~p"/admin/weekly_topics/new"}>
+      <.button>New Weekly topic</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table id="weekly_topics" rows={@weekly_topics} row_click={&JS.navigate(~p"/admin/weekly_topics/#{&1}")}>
+  <:col :let={weekly_topic} label="Title"><%= weekly_topic.title %></:col>
+  <:col :let={weekly_topic} label="Content"><%= weekly_topic.content %></:col>
+  <:col :let={weekly_topic} label="Default position"><%= weekly_topic.default_position %></:col>
+  <:col :let={weekly_topic} label="Default active status"><%= weekly_topic.default_active_status %></:col>
+  <:action :let={weekly_topic}>
+    <div class="sr-only">
+      <.link navigate={~p"/weekly_topics/#{weekly_topic}"}>Show</.link>
+    </div>
+    <.link patch={~p"/admin/weekly_topics/#{weekly_topic}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={weekly_topic}>
+    <.link phx-click={JS.push("delete", value: %{id: weekly_topic.id})} data-confirm="Are you sure?">
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="weekly_topic-modal"
+  show
+  on_cancel={JS.navigate(~p"/admin/weekly_topics")}
+>
+  <.live_component
+    module={OurExperienceWeb.WeeklyTopicLive.FormComponent}
+    id={@weekly_topic.id || :new}
+    title={@page_title}
+    action={@live_action}
+    weekly_topic={@weekly_topic}
+    navigate={~p"/admin/weekly_topics"}
+  />
+</.modal>

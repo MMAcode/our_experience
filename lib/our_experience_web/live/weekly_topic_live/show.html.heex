@@ -1,0 +1,29 @@
+<.header>
+  Weekly topic <%= @weekly_topic.id %>
+  <:subtitle>This is a weekly_topic record from your database.</:subtitle>
+  <:actions>
+    <.link patch={~p"/admin/weekly_topics/#{@weekly_topic}/show/edit"} phx-click={JS.push_focus()}>
+      <.button>Edit weekly_topic</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Title"><%= @weekly_topic.title %></:item>
+  <:item title="Content"><pre><%= @weekly_topic.content %></pre></:item>
+  <:item title="Default position"><%= @weekly_topic.default_position %></:item>
+  <:item title="Default active status"><%= @weekly_topic.default_active_status %></:item>
+</.list>
+
+<.back navigate={~p"/admin/weekly_topics"}>Back to weekly_topics</.back>
+
+<.modal :if={@live_action == :edit} id="weekly_topic-modal" show on_cancel={JS.patch(~p"/admin/weekly_topics/#{@weekly_topic}")}>
+  <.live_component
+    module={OurExperienceWeb.WeeklyTopicLive.FormComponent}
+    id={@weekly_topic.id}
+    title={@page_title}
+    action={@live_action}
+    weekly_topic={@weekly_topic}
+    navigate={~p"/admin/weekly_topics/#{@weekly_topic}"}
+  />
+</.modal>
