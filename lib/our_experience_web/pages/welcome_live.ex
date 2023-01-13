@@ -17,7 +17,10 @@ defmodule OurExperienceWeb.Pages.WelcomeLive do
       <p>...work in progress...</p>
     </div>
     <MiroComponents.admin_level current_user={@current_user}>
-      <p>inner text</p>
+     <.link patch={~p"/admin/weekly_topics/"}>
+      <.button>weekly_topic</.button>
+    </.link>
+            <%!-- <.back navigate={~p"/admin/weekly_topics"}>Weekly_topics</.back> --%>
     </MiroComponents.admin_level>
     <InformationTexts.introduction/>
     """
