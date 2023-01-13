@@ -1,9 +1,11 @@
 defmodule OurExperience.Strategies.Strategy do
+  alias OurExperience.U_Strategies.U_Strategy
   use Ecto.Schema
   import Ecto.Changeset
 
   schema "strategies" do
     field :name, :string
+    has_many :u_strategies, U_Strategy
 
     timestamps()
   end
