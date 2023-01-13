@@ -14,7 +14,7 @@
   <:col :let={weekly_topic} label="Default active status"><%= weekly_topic.default_active_status %></:col>
   <:action :let={weekly_topic}>
     <div class="sr-only">
-      <.link navigate={~p"admin/weekly_topics/#{weekly_topic}"}>Show</.link>
+      <.link navigate={~p"/admin/weekly_topics/#{weekly_topic}"}>Show</.link>
     </div>
     <.link patch={~p"/admin/weekly_topics/#{weekly_topic}/edit"}>Edit</.link>
   </:action>
