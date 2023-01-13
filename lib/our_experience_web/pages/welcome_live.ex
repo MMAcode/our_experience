@@ -18,7 +18,7 @@ defmodule OurExperienceWeb.Pages.WelcomeLive do
     </div>
     <MiroComponents.admin_level current_user={@current_user}>
      <.link patch={~p"/admin/weekly_topics/"}>
-      <.button>weekly_topic</.button>
+      <.button>weekly_topics</.button>
     </.link>
             <%!-- <.back navigate={~p"/admin/weekly_topics"}>Weekly_topics</.back> --%>
     </MiroComponents.admin_level>

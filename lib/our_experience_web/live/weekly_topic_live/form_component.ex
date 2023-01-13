@@ -21,7 +21,7 @@ defmodule OurExperienceWeb.WeeklyTopicLive.FormComponent do
         phx-submit="save"
       >
         <.input field={{f, :title}} type="text" label="title" />
-        <.input field={{f, :content}} type="textarea" label="content" />
+        <.input field={{f, :content}} type="textarea" style="overflow:scroll; min-height:50vh" label="content" />
         <.input field={{f, :default_position}} type="number" label="default_position" />
         <.input field={{f, :default_active_status}} type="checkbox" label="default_active_status" />
         <:actions>

@@ -7,9 +7,9 @@
   </:actions>
 </.header>
 
-<.table id="weekly_topics" rows={@weekly_topics} row_click={&JS.navigate(~p"/admin/weekly_topics/#{&1}")}>
+<.table id="weekly_topics" rows={@weekly_topics} row_click={&JS.navigate(~p"/admin/weekly_topics/#{&1}")} >
   <:col :let={weekly_topic} label="Title"><%= weekly_topic.title %></:col>
-  <:col :let={weekly_topic} label="Content"><%= weekly_topic.content %></:col>
+  <:col :let={weekly_topic} label="Content"><pre style="white-space:pre-wrap; min-width:500px;max-height:40vh; overflow:scroll;"><%= weekly_topic.content %></pre></:col>
   <:col :let={weekly_topic} label="Default position"><%= weekly_topic.default_position %></:col>
   <:col :let={weekly_topic} label="Default active status"><%= weekly_topic.default_active_status %></:col>
   <:action :let={weekly_topic}>
