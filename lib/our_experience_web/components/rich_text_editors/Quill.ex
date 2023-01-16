@@ -100,9 +100,9 @@ defmodule OurExperienceWeb.RichTextEditors.Quill do
     |> Enum.map(fn row -> Jason.encode!(row.data) end)
   end
 
-  defp getQuill(listX, id) do
-    listX
-    |> Enum.filter(&(&1.id == id))
-    |> Enum.map(fn row -> row.data end)
-  end
+  # defp getQuill(listX, id) do
+  #   listX
+  #   |> Enum.filter(&(&1.id == id))
+  #   |> Enum.map(fn row -> row.data end)
+  # end
 end

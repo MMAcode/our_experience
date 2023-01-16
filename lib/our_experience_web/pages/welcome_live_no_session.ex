@@ -3,7 +3,7 @@ defmodule OurExperienceWeb.Pages.WelcomeLiveNoSession do
   on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
   # on_mount {OurExperienceWeb.Auth.AuthForLive, :matchThisInner}
 
-  def mount(_params, session, socket) do
+  def mount(_params, _session, socket) do
     # {:ok, assign(socket, :current_user,  Map.get(session, "current_user"))}
     {:ok, socket}
   end

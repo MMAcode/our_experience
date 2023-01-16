@@ -4,6 +4,8 @@ defmodule OurExperienceWeb.MiroComponents do
   # minimum level to view this content
   attr :minimum_admin_level, :integer, default: 1000
 
+  slot :inner_block
+  attr :current_user, :map, required: true
   def admin_level(assigns) do
     current_user_admin_level =
       case assigns[:current_user][:admin_level] do

@@ -7,6 +7,7 @@ defmodule OurExperience.U_Strategies.U_Strategy do
   schema "u_strategies" do
     # field :strategy_id, :id
     # field :user_id, :id
+    field :status, :string  # "on", "off" ("archived")
 
     belongs_to :user, User
     belongs_to :strategy, Strategy

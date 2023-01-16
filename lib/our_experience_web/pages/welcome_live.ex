@@ -2,6 +2,7 @@ defmodule OurExperienceWeb.Pages.WelcomeLive do
   use OurExperienceWeb, :live_view
   alias OurExperienceWeb.Pages.Public.Intro.InformationTexts
   alias OurExperienceWeb.MiroComponents
+  alias OurExperience.CONSTANTS
   # on_mount {OurExperienceWeb.Auth.AuthForLive, :matchThisInner}
   on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
 
@@ -19,7 +20,7 @@ defmodule OurExperienceWeb.Pages.WelcomeLive do
     <MiroComponents.admin_level current_user={@current_user}>
      <.link patch={~p"/admin/weekly_topics/"}>
       <.button>weekly_topics</.button>
-    </.link>
+     </.link>
             <%!-- <.back navigate={~p"/admin/weekly_topics"}>Weekly_topics</.back> --%>
     </MiroComponents.admin_level>
     <InformationTexts.introduction/>

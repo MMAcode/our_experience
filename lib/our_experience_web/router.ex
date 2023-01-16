@@ -122,7 +122,7 @@ end
   end
 
   def fetch_current_user_or_nil(conn, _opts) do
-    dbg(["fetch_current_user_or_nil plug running; user from conn.session: ", get_session(conn, :current_user)])
+    # dbg(["fetch_current_user_or_nil plug running; user from conn.session: ", get_session(conn, :current_user)])
     user = get_session(conn, :current_user)
     assign(conn, :current_user, user)
   end

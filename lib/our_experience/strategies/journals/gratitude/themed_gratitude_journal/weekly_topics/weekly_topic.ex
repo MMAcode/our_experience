@@ -3,10 +3,13 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.Wee
   import Ecto.Changeset
 
   schema "weekly_topics" do
-    field :content, :string
     field :default_active_status, :boolean, default: false
     field :default_position, :integer
     field :title, :string
+    field :summary, :string
+    field :introduction, :string
+    field :day_by_day_instructions, :string
+    field :content, :string
 
     timestamps()
   end
