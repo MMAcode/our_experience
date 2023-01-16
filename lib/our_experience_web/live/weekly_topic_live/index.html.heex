@@ -9,7 +9,10 @@
 
 <.table id="weekly_topics" rows={@weekly_topics} row_click={&JS.navigate(~p"/admin/weekly_topics/#{&1}")} >
   <:col :let={weekly_topic} label="Title"><%= weekly_topic.title %></:col>
+  <:col :let={weekly_topic} label="Summary"><pre style="white-space:pre-wrap; min-width:500px;max-height:40vh; overflow:scroll;"><%= weekly_topic.summary %></pre></:col>
+  <:col :let={weekly_topic} label="Introduction"><pre style="white-space:pre-wrap; min-width:500px;max-height:40vh; overflow:scroll;"><%= weekly_topic.introduction %></pre></:col>
   <:col :let={weekly_topic} label="Content"><pre style="white-space:pre-wrap; min-width:500px;max-height:40vh; overflow:scroll;"><%= weekly_topic.content %></pre></:col>
+  <:col :let={weekly_topic} label="Day_by_day_instructions"><pre style="white-space:pre-wrap; min-width:500px;max-height:40vh; overflow:scroll;"><%= weekly_topic.day_by_day_instructions %></pre></:col>
   <:col :let={weekly_topic} label="Default position"><%= weekly_topic.default_position %></:col>
   <:col :let={weekly_topic} label="Default active status"><%= weekly_topic.default_active_status %></:col>
   <:action :let={weekly_topic}>
