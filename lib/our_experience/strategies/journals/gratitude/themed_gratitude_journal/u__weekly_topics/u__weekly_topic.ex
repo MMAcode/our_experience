@@ -1,12 +1,15 @@
 defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopics.U_WeeklyTopic do
+  alias OurExperience.U_Strategies.U_Strategy
+  alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopics.WeeklyTopic
   use Ecto.Schema
   import Ecto.Changeset
 
   schema "u_weekly_topics" do
     field :active, :boolean, default: false
     field :position, :integer
-    field :u_strategy_id, :id
-    field :weekly_topic_id, :id
+
+    belongs_to :u_strategy, U_Strategy
+    belongs_to :weekly_topic, WeeklyTopic
 
     timestamps()
   end

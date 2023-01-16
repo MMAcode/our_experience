@@ -12,6 +12,9 @@ defmodule OurExperience.U_Strategies.U_Strategy do
     belongs_to :user, User
     belongs_to :strategy, Strategy
 
+    # only u_strategies about gratitude journal:
+    # has_many :u_weekly_topics, U_WeeklyTopic
+
     timestamps()
   end
 

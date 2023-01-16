@@ -1,4 +1,5 @@
 defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopics.WeeklyTopic do
+  alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopics.U_WeeklyTopic
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -10,6 +11,8 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.Wee
     field :introduction, :string
     field :day_by_day_instructions, :string
     field :content, :string
+
+    has_many :u_weekly_topics, U_WeeklyTopic
 
     timestamps()
   end
