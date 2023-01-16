@@ -1,0 +1,27 @@
+<.header>
+  U  weekly topic <%= @u__weekly_topic.id %>
+  <:subtitle>This is a u__weekly_topic record from your database.</:subtitle>
+  <:actions>
+    <.link patch={~p"/#{@base_path}/u_weekly_topics/#{@u__weekly_topic}/show/edit"} phx-click={JS.push_focus()}>
+      <.button>Edit u__weekly_topic</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Position"><%= @u__weekly_topic.position %></:item>
+  <:item title="Active"><%= @u__weekly_topic.active %></:item>
+</.list>
+
+<.back navigate={~p"/#{@base_path}/u_weekly_topics"}>Back to u_weekly_topics</.back>
+
+<.modal :if={@live_action == :edit} id="u__weekly_topic-modal" show on_cancel={JS.patch(~p"/#{@base_path}/u_weekly_topics/#{@u__weekly_topic}")}>
+  <.live_component
+    module={OurExperienceWeb.U_WeeklyTopicLive.FormComponent}
+    id={@u__weekly_topic.id}
+    title={@page_title}
+    action={@live_action}
+    u__weekly_topic={@u__weekly_topic}
+    navigate={~p"/#{@base_path}/u_weekly_topics/#{@u__weekly_topic}"}
+  />
+</.modal>

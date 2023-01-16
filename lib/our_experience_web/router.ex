@@ -26,10 +26,16 @@ defmodule OurExperienceWeb.Router do
     get "/orig", PageController, :home
   end
 
-  scope "/private", OurExperienceWeb do
+  scope "/my_experience", OurExperienceWeb do
     pipe_through [:browser, :secure]
     live "/", Pages.WelcomePrivateLiveNoSession  # does pipe through plugs
     live "/quill", RichTextEditors.Quill
+
+    live "/u_weekly_topics", U_WeeklyTopicLive.Index, :index
+    # live "/u_weekly_topics/new", U_WeeklyTopicLive.Index, :new
+    live "/u_weekly_topics/:id/edit", U_WeeklyTopicLive.Index, :edit
+    live "/u_weekly_topics/:id", U_WeeklyTopicLive.Show, :show
+    live "/u_weekly_topics/:id/show/edit", U_WeeklyTopicLive.Show, :edit
   end
 
   scope "/admin", OurExperienceWeb do

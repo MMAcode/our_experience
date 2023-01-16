@@ -4,4 +4,10 @@ defmodule OurExperience.CONSTANTS do
         on: "on",
         off: "off"}}
   end
+
+  def url_paths() do
+    %{base_for: %{
+      u_weekly_topics: "my_experience"
+    }}
+  end
 end
