@@ -21,6 +21,12 @@ defmodule OurExperienceWeb.Pages.WelcomeLive do
      <.link patch={~p"/admin/weekly_topics/"}>
       <.button>weekly_topics</.button>
      </.link>
+    <.link patch={~p"/my_experience/u_weekly_topics/"}>
+      <.button>weekly_topics</.button>
+     </.link>
+     my_experience/u_weekly_topics
+
+
             <%!-- <.back navigate={~p"/admin/weekly_topics"}>Weekly_topics</.back> --%>
     </MiroComponents.admin_level>
     <InformationTexts.introduction/>

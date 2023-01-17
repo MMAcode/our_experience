@@ -18,7 +18,9 @@ defmodule OurExperienceWeb.Pages.WelcomePrivateLiveNoSession do
       <p class="">(Created by Miroslav Makarov)</p>
       <br/>
       <p>...work in progress...</p>
-      <p> This is private live page without live session wrapper</p>
+    <.link patch={~p"/my_experience/u_weekly_topics/"}>
+      <.button>weekly_topics</.button>
+     </.link>
       <h3> current user:
       <%= if (@current_user != nil), do: @current_user.email, else: "no user" %>
       </h3>
