@@ -22,5 +22,6 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.Wee
     weekly_topic
     |> cast(attrs, [:title, :content, :default_position, :default_active_status])
     |> validate_required([:title, :content, :default_position, :default_active_status])
+    |> unique_constraint([:default_position])
   end
 end
