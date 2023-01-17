@@ -18,13 +18,13 @@
       <li>
         <a
           href="/"
-          class="rounded-lg bg-zinc-100 px-2 py-1 text-[0.8125rem] font-semibold leading-6 text-zinc-900 hover:bg-zinc-200/80 active:text-zinc-900/70"
+          class="nav_button"
         >
           Home <span aria-hidden="true">&rarr;</span>
         </a>
       </li>
       <%= if @current_user do %>
-        <li><a href="/my_experience">Personal</a></li>
+        <li><a class="nav_button" href="/my_experience">My Home &rarr;</a></li>
         <li>you are logged in as <%= @current_user.email %></li>
         <li class="active"><a href="/auth/logout">Logout</a></li>
       <% else %>
