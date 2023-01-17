@@ -2,8 +2,6 @@ defmodule OurExperienceWeb.Pages.WelcomeLive do
   use OurExperienceWeb, :live_view
   alias OurExperienceWeb.Pages.Public.Intro.InformationTexts
   alias OurExperienceWeb.MiroComponents
-  alias OurExperience.CONSTANTS
-  # on_mount {OurExperienceWeb.Auth.AuthForLive, :matchThisInner}
   on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
 
   def mount(_params, _session, socket) do
