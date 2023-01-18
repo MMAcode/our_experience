@@ -5,6 +5,9 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.GJ_texts do
       ~H"""
       <h2>Gratitude Journal</h2>
       intro to Gratitude journal to be written
+      <%!-- <.link patch={~p"/strategies/themed_gratitude_journal"}>
+      <.button>Read more about Themed Gratitude Journal</.button>
+     </.link> --%>
       """
     end
 

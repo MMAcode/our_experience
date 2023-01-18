@@ -36,6 +36,12 @@ defmodule OurExperienceWeb.Router do
     live "/u_weekly_topics/:id/edit", U_WeeklyTopicLive.Index, :edit
     live "/u_weekly_topics/:id", U_WeeklyTopicLive.Show, :show
     live "/u_weekly_topics/:id/show/edit", U_WeeklyTopicLive.Show, :edit
+
+
+    scope "/strategies/themed_gratitude_journal", Pages.GratitudeJournal do
+      live "/u_weekly_topics", UWeeklyTopics.Index
+    end
+    # /my_experience/strategies/themed_gratitude_journal/weekly_topics
   end
 
   scope "/admin", OurExperienceWeb do

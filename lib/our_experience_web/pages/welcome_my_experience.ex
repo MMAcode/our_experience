@@ -26,10 +26,10 @@ defmodule OurExperienceWeb.Pages.WelcomeMyExperience do
       <%!-- <h3> current user: --%>
       <%!-- <%= if (@current_user != nil), do: @current_user.email, else: "no user" %> --%>
       <%!-- </h3> --%>
-<br/>
-
-
-
+    <br/>
+    <.link patch={~p"/my_experience/strategies/themed_gratitude_journal/u_weekly_topics"}>
+      <.button>Start using <strong> Themed Gratitude Journal </strong> </.button>
+     </.link>
     </div>
     """
   end
