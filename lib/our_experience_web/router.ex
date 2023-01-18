@@ -28,7 +28,7 @@ defmodule OurExperienceWeb.Router do
 
   scope "/my_experience", OurExperienceWeb do
     pipe_through [:browser, :secure]
-    live "/", Pages.WelcomePrivateLiveNoSession  # does pipe through plugs
+    live "/", Pages.WelcomeMyExperience  # does pipe through plugs
     live "/quill", RichTextEditors.Quill
 
     live "/u_weekly_topics", U_WeeklyTopicLive.Index, :index

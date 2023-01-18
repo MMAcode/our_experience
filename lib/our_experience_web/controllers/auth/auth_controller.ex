@@ -88,7 +88,7 @@ defmodule OurExperienceWeb.Auth.AuthController do
         # |> put_flash(:info, "Successfully authenticated as " <> user.name <> ".")
         |> put_session(:current_user, user)
         # |> configure_session(renew: true)
-        |> redirect(to: "/")
+        |> redirect(to: "/my_experience")
 
       {:error, reason} ->
         conn

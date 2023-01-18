@@ -1,4 +1,4 @@
-defmodule OurExperienceWeb.Pages.WelcomePrivateLiveNoSession do
+defmodule OurExperienceWeb.Pages.WelcomeMyExperience do
   use OurExperienceWeb, :live_view
 
   # on_mount {OurExperienceWeb.Auth.AuthForLive, :matchThisInner}
