@@ -19,7 +19,7 @@ defmodule OurExperienceWeb.Pages.WelcomeMyExperience do
       <p class="">(Created by Miroslav Makarov)</p>
       <br/>
       <p>...work in progress...</p>
-    <.link patch={~p"/my_experience/u_weekly_topics/"}>
+    <.link navigate={~p"/my_experience/u_weekly_topics/"}>
       <.button>My weekly_topics</.button>
      </.link>
 
@@ -27,7 +27,7 @@ defmodule OurExperienceWeb.Pages.WelcomeMyExperience do
       <%!-- <%= if (@current_user != nil), do: @current_user.email, else: "no user" %> --%>
       <%!-- </h3> --%>
     <br/>
-    <.link patch={~p"/my_experience/strategies/themed_gratitude_journal/u_weekly_topics"}>
+    <.link navigate={~p"/my_experience/strategies/themed_gratitude_journal/u_weekly_topics"}>
       <.button>Start using <strong> Themed Gratitude Journal </strong> </.button>
      </.link>
     </div>
