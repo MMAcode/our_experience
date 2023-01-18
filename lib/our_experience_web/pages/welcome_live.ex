@@ -20,7 +20,7 @@ defmodule OurExperienceWeb.Pages.WelcomeLive do
       <.button>weekly_topics</.button>
      </.link>
     <.link patch={~p"/my_experience/u_weekly_topics/"}>
-      <.button>weekly_topics</.button>
+      <.button>My weekly_topics</.button>
      </.link>
      my_experience/u_weekly_topics
 

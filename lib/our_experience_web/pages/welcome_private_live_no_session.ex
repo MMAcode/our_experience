@@ -19,7 +19,7 @@ defmodule OurExperienceWeb.Pages.WelcomePrivateLiveNoSession do
       <br/>
       <p>...work in progress...</p>
     <.link patch={~p"/my_experience/u_weekly_topics/"}>
-      <.button>weekly_topics</.button>
+      <.button>My weekly_topics</.button>
      </.link>
       <h3> current user:
       <%= if (@current_user != nil), do: @current_user.email, else: "no user" %>
