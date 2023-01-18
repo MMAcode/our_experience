@@ -1,5 +1,6 @@
 defmodule OurExperienceWeb.Pages.WelcomeMyExperience do
   use OurExperienceWeb, :live_view
+  alias OurExperienceWeb.Pages.GratitudeJournal.GJ_texts
 
   # on_mount {OurExperienceWeb.Auth.AuthForLive, :matchThisInner}
 
@@ -21,9 +22,13 @@ defmodule OurExperienceWeb.Pages.WelcomeMyExperience do
     <.link patch={~p"/my_experience/u_weekly_topics/"}>
       <.button>My weekly_topics</.button>
      </.link>
-      <h3> current user:
-      <%= if (@current_user != nil), do: @current_user.email, else: "no user" %>
-      </h3>
+
+      <%!-- <h3> current user: --%>
+      <%!-- <%= if (@current_user != nil), do: @current_user.email, else: "no user" %> --%>
+      <%!-- </h3> --%>
+<br/>
+
+
 
     </div>
     """

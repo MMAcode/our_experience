@@ -1,6 +1,7 @@
 defmodule OurExperienceWeb.Pages.WelcomeLive do
   use OurExperienceWeb, :live_view
   alias OurExperienceWeb.Pages.Public.Intro.InformationTexts
+  alias OurExperienceWeb.Pages.GratitudeJournal.GJ_texts
   alias OurExperienceWeb.MiroComponents
   on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
 
@@ -28,6 +29,7 @@ defmodule OurExperienceWeb.Pages.WelcomeLive do
             <%!-- <.back navigate={~p"/admin/weekly_topics"}>Weekly_topics</.back> --%>
     </MiroComponents.admin_level>
     <InformationTexts.introduction/>
+    <GJ_texts.public_introduction/>
     """
   end
 end
