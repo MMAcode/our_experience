@@ -6,16 +6,10 @@ defmodule OurExperience.U_Strategies.U_Strategy do
   import Ecto.Changeset
 
   schema "u_strategies" do
-    # field :strategy_id, :id
-    # field :user_id, :id
-    # "on", "off" ("archived")
-    field :status, :string
+    field :status, :string     # "on", "off" ("archived")
 
     belongs_to :user, User
     belongs_to :strategy, Strategy
-
-    # only u_strategies about gratitude journal:
-    # has_many :u_weekly_topics, U_WeeklyTopic
 
     timestamps()
   end

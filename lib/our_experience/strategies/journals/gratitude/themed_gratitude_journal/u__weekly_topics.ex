@@ -55,6 +55,13 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_W
     |> Repo.insert()
   end
 
+  # TODO:
+  # def create_u__weekly_topic_for_user_with_id(attrs \\ %{}) do
+  #   %U_WeeklyTopic{}
+  #   |> U_WeeklyTopic.changeset(attrs)
+  #   |> Repo.insert()
+  # end
+
   @doc """
   Updates a u__weekly_topic.
 

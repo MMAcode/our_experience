@@ -36,6 +36,7 @@ defmodule OurExperience.Strategies do
 
   """
   def get_strategy!(id), do: Repo.get!(Strategy, id)
+  def get_strategy_by_name(name), do: Repo.get_by(Strategy, name: name)
 
   @doc """
   Creates a strategy.

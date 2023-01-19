@@ -74,7 +74,7 @@ defmodule OurExperienceWeb.Auth.Ueberauth.UserFromAuth do
 
     # dbg(["miromm", user])
     # %{id: auth.uid, name: name_from_auth(auth), avatar: avatar_from_auth(auth), email: email}
-    %{id: user.id, email: user.email, admin_level: user.admin_level}
+    user
   end
 
   # defp name_from_auth(auth) do

@@ -17,5 +17,6 @@ defmodule OurExperience.Strategies.Strategy do
     strategy
     |> cast(attrs, [:name])
     |> validate_required([:name])
+    |> unique_constraint([:name])
   end
 end

@@ -20,3 +20,7 @@ h4{
 h5{
   @apply text-xl;
 }
+
+button {
+  @apply m-2
+}

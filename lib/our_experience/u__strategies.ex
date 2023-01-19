@@ -4,6 +4,7 @@ defmodule OurExperience.U_Strategies do
   """
 
   import Ecto.Query, warn: false
+  alias OurExperience.CONSTANTS
   alias OurExperience.Repo
 
   alias OurExperience.U_Strategies.U_Strategy
@@ -36,6 +37,7 @@ defmodule OurExperience.U_Strategies do
 
   """
   def get_u__strategy!(id), do: Repo.get!(U_Strategy, id)
+  def get_active_u_strategy_by_user_id(id), do: Repo.get_by(U_Strategy, [status: CONSTANTS.u_strategies.status.on])
 
   @doc """
   Creates a u__strategy.

@@ -1,13 +1,17 @@
 defmodule OurExperienceWeb.Pages.WelcomeMyExperience do
   use OurExperienceWeb, :live_view
-  alias OurExperienceWeb.Pages.GratitudeJournal.GJ_texts
+  alias OurExperience.Strategies
+  alias OurExperience.CONSTANTS
+  alias OurExperience.Repo
+  alias OurExperience.U_Strategies
+  alias OurExperience.U_Strategies.U_Strategy
 
   # on_mount {OurExperienceWeb.Auth.AuthForLive, :matchThisInner}
 
   def mount(_params, session, socket) do
     user = Map.get(session, "current_user")
     dbg(["user in private live mount: ", user])
-    {:ok, assign(socket, :current_user, Map.get(session, "current_user"))}
+    {:ok, assign(socket, :current_user,  Map.get(session, "current_user"))}
     # {:ok, socket}
   end
 
@@ -26,18 +30,16 @@ defmodule OurExperienceWeb.Pages.WelcomeMyExperience do
       <%!-- <h3> current user: --%>
       <%!-- <%= if (@current_user != nil), do: @current_user.email, else: "no user" %> --%>
       <%!-- </h3> --%>
-      <br />
-      <%!-- <.link navigate={~p"/my_experience/strategies/themed_gratitude_journal/u_weekly_topics"}> --%>
-      <.button phx-click="start-gratitude-journal">
-        Start using <strong> Themed Gratitude Journal </strong>
-      </.button>
-      <%!-- </.link> --%>
+    <br/>
+    <%!-- <.link navigate={~p"/my_experience/strategies/themed_gratitude_journal/u_weekly_topics"}> --%>
+      <.button phx-click="start-gratitude-journal">Start using <strong> Themed Gratitude Journal </strong> </.button>
+     <%!-- </.link> --%>
     </div>
     """
   end
 
   def handle_event("start-gratitude-journal", _attrs, socket) do
-    dbg(["hiio", socket.assigns.current_user])
+    dbg ["hiio", socket.assigns.current_user]
 
     {:noreply, socket}
   end
