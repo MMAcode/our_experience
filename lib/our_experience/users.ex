@@ -55,7 +55,7 @@ defmodule OurExperience.Users do
   #   |> User.changeset(attrs)
   #   |> Repo.insert()
   # end
-    def create_user(email) do
+  def create_user(email) do
     %User{}
     |> User.changeset(%{email: email})
     |> Repo.insert()

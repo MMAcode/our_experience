@@ -17,19 +17,17 @@ defmodule OurExperienceWeb.Pages.WelcomeLive do
       <p>...work in progress...</p>
     </div>
     <MiroComponents.admin_level current_user={@current_user}>
-     <.link navigate={~p"/admin/weekly_topics/"}>
-      <.button>weekly_topics</.button>
-     </.link>
-    <.link navigate={~p"/my_experience/u_weekly_topics/"}>
-      <.button>My weekly_topics</.button>
-     </.link>
-     my_experience/u_weekly_topics
-
-
-            <%!-- <.back navigate={~p"/admin/weekly_topics"}>Weekly_topics</.back> --%>
+      <.link navigate={~p"/admin/weekly_topics/"}>
+        <.button>weekly_topics</.button>
+      </.link>
+      <.link navigate={~p"/my_experience/u_weekly_topics/"}>
+        <.button>My weekly_topics</.button>
+      </.link>
+      my_experience/u_weekly_topics
+      <%!-- <.back navigate={~p"/admin/weekly_topics"}>Weekly_topics</.back> --%>
     </MiroComponents.admin_level>
-    <InformationTexts.introduction/>
-    <GJ_texts.public_introduction/>
+    <InformationTexts.introduction />
+    <GJ_texts.public_introduction />
     """
   end
 end

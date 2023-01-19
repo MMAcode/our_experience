@@ -6,6 +6,7 @@ defmodule OurExperienceWeb.MiroComponents do
 
   slot :inner_block
   attr :current_user, :map, required: true
+
   def admin_level(assigns) do
     current_user_admin_level =
       case assigns[:current_user][:admin_level] do

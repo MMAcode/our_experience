@@ -1,7 +1,7 @@
 defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopics.WeeklyTopic do
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopics.U_WeeklyTopic
   use Ecto.Schema
-    use StructAccess
+  use StructAccess
 
   import Ecto.Changeset
 

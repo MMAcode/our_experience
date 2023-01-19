@@ -34,12 +34,16 @@ defmodule OurExperience.U_StrategiesTest do
       u__strategy = u__strategy_fixture()
       update_attrs = %{}
 
-      assert {:ok, %U_Strategy{} = u__strategy} = U_Strategies.update_u__strategy(u__strategy, update_attrs)
+      assert {:ok, %U_Strategy{} = u__strategy} =
+               U_Strategies.update_u__strategy(u__strategy, update_attrs)
     end
 
     test "update_u__strategy/2 with invalid data returns error changeset" do
       u__strategy = u__strategy_fixture()
-      assert {:error, %Ecto.Changeset{}} = U_Strategies.update_u__strategy(u__strategy, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               U_Strategies.update_u__strategy(u__strategy, @invalid_attrs)
+
       assert u__strategy == U_Strategies.get_u__strategy!(u__strategy.id)
     end
 

@@ -14,18 +14,15 @@
       </p>
     </div> --%>
     <ul class="flex items-center gap-4">
-    <%!-- <li>current url: <%= @conn.request_path%> </li> --%>
+      <%!-- <li>current url: <%= @conn.request_path%> </li> --%>
       <li>
-        <a
-          href="/"
-          class="nav_button"
-        >
+        <a href="/" class="nav_button">
           Home <span aria-hidden="true">&rarr;</span>
         </a>
       </li>
       <%= if @current_user do %>
         <li><a class="nav_button" href="/my_experience">My Home &rarr;</a></li>
-        <li>you are logged in as <%= String.slice(@current_user.email,0..8) %>...</li>
+        <li>you are logged in as <%= String.slice(@current_user.email, 0..8) %>...</li>
         <li class="active"><a href="/auth/logout">Logout</a></li>
       <% else %>
         <li><a href="/auth/auth0">Login/Register</a></li>

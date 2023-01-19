@@ -19,16 +19,18 @@ defmodule OurExperienceWeb.Router do
     plug :accepts, ["json"]
   end
 
-    #  get "/orig", OurExperienceWeb.PageController, :home   # probably not allowed 'out of scope'
+  #  get "/orig", OurExperienceWeb.PageController, :home   # probably not allowed 'out of scope'
   scope "/", OurExperienceWeb do
     pipe_through :browser
-    live "/", Pages.WelcomeLive  # does pipe through plugs
+    # does pipe through plugs
+    live "/", Pages.WelcomeLive
     get "/orig", PageController, :home
   end
 
   scope "/my_experience", OurExperienceWeb do
     pipe_through [:browser, :secure]
-    live "/", Pages.WelcomeMyExperience  # does pipe through plugs
+    # does pipe through plugs
+    live "/", Pages.WelcomeMyExperience
     live "/quill", RichTextEditors.Quill
 
     live "/u_weekly_topics", U_WeeklyTopicLive.Index, :index
@@ -37,10 +39,10 @@ defmodule OurExperienceWeb.Router do
     live "/u_weekly_topics/:id", U_WeeklyTopicLive.Show, :show
     live "/u_weekly_topics/:id/show/edit", U_WeeklyTopicLive.Show, :edit
 
-
     scope "/strategies/themed_gratitude_journal", Pages.GratitudeJournal do
       live "/u_weekly_topics", UWeeklyTopics.Index
     end
+
     # /my_experience/strategies/themed_gratitude_journal/weekly_topics
   end
 
@@ -51,18 +53,18 @@ defmodule OurExperienceWeb.Router do
     live "/weekly_topics/:id/edit", WeeklyTopicLive.Index, :edit
     live "/weekly_topics/:id", WeeklyTopicLive.Show, :show
     live "/weekly_topics/:id/show/edit", WeeklyTopicLive.Show, :edit
-end
+  end
 
-  scope "/live" do #live but not session
-   pipe_through :browser
-   live "/ls", OurExperienceWeb.Pages.WelcomeLive
+  # live but not session
+  scope "/live" do
+    pipe_through :browser
+    live "/ls", OurExperienceWeb.Pages.WelcomeLive
   end
 
   live_session :dummy,
     root_layout: {OurExperienceWeb.Layouts, :root},
     # root_layout: {OurExperienceWeb.Layouts, :app},
-    on_mount: {AuthForLive, :matchThis}
-    do
+    on_mount: {AuthForLive, :matchThis} do
     # pipe_through :browser
 
     live "/ls", OurExperienceWeb.Pages.WelcomeLive
@@ -106,7 +108,9 @@ end
     dbg(["secure plug running; user from conn.session:", user])
 
     case user do
-      nil -> to_auth(conn)
+      nil ->
+        to_auth(conn)
+
       _ ->
         assign(conn, :current_user, user)
     end
@@ -115,22 +119,24 @@ end
   def admin_only(conn, _params) do
     case conn.assigns[:current_user][:admin_level] do
       nil ->
-            dbg ["admin_only f :current_user:", conn.assigns[:current_user]]
-            to_auth(conn)
-      level -> if level < 1000, do: to_home(conn), else: conn
+        dbg(["admin_only f :current_user:", conn.assigns[:current_user]])
+        to_auth(conn)
+
+      level ->
+        if level < 1000, do: to_home(conn), else: conn
     end
   end
 
   defp to_auth(conn) do
-        conn
-        |> redirect(to: "/auth/auth0")
-        |> halt
+    conn
+    |> redirect(to: "/auth/auth0")
+    |> halt
   end
 
   defp to_home(conn) do
-        conn
-        |> redirect(to: "/")
-        |> halt
+    conn
+    |> redirect(to: "/")
+    |> halt
   end
 
   def fetch_current_user_or_nil(conn, _opts) do
@@ -138,5 +144,4 @@ end
     user = get_session(conn, :current_user)
     assign(conn, :current_user, user)
   end
-
 end

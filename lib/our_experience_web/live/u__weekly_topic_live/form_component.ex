@@ -55,7 +55,10 @@ defmodule OurExperienceWeb.U_WeeklyTopicLive.FormComponent do
   end
 
   defp save_u__weekly_topic(socket, :edit, u__weekly_topic_params) do
-    case U_WeeklyTopics.update_u__weekly_topic(socket.assigns.u__weekly_topic, u__weekly_topic_params) do
+    case U_WeeklyTopics.update_u__weekly_topic(
+           socket.assigns.u__weekly_topic,
+           u__weekly_topic_params
+         ) do
       {:ok, _u__weekly_topic} ->
         {:noreply,
          socket

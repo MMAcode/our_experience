@@ -11,8 +11,7 @@ config :our_experience,
   ecto_repos: [OurExperience.Repo]
 
 # Miro config
-config :our_experience, Miro,
-  logout_url: "http://localhost:4025"
+config :our_experience, Miro, logout_url: "http://localhost:4025"
 
 # Configures the endpoint
 config :our_experience, OurExperienceWeb.Endpoint,
@@ -63,16 +62,14 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-
 # Configures Ueberauth
 config :ueberauth, Ueberauth,
   providers: [
-    auth0: { Ueberauth.Strategy.Auth0, [] },
+    auth0: {Ueberauth.Strategy.Auth0, []}
     # auth0: { Ueberauth.Strategy.Auth0, [callback_path: "/"] },
   ]
+
 import_config "secrets/auth0.secret.exs"
-
-
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

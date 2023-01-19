@@ -2,14 +2,18 @@ defmodule OurExperienceWeb.U_WeeklyTopicLive.Index do
   use OurExperienceWeb, :live_view
   alias OurExperience.CONSTANTS
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopics
+
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopics.U_WeeklyTopic
+
   on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
 
   @impl true
   def mount(_params, _session, socket) do
-    dbg CONSTANTS.url_paths.base_for.u_weekly_topics
-    {:ok, assign(socket, :u_weekly_topics, list_u_weekly_topics())
-    |> assign(:base_path, CONSTANTS.url_paths.base_for.u_weekly_topics)}
+    dbg(CONSTANTS.url_paths().base_for.u_weekly_topics)
+
+    {:ok,
+     assign(socket, :u_weekly_topics, list_u_weekly_topics())
+     |> assign(:base_path, CONSTANTS.url_paths().base_for.u_weekly_topics)}
   end
 
   @impl true

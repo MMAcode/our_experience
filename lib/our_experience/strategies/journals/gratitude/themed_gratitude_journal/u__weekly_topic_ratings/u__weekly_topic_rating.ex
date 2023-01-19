@@ -4,15 +4,15 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_W
   import Ecto.Changeset
   alias OurExperience.Users.User
   alias OurExperience.U_Strategies.U_Strategy
-  alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopics.WeeklyTopic
-  alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopics.U_WeeklyTopic
 
+  alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopics.WeeklyTopic
+
+  alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopics.U_WeeklyTopic
 
   schema "u_weekly_topic_ratings" do
     field :after_first_view, :map
     field :after_first_week, :map
     field :manual_activations, :map
-
 
     belongs_to :user, User
     belongs_to :u_strategy, U_Strategy
@@ -26,6 +26,7 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_W
   def changeset(u__weekly_topic_rating, attrs) do
     u__weekly_topic_rating
     |> cast(attrs, [:after_first_view, :after_first_week, :manual_activations])
+
     # |> validate_required([:after_first_view, :after_first_week, :manual_activations])
   end
 end

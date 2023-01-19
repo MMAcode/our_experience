@@ -4,8 +4,18 @@ defmodule OurExperienceWeb.WeeklyTopicLiveTest do
   import Phoenix.LiveViewTest
   import OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopicsFixtures
 
-  @create_attrs %{content: "some content", default_active_status: true, default_position: 42, title: "some title"}
-  @update_attrs %{content: "some updated content", default_active_status: false, default_position: 43, title: "some updated title"}
+  @create_attrs %{
+    content: "some content",
+    default_active_status: true,
+    default_position: 42,
+    title: "some title"
+  }
+  @update_attrs %{
+    content: "some updated content",
+    default_active_status: false,
+    default_position: 43,
+    title: "some updated title"
+  }
   @invalid_attrs %{content: nil, default_active_status: false, default_position: nil, title: nil}
 
   defp create_weekly_topic(_) do
@@ -48,7 +58,9 @@ defmodule OurExperienceWeb.WeeklyTopicLiveTest do
     test "updates weekly_topic in listing", %{conn: conn, weekly_topic: weekly_topic} do
       {:ok, index_live, _html} = live(conn, ~p"/admin/weekly_topics")
 
-      assert index_live |> element("#weekly_topics-#{weekly_topic.id} a", "Edit") |> render_click() =~
+      assert index_live
+             |> element("#weekly_topics-#{weekly_topic.id} a", "Edit")
+             |> render_click() =~
                "Edit Weekly topic"
 
       assert_patch(index_live, ~p"/admin/weekly_topics/#{weekly_topic}/edit")
@@ -70,7 +82,10 @@ defmodule OurExperienceWeb.WeeklyTopicLiveTest do
     test "deletes weekly_topic in listing", %{conn: conn, weekly_topic: weekly_topic} do
       {:ok, index_live, _html} = live(conn, ~p"/admin/weekly_topics")
 
-      assert index_live |> element("#weekly_topics-#{weekly_topic.id} a", "Delete") |> render_click()
+      assert index_live
+             |> element("#weekly_topics-#{weekly_topic.id} a", "Delete")
+             |> render_click()
+
       refute has_element?(index_live, "#weekly_topic-#{weekly_topic.id}")
     end
   end

@@ -6,7 +6,7 @@ defmodule OurExperienceWeb.U_WeeklyTopicLive.Show do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, :base_path, CONSTANTS.url_paths.base_for.u_weekly_topics)}
+    {:ok, assign(socket, :base_path, CONSTANTS.url_paths().base_for.u_weekly_topics)}
   end
 
   @impl true

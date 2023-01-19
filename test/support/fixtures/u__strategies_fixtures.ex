@@ -10,9 +10,7 @@ defmodule OurExperience.U_StrategiesFixtures do
   def u__strategy_fixture(attrs \\ %{}) do
     {:ok, u__strategy} =
       attrs
-      |> Enum.into(%{
-
-      })
+      |> Enum.into(%{})
       |> OurExperience.U_Strategies.create_u__strategy()
 
     u__strategy

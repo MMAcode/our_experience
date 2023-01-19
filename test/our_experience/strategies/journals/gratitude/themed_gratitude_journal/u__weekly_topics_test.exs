@@ -23,7 +23,9 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_W
     test "create_u__weekly_topic/1 with valid data creates a u__weekly_topic" do
       valid_attrs = %{active: true, position: 42}
 
-      assert {:ok, %U_WeeklyTopic{} = u__weekly_topic} = U_WeeklyTopics.create_u__weekly_topic(valid_attrs)
+      assert {:ok, %U_WeeklyTopic{} = u__weekly_topic} =
+               U_WeeklyTopics.create_u__weekly_topic(valid_attrs)
+
       assert u__weekly_topic.active == true
       assert u__weekly_topic.position == 42
     end
@@ -36,21 +38,29 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_W
       u__weekly_topic = u__weekly_topic_fixture()
       update_attrs = %{active: false, position: 43}
 
-      assert {:ok, %U_WeeklyTopic{} = u__weekly_topic} = U_WeeklyTopics.update_u__weekly_topic(u__weekly_topic, update_attrs)
+      assert {:ok, %U_WeeklyTopic{} = u__weekly_topic} =
+               U_WeeklyTopics.update_u__weekly_topic(u__weekly_topic, update_attrs)
+
       assert u__weekly_topic.active == false
       assert u__weekly_topic.position == 43
     end
 
     test "update_u__weekly_topic/2 with invalid data returns error changeset" do
       u__weekly_topic = u__weekly_topic_fixture()
-      assert {:error, %Ecto.Changeset{}} = U_WeeklyTopics.update_u__weekly_topic(u__weekly_topic, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               U_WeeklyTopics.update_u__weekly_topic(u__weekly_topic, @invalid_attrs)
+
       assert u__weekly_topic == U_WeeklyTopics.get_u__weekly_topic!(u__weekly_topic.id)
     end
 
     test "delete_u__weekly_topic/1 deletes the u__weekly_topic" do
       u__weekly_topic = u__weekly_topic_fixture()
       assert {:ok, %U_WeeklyTopic{}} = U_WeeklyTopics.delete_u__weekly_topic(u__weekly_topic)
-      assert_raise Ecto.NoResultsError, fn -> U_WeeklyTopics.get_u__weekly_topic!(u__weekly_topic.id) end
+
+      assert_raise Ecto.NoResultsError, fn ->
+        U_WeeklyTopics.get_u__weekly_topic!(u__weekly_topic.id)
+      end
     end
 
     test "change_u__weekly_topic/1 returns a u__weekly_topic changeset" do

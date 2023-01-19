@@ -7,28 +7,31 @@ defmodule OurExperienceWeb.Auth.Ueberauth.UserFromAuth do
   alias OurExperience.Users
 
   def find_or_create(%Auth{provider: :identity} = auth) do
-    dbg ["miro in find_or_create 1", auth]
+    dbg(["miro in find_or_create 1", auth])
+
     case validate_pass(auth.credentials) do
       :ok ->
         {:ok, basic_info(auth)}
-      {:error, reason} -> {:error, reason}
+
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 
   def find_or_create(%Auth{} = auth) do
-    dbg ["miro in find_or_create 2", auth]
+    dbg(["miro in find_or_create 2", auth])
     {:ok, basic_info(auth)}
   end
 
   # github does it this way
-  defp avatar_from_auth( %{info: %{urls: %{avatar_url: image}} }), do: image
+  defp avatar_from_auth(%{info: %{urls: %{avatar_url: image}}}), do: image
 
   # facebook does it this way
-  defp avatar_from_auth( %{info: %{image: image} }), do: image
+  defp avatar_from_auth(%{info: %{image: image}}), do: image
 
   # default case if nothing matches
-  defp avatar_from_auth( auth ) do
-    Logger.warn auth.provider <> " needs to find an avatar URL!"
+  defp avatar_from_auth(auth) do
+    Logger.warn(auth.provider <> " needs to find an avatar URL!")
     Logger.debug(Jason.encode!(auth))
     nil
   end
@@ -51,22 +54,24 @@ defmodule OurExperienceWeb.Auth.Ueberauth.UserFromAuth do
     # # %{id: auth.uid, name: name_from_auth(auth), avatar: avatar_from_auth(auth), email: email}
     # %{email: email}
 
-
     user_from_db = Users.get_user_by_email(email)
 
-    user = if (!user_from_db) do
-      case Users.create_user(email)  do
-        {:ok, new_user} ->
-          dbg("user #{email} created")
-          new_user
-        error ->
-          dbg(["error creating user:", error])
-          nil
+    user =
+      if !user_from_db do
+        case Users.create_user(email) do
+          {:ok, new_user} ->
+            dbg("user #{email} created")
+            new_user
+
+          error ->
+            dbg(["error creating user:", error])
+            nil
+        end
+      else
+        dbg(["user retrieved from database: ", user_from_db])
+        user_from_db
       end
-    else
-      dbg ["user retrieved from database: ",user_from_db]
-      user_from_db
-    end
+
     # dbg(["miromm", user])
     # %{id: auth.uid, name: name_from_auth(auth), avatar: avatar_from_auth(auth), email: email}
     %{id: user.id, email: user.email, admin_level: user.admin_level}
@@ -89,11 +94,14 @@ defmodule OurExperienceWeb.Auth.Ueberauth.UserFromAuth do
   defp validate_pass(%{other: %{password: ""}}) do
     {:error, "Password required"}
   end
+
   defp validate_pass(%{other: %{password: pw, password_confirmation: pw}}) do
     :ok
   end
+
   defp validate_pass(%{other: %{password: _}}) do
     {:error, "Passwords do not match"}
   end
+
   defp validate_pass(_), do: {:error, "Password Required"}
 end

@@ -10,17 +10,30 @@
 
 <.list>
   <:item title="Title"><%= @weekly_topic.title %></:item>
-  <:item title="Summary"><pre style="white-space:pre-wrap; width:98vw max-width:1000px;"><%= @weekly_topic.summary %></pre></:item>
-  <:item title="Introduction"><pre style="white-space:pre-wrap; width:98vw max-width:1000px;"><%= @weekly_topic.introduction %></pre></:item>
-  <:item title="Content"><pre style="white-space:pre-wrap; width:98vw max-width:1000px;"><%= @weekly_topic.content %></pre></:item>
-  <:item title="Day_by_day_instructions"><pre style="white-space:pre-wrap; width:98vw max-width:1000px;"><%= @weekly_topic.day_by_day_instructions %></pre></:item>
+  <:item title="Summary">
+    <pre style="white-space:pre-wrap; width:98vw max-width:1000px;"><%= @weekly_topic.summary %></pre>
+  </:item>
+  <:item title="Introduction">
+    <pre style="white-space:pre-wrap; width:98vw max-width:1000px;"><%= @weekly_topic.introduction %></pre>
+  </:item>
+  <:item title="Content">
+    <pre style="white-space:pre-wrap; width:98vw max-width:1000px;"><%= @weekly_topic.content %></pre>
+  </:item>
+  <:item title="Day_by_day_instructions">
+    <pre style="white-space:pre-wrap; width:98vw max-width:1000px;"><%= @weekly_topic.day_by_day_instructions %></pre>
+  </:item>
   <:item title="Default position"><%= @weekly_topic.default_position %></:item>
   <:item title="Default active status"><%= @weekly_topic.default_active_status %></:item>
 </.list>
 
 <.back navigate={~p"/admin/weekly_topics"}>Back to weekly_topics</.back>
 
-<.modal :if={@live_action == :edit} id="weekly_topic-modal" show on_cancel={JS.patch(~p"/admin/weekly_topics/#{@weekly_topic}")}>
+<.modal
+  :if={@live_action == :edit}
+  id="weekly_topic-modal"
+  show
+  on_cancel={JS.patch(~p"/admin/weekly_topics/#{@weekly_topic}")}
+>
   <.live_component
     module={OurExperienceWeb.WeeklyTopicLive.FormComponent}
     id={@weekly_topic.id}

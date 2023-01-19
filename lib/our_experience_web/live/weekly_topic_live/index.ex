@@ -2,7 +2,9 @@ defmodule OurExperienceWeb.WeeklyTopicLive.Index do
   use OurExperienceWeb, :live_view
 
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopics
+
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopics.WeeklyTopic
+
   on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
 
   @impl true

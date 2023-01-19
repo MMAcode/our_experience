@@ -1,5 +1,7 @@
-defmodule OurExperienceWeb.Auth.AuthForLive do # auth for live  page (wrapped in live_session)
-  import Phoenix.Component    # for assign(); this methodd was moved from \Phoenix.LiveView to here in 0.18.0
+# auth for live  page (wrapped in live_session)
+defmodule OurExperienceWeb.Auth.AuthForLive do
+  # for assign(); this methodd was moved from \Phoenix.LiveView to here in 0.18.0
+  import Phoenix.Component
 
   # live hook for welcome_live
   def on_mount(:matchThis, params, session, socket) do
@@ -22,11 +24,12 @@ defmodule OurExperienceWeb.Auth.AuthForLive do # auth for live  page (wrapped in
     # {:cont, socket}
   end
 
-  defp assign_current_user(socket, _session, nameEnd) do # assign current user from session to socket
+  # assign current user from session to socket
+  defp assign_current_user(socket, _session, nameEnd) do
     {:cont,
      assign(socket,
        current_user: %{name: "live-plug - dummyUser_fromAuthForLive_" <> nameEnd}
-      #  csrf_token: "MiroDummyCs"   # this does not have any effect
+       #  csrf_token: "MiroDummyCs"   # this does not have any effect
      )}
 
     # case session do

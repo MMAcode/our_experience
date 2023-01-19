@@ -17,7 +17,7 @@ defmodule OurExperienceWeb.RichTextEditors.Quill do
 
     {:ok,
      assign(socket, quills: list_quills(), quill: nil, count: 0, page: "connected")
-    #  |> push_event("miroFromServer", %{savedQuills: nil})}
+     #  |> push_event("miroFromServer", %{savedQuills: nil})}
      |> push_event("miroFromServer", %{savedQuills: quills})}
   end
 
@@ -77,9 +77,9 @@ defmodule OurExperienceWeb.RichTextEditors.Quill do
           # |> push_event("miroFromServer", %{id: "miroId"})
           # |> fn x -> dbg(["miro 125", x], printable_limit: :infinity, limit: :infinity); x end.()
           # |> (fn x ->
-                # dbg(["miro 1256jm", saved_quill], printable_limit: :infinity, limit: :infinity)
-                # x
-              # end).()
+          # dbg(["miro 1256jm", saved_quill], printable_limit: :infinity, limit: :infinity)
+          # x
+          # end).()
           # |> push_event("miroFromServer", %{savedQuills: saved_quill.data})
         }
 

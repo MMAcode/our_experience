@@ -29,8 +29,11 @@ defmodule OurExperienceWeb.Pages.Public.Intro.InformationTexts do
       Multiple scientific research shows that gratitude journaling, if done well, does boost once happiness significantly and consistently.
       To stay realistic we may expect our happiness to improve by 10% after 6 months but this effect appears long lasting.
     </p>
-    <br/>
-    <p>Comming Soon: <br/> <strong> Themed Gratitude Journal 'application'</strong> will be added to this website within next few months for anyone to use and rate. </p>
+    <br />
+    <p>
+      Comming Soon: <br /> <strong> Themed Gratitude Journal 'application'</strong>
+      will be added to this website within next few months for anyone to use and rate.
+    </p>
     <p></p>
     <p></p>
     """

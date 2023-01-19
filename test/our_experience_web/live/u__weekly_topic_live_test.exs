@@ -46,7 +46,9 @@ defmodule OurExperienceWeb.U_WeeklyTopicLiveTest do
     test "updates u__weekly_topic in listing", %{conn: conn, u__weekly_topic: u__weekly_topic} do
       {:ok, index_live, _html} = live(conn, ~p"/u_weekly_topics")
 
-      assert index_live |> element("#u_weekly_topics-#{u__weekly_topic.id} a", "Edit") |> render_click() =~
+      assert index_live
+             |> element("#u_weekly_topics-#{u__weekly_topic.id} a", "Edit")
+             |> render_click() =~
                "Edit U  weekly topic"
 
       assert_patch(index_live, ~p"/u_weekly_topics/#{u__weekly_topic}/edit")
@@ -67,7 +69,10 @@ defmodule OurExperienceWeb.U_WeeklyTopicLiveTest do
     test "deletes u__weekly_topic in listing", %{conn: conn, u__weekly_topic: u__weekly_topic} do
       {:ok, index_live, _html} = live(conn, ~p"/u_weekly_topics")
 
-      assert index_live |> element("#u_weekly_topics-#{u__weekly_topic.id} a", "Delete") |> render_click()
+      assert index_live
+             |> element("#u_weekly_topics-#{u__weekly_topic.id} a", "Delete")
+             |> render_click()
+
       refute has_element?(index_live, "#u__weekly_topic-#{u__weekly_topic.id}")
     end
   end

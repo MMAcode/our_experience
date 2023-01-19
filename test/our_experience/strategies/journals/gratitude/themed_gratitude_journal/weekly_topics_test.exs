@@ -21,7 +21,12 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.Wee
     end
 
     test "create_weekly_topic/1 with valid data creates a weekly_topic" do
-      valid_attrs = %{content: "some content", default_active_status: true, default_position: 42, title: "some title"}
+      valid_attrs = %{
+        content: "some content",
+        default_active_status: true,
+        default_position: 42,
+        title: "some title"
+      }
 
       assert {:ok, %WeeklyTopic{} = weekly_topic} = WeeklyTopics.create_weekly_topic(valid_attrs)
       assert weekly_topic.content == "some content"
@@ -36,9 +41,17 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.Wee
 
     test "update_weekly_topic/2 with valid data updates the weekly_topic" do
       weekly_topic = weekly_topic_fixture()
-      update_attrs = %{content: "some updated content", default_active_status: false, default_position: 43, title: "some updated title"}
 
-      assert {:ok, %WeeklyTopic{} = weekly_topic} = WeeklyTopics.update_weekly_topic(weekly_topic, update_attrs)
+      update_attrs = %{
+        content: "some updated content",
+        default_active_status: false,
+        default_position: 43,
+        title: "some updated title"
+      }
+
+      assert {:ok, %WeeklyTopic{} = weekly_topic} =
+               WeeklyTopics.update_weekly_topic(weekly_topic, update_attrs)
+
       assert weekly_topic.content == "some updated content"
       assert weekly_topic.default_active_status == false
       assert weekly_topic.default_position == 43
@@ -47,7 +60,10 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.Wee
 
     test "update_weekly_topic/2 with invalid data returns error changeset" do
       weekly_topic = weekly_topic_fixture()
-      assert {:error, %Ecto.Changeset{}} = WeeklyTopics.update_weekly_topic(weekly_topic, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               WeeklyTopics.update_weekly_topic(weekly_topic, @invalid_attrs)
+
       assert weekly_topic == WeeklyTopics.get_weekly_topic!(weekly_topic.id)
     end
 
