@@ -36,7 +36,19 @@ defmodule OurExperience.Users do
 
   """
   def get_user!(id), do: Repo.get!(User, id)
-  def get_user_by_email(email), do: Repo.get_by(User, email: email)
+  # def get_user_by_email(email), do: Repo.get_by(User, email: email)
+  def get_user_by_email(email) do
+    Repo.get_by(User, email: email)
+    |> Repo.preload(u_strategies: [:strategy])
+
+
+
+  end
+
+  # def get_user_with_strategies_by_email(email) do
+  #   Repo.get_by(User, email: email)
+  #   |> Repo.preload(:u_strategies)
+  # end
 
   @doc """
   Creates a user.
