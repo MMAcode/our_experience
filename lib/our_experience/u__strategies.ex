@@ -37,7 +37,7 @@ defmodule OurExperience.U_Strategies do
 
   """
   def get_u__strategy!(id), do: Repo.get!(U_Strategy, id)
-  def get_active_u_strategy_by_user_id(id), do: Repo.get_by(U_Strategy, [status: CONSTANTS.u_strategies.status.on])
+  # def get_active_u_strategy_by_user_and__id(id), do: Repo.get_by(U_Strategy, [status: CONSTANTS.u_strategies.status.on])
 
   @doc """
   Creates a u__strategy.
