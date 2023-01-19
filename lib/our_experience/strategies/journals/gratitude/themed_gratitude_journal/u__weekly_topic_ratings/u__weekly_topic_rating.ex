@@ -24,8 +24,6 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_W
   def changeset(u__weekly_topic_rating, attrs) do
     u__weekly_topic_rating
     |> cast(attrs, [:after_first_view, :after_first_week, :manual_activations])
-
-
     # |> validate_required([:after_first_view, :after_first_week, :manual_activations])
   end
 end
