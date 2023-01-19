@@ -2,6 +2,7 @@ defmodule OurExperience.Users.User do
   alias OurExperience.U_Strategies.U_Strategy
   use Ecto.Schema
   import Ecto.Changeset
+  use StructAccess
 
   schema "users" do
     field :email, :string

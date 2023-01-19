@@ -53,7 +53,8 @@ defmodule OurExperience.MixProject do
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
       {:ueberauth, "~> 0.10"},
-      {:ueberauth_auth0, "~> 2.1"}
+      {:ueberauth_auth0, "~> 2.1"},
+      {:struct_access, "~> 1.1.2"}
     ]
   end
 

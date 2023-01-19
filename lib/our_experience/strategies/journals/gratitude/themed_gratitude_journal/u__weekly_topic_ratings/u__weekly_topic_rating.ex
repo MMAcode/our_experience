@@ -1,10 +1,12 @@
 defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopicRatings.U_WeeklyTopicRating do
   use Ecto.Schema
+  use StructAccess
   import Ecto.Changeset
   alias OurExperience.Users.User
   alias OurExperience.U_Strategies.U_Strategy
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopics.WeeklyTopic
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopics.U_WeeklyTopic
+
 
   schema "u_weekly_topic_ratings" do
     field :after_first_view, :map

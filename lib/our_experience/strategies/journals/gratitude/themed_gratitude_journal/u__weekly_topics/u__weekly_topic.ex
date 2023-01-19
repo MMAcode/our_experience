@@ -3,7 +3,9 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_W
   alias OurExperience.U_Strategies.U_Strategy
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopics.WeeklyTopic
   use Ecto.Schema
+  use StructAccess
   import Ecto.Changeset
+
 
   schema "u_weekly_topics" do
     field :active, :boolean, default: false

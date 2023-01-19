@@ -1,6 +1,8 @@
 defmodule OurExperience.Strategies.Strategy do
   alias OurExperience.U_Strategies.U_Strategy
   use Ecto.Schema
+    use StructAccess
+
   import Ecto.Changeset
 
   schema "strategies" do

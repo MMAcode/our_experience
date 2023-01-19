@@ -1,5 +1,7 @@
 defmodule OurExperience.RichTextStorageSchema do
   use Ecto.Schema
+    use StructAccess
+
   import Ecto.Changeset
 
   schema "rich_text_storage_test" do
