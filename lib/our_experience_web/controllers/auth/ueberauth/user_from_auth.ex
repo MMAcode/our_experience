@@ -16,7 +16,7 @@ defmodule OurExperienceWeb.Auth.Ueberauth.UserFromAuth do
   end
 
   def find_or_create(%Auth{} = auth) do
-    dbg "miro in find_or_create 2"
+    dbg ["miro in find_or_create 2", auth]
     {:ok, basic_info(auth)}
   end
 
@@ -64,12 +64,12 @@ defmodule OurExperienceWeb.Auth.Ueberauth.UserFromAuth do
           nil
       end
     else
-      dbg "user #{email} retrieved from database"
+      dbg ["user retrieved from database: ",user_from_db]
       user_from_db
     end
- dbg(["miromm", user])
+    # dbg(["miromm", user])
     # %{id: auth.uid, name: name_from_auth(auth), avatar: avatar_from_auth(auth), email: email}
-    %{email: user.email, admin_level: user.admin_level}
+    %{id: user.id, email: user.email, admin_level: user.admin_level}
   end
 
   # defp name_from_auth(auth) do

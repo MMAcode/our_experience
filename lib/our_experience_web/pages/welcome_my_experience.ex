@@ -27,10 +27,16 @@ defmodule OurExperienceWeb.Pages.WelcomeMyExperience do
       <%!-- <%= if (@current_user != nil), do: @current_user.email, else: "no user" %> --%>
       <%!-- </h3> --%>
     <br/>
-    <.link navigate={~p"/my_experience/strategies/themed_gratitude_journal/u_weekly_topics"}>
-      <.button>Start using <strong> Themed Gratitude Journal </strong> </.button>
-     </.link>
+    <%!-- <.link navigate={~p"/my_experience/strategies/themed_gratitude_journal/u_weekly_topics"}> --%>
+      <.button phx-click="start-gratitude-journal">Start using <strong> Themed Gratitude Journal </strong> </.button>
+     <%!-- </.link> --%>
     </div>
     """
+  end
+
+  def handle_event("start-gratitude-journal", _attrs, socket) do
+    dbg ["hiio", socket.assigns.current_user]
+
+    {:noreply, socket}
   end
 end

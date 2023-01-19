@@ -12,7 +12,7 @@ config :our_experience,
 
 # Miro config
 config :our_experience, Miro,
-  logout_url: "http://localhost:4000"
+  logout_url: "http://localhost:4025"
 
 # Configures the endpoint
 config :our_experience, OurExperienceWeb.Endpoint,
