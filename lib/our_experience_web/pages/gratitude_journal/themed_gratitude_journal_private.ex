@@ -1,17 +1,23 @@
-defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPublic do
+defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate do
+  alias OurExperience.Users
   use OurExperienceWeb, :live_view
   on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
 
-  def mount(_params, _session, socket) do
+  # def mount(_params, _session, %{current_user: user} = socket) do
+  def mount(_params, _session, %{assigns: %{current_user: user}} = socket) do
+
+
+    # user = Users.get_user_by_email(user.email)
+    user = Users.get_user_for_TGJ(user.id)
+    dbg ["aaa", user]
+
     {:ok, socket}
   end
 
   def render(assigns) do
     ~H"""
-    <h3>Themed Gratitude Journal 1.0 - public</h3>
-    <.b_link to={~p"/my_experience/strategies/themed_gratitude_journal"}>
-      Start using <strong> Themed Gratitude Journal</strong>
-    </.b_link>
+    <h3>Themed Gratitude Journal 1.0 - private</h3>
+
     <.button phx-click="do">test_me</.button>
     """
   end

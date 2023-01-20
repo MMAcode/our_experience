@@ -2,8 +2,7 @@ defmodule OurExperience.U_Strategies.U_Strategy do
   alias OurExperience.Users
   alias OurExperience.Strategies.Strategy
   alias OurExperience.Users.User
-  alias OurExperience.Users
-  alias OurExperience.Strategies
+  alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopics.U_WeeklyTopic
   use Ecto.Schema
   use StructAccess
   import Ecto.Changeset
@@ -13,6 +12,8 @@ defmodule OurExperience.U_Strategies.U_Strategy do
 
     belongs_to :user, User
     belongs_to :strategy, Strategy
+
+    has_many :u_topics, U_WeeklyTopic, foreign_key: :u_strategy_id
 
     timestamps()
   end

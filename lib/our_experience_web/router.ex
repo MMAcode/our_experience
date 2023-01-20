@@ -30,25 +30,6 @@ defmodule OurExperienceWeb.Router do
     end
   end
 
-  # scope "/my_experience", OurExperienceWeb do
-  #   pipe_through [:browser, :secure]
-  #   # does pipe through plugs
-  #   live "/", Pages.WelcomeMyExperience
-  #   live "/quill", RichTextEditors.Quill
-
-  #   live "/u_weekly_topics", U_WeeklyTopicLive.Index, :index
-  #   # live "/u_weekly_topics/new", U_WeeklyTopicLive.Index, :new
-  #   live "/u_weekly_topics/:id/edit", U_WeeklyTopicLive.Index, :edit
-  #   live "/u_weekly_topics/:id", U_WeeklyTopicLive.Show, :show
-  #   live "/u_weekly_topics/:id/show/edit", U_WeeklyTopicLive.Show, :edit
-
-  #   scope "/strategies/themed_gratitude_journal", Pages.GratitudeJournal do
-  #     live "/u_weekly_topics", UWeeklyTopics.Index
-  #   end
-
-  #   # /my_experience/strategies/themed_gratitude_journal/weekly_topics
-  # end
-
   live_session :my_experience,
     on_mount: OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns do
     scope "/my_experience", OurExperienceWeb do
@@ -63,6 +44,7 @@ defmodule OurExperienceWeb.Router do
       live "/u_weekly_topics/:id", U_WeeklyTopicLive.Show, :show
       live "/u_weekly_topics/:id/show/edit", U_WeeklyTopicLive.Show, :edit
       scope "/strategies/themed_gratitude_journal", Pages.GratitudeJournal do
+        live "/" , ThemedGratitudeJournalPrivate
         live "/u_weekly_topics", UWeeklyTopics.Index
       end
 

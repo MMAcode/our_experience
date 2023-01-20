@@ -17,7 +17,7 @@ defmodule OurExperienceWeb.Pages.WelcomeLive do
       <p>...work in progress...</p>
     </div>
       <.admin_level current_user={@current_user}>
-        <.b_link to={~p"/strategies/themed_gratitude_journal/"}>Start or learn more about Themed Gratitude Journal</.b_link>
+        <.b_link to={~p"/strategies/themed_gratitude_journal/"}>Learn more about Themed Gratitude Journal</.b_link>
         <.b_link to={~p"/admin/weekly_topics/"}>weekly_topics</.b_link>
         <.b_link to={~p"/my_experience/u_weekly_topics/"}>My weekly_topics</.b_link>
       </.admin_level>
