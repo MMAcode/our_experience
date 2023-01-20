@@ -1,4 +1,4 @@
-defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournal do
+defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPublic do
   use OurExperienceWeb, :live_view
   on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
 
@@ -27,7 +27,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournal do
 
   def handle_event("start-gratitude-journal", _attrs, %{assigns: %{current_user: user}} = socket) do
     # create u_strategy
-    gj_strategy_id = Strategies.get_strategy_themed_gratitude_journal().id
+    gj_strategy_id = OurExperience.Strategies.get_strategy_themed_gratitude_journal().id
 
     """
          1) check if user already has that strategy active

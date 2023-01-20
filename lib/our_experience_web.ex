@@ -86,6 +86,7 @@ defmodule OurExperienceWeb do
       import Phoenix.HTML
       # Core UI components and translation
       import OurExperienceWeb.CoreComponents
+      import OurExperienceWeb.MiroComponents
       import OurExperienceWeb.Gettext
 
       # Shortcut for generating JS commands

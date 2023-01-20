@@ -7,7 +7,6 @@ defmodule OurExperienceWeb.Pages.WelcomeMyExperience do
   alias OurExperience.U_Strategies.U_Strategy
   alias OurExperience.Users
 
-
   def mount(_params, session, socket) do
     {:ok, assign(socket, :current_user, Map.get(session, "current_user"))}
   end
@@ -20,20 +19,9 @@ defmodule OurExperienceWeb.Pages.WelcomeMyExperience do
       <p class="">(Created by Miroslav Makarov)</p>
       <br />
       <p>...work in progress...</p>
-
-
-      <.link navigate={~p"/my_experience/u_weekly_topics/"}>
-        <.button>My weekly_topics</.button>
-      </.link>
-
+      <.b_link to={~p"/my_experience/u_weekly_topics/"}>My weekly_topics</.b_link>
       <br />
-      <%!-- <.link navigate={~p"/my_experience/strategies/themed_gratitude_journal/u_weekly_topics"}> --%>
-
-
-      <%!-- </.link> --%>
     </div>
     """
   end
-
-
 end

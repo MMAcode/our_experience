@@ -1,5 +1,6 @@
 defmodule OurExperienceWeb.MiroComponents do
   use Phoenix.Component
+  import OurExperienceWeb.CoreComponents
 
   # minimum level to view this content
   attr :minimum_admin_level, :integer, default: 1000
@@ -27,5 +28,16 @@ defmodule OurExperienceWeb.MiroComponents do
 
       """
     end
+  end
+
+  # <.b_link to={~p""}></.b_link>
+  def b_link(assigns) do
+    dbg assigns
+    ~H"""
+    <%!-- # <.link navigate={~p"/strategies/themed_gratitude_journal/"}> --%>
+    <.link navigate={@to}>
+      <.button><%= render_slot(@inner_block) %></.button>
+    </.link>
+    """
   end
 end

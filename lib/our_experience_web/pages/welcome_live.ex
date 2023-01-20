@@ -2,7 +2,7 @@ defmodule OurExperienceWeb.Pages.WelcomeLive do
   use OurExperienceWeb, :live_view
   alias OurExperienceWeb.Pages.Public.Intro.InformationTexts
   alias OurExperienceWeb.Pages.GratitudeJournal.GJ_texts
-alias OurExperienceWeb.MiroComponents
+# alias OurExperienceWeb.MiroComponents
   on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
 
   def mount(_params, _session, socket) do
@@ -16,24 +16,14 @@ alias OurExperienceWeb.MiroComponents
       <p class="">(Created by Miroslav Makarov)</p>
       <p>...work in progress...</p>
     </div>
-      <MiroComponents.admin_level current_user={@current_user}>
-        <.link navigate={~p"/strategies/themed_gratitude_journal/"}>
-          <.button>Start or learn more about Themed Gratitude Journal</.button>
-        </.link>
-        <.link navigate={~p"/admin/weekly_topics/"}>
-          <.button>weekly_topics</.button>
-        </.link>
-        <.link navigate={~p"/my_experience/u_weekly_topics/"}>
-          <.button>My weekly_topics</.button>
-        </.link>
-        my_experience/u_weekly_topics
-        <%!-- <.back navigate={~p"/admin/weekly_topics"}>Weekly_topics</.back> --%>
-      </MiroComponents.admin_level>
+      <.admin_level current_user={@current_user}>
+        <.b_link to={~p"/strategies/themed_gratitude_journal/"}>Start or learn more about Themed Gratitude Journal</.b_link>
+        <.b_link to={~p"/admin/weekly_topics/"}>weekly_topics</.b_link>
+        <.b_link to={~p"/my_experience/u_weekly_topics/"}>My weekly_topics</.b_link>
+      </.admin_level>
     <InformationTexts.introduction />
     <GJ_texts.public_introduction />
-    <.link navigate={~p"/strategies/themed_gratitude_journal/"}>
-      <.button>Start or learn more about Themed Gratitude Journal</.button>
-    </.link>
+÷ƒ        <.b_link to={~p"/strategies/themed_gratitude_journal/"}>Start or learn more about Themed Gratitude Journal</.b_link>
     """
   end
 end

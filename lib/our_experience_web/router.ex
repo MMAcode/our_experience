@@ -26,7 +26,7 @@ defmodule OurExperienceWeb.Router do
     live "/", Pages.WelcomeLive
     get "/orig", PageController, :home
     scope "/strategies", Pages do
-      live "themed_gratitude_journal", GratitudeJournal.ThemedGratitudeJournal
+      live "themed_gratitude_journal", GratitudeJournal.ThemedGratitudeJournalPublic
     end
   end
 
