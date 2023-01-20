@@ -53,9 +53,21 @@ defmodule OurExperience.Users do
     # |> Repo.preload(u_strategies: [:strategy])
   end
 
-    def get_user_for_TGJ(id) do
-    Repo.get_by(User, id: id)
-    |> Repo.preload(u_strategies: [:strategy, :u_topics])
+  def get_user_for_TGJ(id) do
+    Repo.one(
+      from u in User,
+      where: u.id == ^id,
+      # probably can be inner_join = just join
+      left_join: u_s in assoc(u, :u_strategies),
+      where: u_s.status == "on",
+      join: s in assoc(u_s, :strategy),
+      left_join: uwt in assoc(u_s, :u_weekly_topics), #not inner_joint because if there are no topics, it would not load user either
+      preload: [u_strategies: {u_s, [strategy: s, u_weekly_topics: uwt]}]
+      )
+
+      # Repo.get_by(User, id: id)
+      # |> Repo.preload(u_strategies: [:strategy, :u_weekly_topics])
+      # |> Repo.preload(u_strategies: [:strategy, :u_topics])
   end
 
   @doc """

@@ -13,7 +13,8 @@ defmodule OurExperience.U_Strategies.U_Strategy do
     belongs_to :user, User
     belongs_to :strategy, Strategy
 
-    has_many :u_topics, U_WeeklyTopic, foreign_key: :u_strategy_id
+    # only for themed_gratitude_journal strategy!
+    has_many :u_weekly_topics, U_WeeklyTopic, foreign_key: :u_strategy_id
 
     timestamps()
   end
