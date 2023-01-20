@@ -27,23 +27,45 @@ defmodule OurExperienceWeb.Router do
     get "/orig", PageController, :home
   end
 
-  scope "/my_experience", OurExperienceWeb do
-    pipe_through [:browser, :secure]
-    # does pipe through plugs
-    live "/", Pages.WelcomeMyExperience
-    live "/quill", RichTextEditors.Quill
+  # scope "/my_experience", OurExperienceWeb do
+  #   pipe_through [:browser, :secure]
+  #   # does pipe through plugs
+  #   live "/", Pages.WelcomeMyExperience
+  #   live "/quill", RichTextEditors.Quill
 
-    live "/u_weekly_topics", U_WeeklyTopicLive.Index, :index
-    # live "/u_weekly_topics/new", U_WeeklyTopicLive.Index, :new
-    live "/u_weekly_topics/:id/edit", U_WeeklyTopicLive.Index, :edit
-    live "/u_weekly_topics/:id", U_WeeklyTopicLive.Show, :show
-    live "/u_weekly_topics/:id/show/edit", U_WeeklyTopicLive.Show, :edit
+  #   live "/u_weekly_topics", U_WeeklyTopicLive.Index, :index
+  #   # live "/u_weekly_topics/new", U_WeeklyTopicLive.Index, :new
+  #   live "/u_weekly_topics/:id/edit", U_WeeklyTopicLive.Index, :edit
+  #   live "/u_weekly_topics/:id", U_WeeklyTopicLive.Show, :show
+  #   live "/u_weekly_topics/:id/show/edit", U_WeeklyTopicLive.Show, :edit
 
-    scope "/strategies/themed_gratitude_journal", Pages.GratitudeJournal do
-      live "/u_weekly_topics", UWeeklyTopics.Index
+  #   scope "/strategies/themed_gratitude_journal", Pages.GratitudeJournal do
+  #     live "/u_weekly_topics", UWeeklyTopics.Index
+  #   end
+
+  #   # /my_experience/strategies/themed_gratitude_journal/weekly_topics
+  # end
+
+  live_session :my_experience,
+    on_mount: OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns do
+    scope "/my_experience", OurExperienceWeb do
+      pipe_through [:browser, :secure]
+      # does pipe through plugs
+      live "/", Pages.WelcomeMyExperience
+      live "/quill", RichTextEditors.Quill
+
+      live "/u_weekly_topics", U_WeeklyTopicLive.Index, :index
+      # live "/u_weekly_topics/new", U_WeeklyTopicLive.Index, :new
+      live "/u_weekly_topics/:id/edit", U_WeeklyTopicLive.Index, :edit
+      live "/u_weekly_topics/:id", U_WeeklyTopicLive.Show, :show
+      live "/u_weekly_topics/:id/show/edit", U_WeeklyTopicLive.Show, :edit
+
+      scope "/strategies/themed_gratitude_journal", Pages.GratitudeJournal do
+        live "/u_weekly_topics", UWeeklyTopics.Index
+      end
+
+      # /my_experience/strategies/themed_gratitude_journal/weekly_topics
     end
-
-    # /my_experience/strategies/themed_gratitude_journal/weekly_topics
   end
 
   scope "/admin", OurExperienceWeb do
@@ -65,7 +87,7 @@ defmodule OurExperienceWeb.Router do
     root_layout: {OurExperienceWeb.Layouts, :root},
     # root_layout: {OurExperienceWeb.Layouts, :app},
     on_mount: {AuthForLive, :matchThis} do
-    # pipe_through :browser
+    # pipe_through :browser #=normal (not live!) plug - needed here only if I would add any non-live routes here (get ...)
 
     live "/ls", OurExperienceWeb.Pages.WelcomeLive
     # live "/li", Pages.WelcomeLive, :edit

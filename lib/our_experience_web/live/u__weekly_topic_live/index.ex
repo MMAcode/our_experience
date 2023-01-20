@@ -5,7 +5,7 @@ defmodule OurExperienceWeb.U_WeeklyTopicLive.Index do
 
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopics.U_WeeklyTopic
 
-  on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
+#   on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
 
   @impl true
   def mount(_params, _session, socket) do

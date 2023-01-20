@@ -37,18 +37,18 @@ defmodule OurExperience.Users do
   """
   def get_user!(id), do: Repo.get!(User, id)
   # def get_user_by_email(email), do: Repo.get_by(User, email: email)
+
   def get_user_by_email(email) do
-    Repo.get_by(User, email: email)
-    |> Repo.preload(u_strategies: [:strategy])
+    Repo.one from u in User, where: u.email==^email,
+           left_join: u_s in assoc(u, :u_strategies),
+           where: u_s.status == "on",
+           join: s in assoc(u_s, :strategy),
+           preload: [u_strategies: {u_s, [strategy: s]}]
 
-
-
+# simpler, but 3 trips to db instead of 1 (and possibly no filtering?)
+    # Repo.get_by(User, email: email)
+    # |> Repo.preload(u_strategies: [:strategy])
   end
-
-  # def get_user_with_strategies_by_email(email) do
-  #   Repo.get_by(User, email: email)
-  #   |> Repo.preload(:u_strategies)
-  # end
 
   @doc """
   Creates a user.

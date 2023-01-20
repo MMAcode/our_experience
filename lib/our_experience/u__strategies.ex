@@ -57,6 +57,18 @@ defmodule OurExperience.U_Strategies do
     |> Repo.insert()
   end
 
+  # u_strategy could be also create using User struct: preload all u_strategies association and then in changeset use cast_assoc and append new
+
+  def create_u__strategy_TGJ_without_changeset(user_id, status \\CONSTANTS.u_strategies.status.on) do
+   u_s = %U_Strategy{
+      user_id: user_id,
+      strategy_id: OurExperience.Strategies.get_strategy_themed_gratitude_journal.id,
+      status: status
+    }
+
+    Repo.insert!(u_s)
+  end
+
   @doc """
   Updates a u__strategy.
 

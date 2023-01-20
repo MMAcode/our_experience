@@ -2,7 +2,7 @@ defmodule OurExperienceWeb.WeeklyTopicLive.Show do
   use OurExperienceWeb, :live_view
 
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopics
-  on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
+  # on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
 
   @impl true
   def mount(_params, _session, socket) do
