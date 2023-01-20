@@ -25,6 +25,9 @@ defmodule OurExperienceWeb.Router do
     # does pipe through plugs
     live "/", Pages.WelcomeLive
     get "/orig", PageController, :home
+    scope "/strategies", Pages do
+      live "themed_gratitude_journal", GratitudeJournal.ThemedGratitudeJournal
+    end
   end
 
   # scope "/my_experience", OurExperienceWeb do
@@ -59,7 +62,6 @@ defmodule OurExperienceWeb.Router do
       live "/u_weekly_topics/:id/edit", U_WeeklyTopicLive.Index, :edit
       live "/u_weekly_topics/:id", U_WeeklyTopicLive.Show, :show
       live "/u_weekly_topics/:id/show/edit", U_WeeklyTopicLive.Show, :edit
-
       scope "/strategies/themed_gratitude_journal", Pages.GratitudeJournal do
         live "/u_weekly_topics", UWeeklyTopics.Index
       end
