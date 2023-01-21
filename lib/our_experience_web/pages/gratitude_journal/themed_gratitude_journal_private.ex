@@ -11,7 +11,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
 
   def mount(_params, _session, %{assigns: %{current_user: user} = assigns} = socket) do
 
-    user = Users.get_user_for_TGJ(user.id)
+if !connected?(socket), do:    _user = Users.get_user_for_TGJ(user.id) |> dbg
     user = if !connected?(socket), do: user_with_existing_active_TGJ_strategy_and_topics(user), else: user
     socket = assign(socket, current_user: user)
 
@@ -22,7 +22,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
     # dbg socket.assigns
 
     str = get_active_TGJ_Strategy(user)
-    if connected?(socket), do: Users.initiate_weekly_topics_for_user(user.id, str.id)
+    # if connected?(socket), do: Users.initiate_weekly_topics_for_user(user.id, str.id)
 
     {:ok, socket}
   end
