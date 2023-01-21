@@ -4,7 +4,7 @@ defmodule OurExperienceWeb.Auth.Ueberauth.UserFromAuth do
   """
   require Logger
   alias Ueberauth.Auth
-  alias OurExperience.Users
+  alias OurExperience.Users.Users
 
   def find_or_create(%Auth{provider: :identity} = auth) do
     dbg(["miro in find_or_create 1", auth])

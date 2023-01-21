@@ -3,9 +3,9 @@ defmodule OurExperienceWeb.Pages.WelcomeMyExperience do
   alias OurExperience.Strategies
   alias OurExperience.CONSTANTS
   alias OurExperience.Repo
-  alias OurExperience.U_Strategies
+  alias OurExperience.U_Strategies.U_Strategies
   alias OurExperience.U_Strategies.U_Strategy
-  alias OurExperience.Users
+  alias OurExperience.Users.Users
 
   def mount(_params, session, socket) do
     {:ok, assign(socket, :current_user, Map.get(session, "current_user"))}

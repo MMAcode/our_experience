@@ -1,7 +1,7 @@
 defmodule OurExperience.UsersFixtures do
   @moduledoc """
   This module defines test helpers for creating
-  entities via the `OurExperience.Users` context.
+  entities via the `OurExperience.Users.Users` context.
   """
 
   @doc """
@@ -18,7 +18,7 @@ defmodule OurExperience.UsersFixtures do
       |> Enum.into(%{
         email: unique_user_email()
       })
-      |> OurExperience.Users.create_user()
+      |> OurExperience.Users.Users.create_user()
 
     user
   end

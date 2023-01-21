@@ -1,4 +1,4 @@
-defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopics do
+defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopics.WeeklyTopics do
   import Ecto.Query, warn: false
   alias OurExperience.Repo
 

@@ -1,5 +1,5 @@
 defmodule OurExperience.U_Strategies.U_Strategy do
-  alias OurExperience.Users
+  alias OurExperience.Users.Users
   alias OurExperience.Strategies.Strategy
   alias OurExperience.Users.User
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopics.U_WeeklyTopic

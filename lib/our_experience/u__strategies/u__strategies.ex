@@ -1,4 +1,4 @@
-defmodule OurExperience.U_Strategies do
+defmodule OurExperience.U_Strategies.U_Strategies do
   @moduledoc """
   The U_Strategies context.
   """

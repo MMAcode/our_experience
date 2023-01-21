@@ -1,4 +1,4 @@
-defmodule OurExperience.Users do
+defmodule OurExperience.Users.Users do
   @moduledoc """
   The Users context.
   """

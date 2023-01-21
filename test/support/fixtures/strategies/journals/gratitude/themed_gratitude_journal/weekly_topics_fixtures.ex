@@ -1,7 +1,7 @@
 defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopicsFixtures do
   @moduledoc """
   This module defines test helpers for creating
-  entities via the `OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopics` context.
+  entities via the `OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopics.WeeklyTopics` context.
   """
 
   @doc """
@@ -16,7 +16,7 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.Wee
         default_position: 42,
         title: "some title"
       })
-      |> OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopics.create_weekly_topic()
+      |> OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopics.WeeklyTopics.create_weekly_topic()
 
     weekly_topic
   end

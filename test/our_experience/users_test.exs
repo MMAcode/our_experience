@@ -1,7 +1,7 @@
-defmodule OurExperience.UsersTest do
+defmodule OurExperience.Users.UsersTest do
   use OurExperience.DataCase
 
-  alias OurExperience.Users
+  alias OurExperience.Users.Users
 
   describe "users" do
     alias OurExperience.Users.User

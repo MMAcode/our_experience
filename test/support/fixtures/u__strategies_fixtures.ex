@@ -1,7 +1,7 @@
 defmodule OurExperience.U_StrategiesFixtures do
   @moduledoc """
   This module defines test helpers for creating
-  entities via the `OurExperience.U_Strategies` context.
+  entities via the `OurExperience.U_Strategies.U_Strategies` context.
   """
 
   @doc """
@@ -11,7 +11,7 @@ defmodule OurExperience.U_StrategiesFixtures do
     {:ok, u__strategy} =
       attrs
       |> Enum.into(%{})
-      |> OurExperience.U_Strategies.create_u__strategy()
+      |> OurExperience.U_Strategies.U_Strategies.create_u__strategy()
 
     u__strategy
   end

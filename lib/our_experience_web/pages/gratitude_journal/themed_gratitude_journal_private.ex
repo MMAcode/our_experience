@@ -1,7 +1,7 @@
 defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate do
-  alias OurExperience.Users
+  alias OurExperience.Users.Users
   alias OurExperience.Users.User
-  alias OurExperience.U_Strategies
+  alias OurExperience.U_Strategies.U_Strategies
   alias OurExperience.U_Strategies.U_Strategy
 
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopics.U_WeeklyTopic
