@@ -57,18 +57,32 @@ defmodule OurExperience.Users do
     Repo.one(
       from u in User,
       where: u.id == ^id,
-      # probably can be inner_join = just join
       left_join: u_s in assoc(u, :u_strategies),
-      where: u_s.status == "on",
-      join: s in assoc(u_s, :strategy),
+      on: u_s.status == "on", #not 'where' because that would remove the row regardles the left join
+      left_join: s in assoc(u_s, :strategy),
       left_join: uwt in assoc(u_s, :u_weekly_topics), #not inner_joint because if there are no topics, it would not load user either
       preload: [u_strategies: {u_s, [strategy: s, u_weekly_topics: uwt]}]
-      )
+      ) |>dbg
 
       # Repo.get_by(User, id: id)
       # |> Repo.preload(u_strategies: [:strategy, :u_weekly_topics])
       # |> Repo.preload(u_strategies: [:strategy, :u_topics])
   end
+
+  def initiate_weekly_topics_for_user(id) do
+      """
+      get all topics
+      for each map
+      save
+        through user - u_strategy? probably bad practice as not all strategies have this
+        on its own ->
+      """
+
+
+
+
+  end
+
 
   @doc """
   Creates a user.

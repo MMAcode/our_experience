@@ -1,8 +1,4 @@
 defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopics do
-  @moduledoc """
-  The Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopics context.
-  """
-
   import Ecto.Query, warn: false
   alias OurExperience.Repo
 

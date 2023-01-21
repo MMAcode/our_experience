@@ -1,17 +1,57 @@
 defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate do
   alias OurExperience.Users
+  alias OurExperience.Users.User
+  alias OurExperience.U_Strategies
+  alias OurExperience.U_Strategies.U_Strategy
+
+  alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopics.U_WeeklyTopic
+
   use OurExperienceWeb, :live_view
   on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
 
-  # def mount(_params, _session, %{current_user: user} = socket) do
-  def mount(_params, _session, %{assigns: %{current_user: user}} = socket) do
+  def mount(_params, _session, %{assigns: %{current_user: user} = assigns} = socket) do
 
-
-    # user = Users.get_user_by_email(user.email)
     user = Users.get_user_for_TGJ(user.id)
-    dbg ["aaa", user]
+    user = if !connected?(socket), do: with_existing_active_TGJ_strategy(user), else: user
+    socket = assign(socket, current_user: user)
 
+    socket = case get_active_weekly_topic(user) do
+      nil -> assign(socket, render_weekly_topics: true)
+      _topic -> assign(socket, render_journal: true)
+    end
+    dbg socket.assigns
     {:ok, socket}
+  end
+
+  @spec get_active_weekly_topic(%User{}) :: %U_WeeklyTopic{} | nil
+  defp get_active_weekly_topic(user) do
+    strategy = get_active_TGJ_Strategy(user)
+
+    if !!strategy do
+      strategy.u_weekly_topics
+      |> Enum.filter(&(&1.active == true))
+      |> Enum.at(0)
+    else
+      nil
+    end
+  end
+
+  defp with_existing_active_TGJ_strategy(user) do
+    case get_active_TGJ_Strategy(user) do
+      nil ->
+        U_Strategies.create_u__strategy_TGJ_without_changeset(user.id)
+
+        # copy topics here!!! all NOT active
+
+        """
+
+        """
+
+        Users.get_user_for_TGJ(user.id)
+
+      _strategy ->
+        user
+    end
   end
 
   def render(assigns) do
@@ -20,6 +60,18 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
 
     <.button phx-click="do">test_me</.button>
     """
+  end
+
+  @spec get_active_TGJ_Strategy(%User{}) :: %U_Strategy{} | nil
+  defp get_active_TGJ_Strategy(user) do
+    user.u_strategies
+    |> Enum.filter(
+      &(&1.strategy.name == OurExperience.CONSTANTS.strategies().name.themed_gratitude_journal &&
+          &1.status == OurExperience.CONSTANTS.u_strategies().status.on)
+    )
+    # newest/biggest date will be first in the list (position 0)
+    |> Enum.sort(&(&1.updated_at > &2.updated_at))
+    |> Enum.at(0)
   end
 
   def handle_event("do", _attrs, %{assigns: %{current_user: user}} = socket) do
