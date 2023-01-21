@@ -13,6 +13,8 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
   when new user comes to this url/liveview, new u_strategy (and u_weekly_topics_) will be auto-created for him
   """
   def mount(_params, _session, %{assigns: %{current_user: user}} = socket) do
+    # socket = assign(socket, render_weekly_topics: false, render_journal: false)
+
     # set new u_strategy and topics, if needed:
     user_fromDb = Users.get_user_for_TGJ(user.id)
 
@@ -26,7 +28,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
     # nav to weeklyTopics or Journal:
     socket =
       case get_active_weekly_topic(user_wStrategy) do
-        nil -> assign(socket, render_weekly_topics: true)
+        nil -> assign(socket, render_weekly_topics: false)
         _topic -> assign(socket, render_journal: true)
       end
 
@@ -37,7 +39,8 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
   def render(assigns) do
     ~H"""
     <h3>Themed Gratitude Journal 1.0 - private</h3>
-    <%!-- <div :if={@}> </div> --%>
+    <div :if={assigns[:render_weekly_topics]}> weekly topics</div>
+    <div :if={assigns[:render_journal]}> journal</div>
 
     <%!-- <.button phx-click="do">test_me</.button> --%>
     """
