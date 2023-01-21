@@ -3,6 +3,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
   alias OurExperience.Users.User
   alias OurExperience.U_Strategies.U_Strategies
   alias OurExperience.U_Strategies.U_Strategy
+  alias OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew
 
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopics.U_WeeklyTopic
 
@@ -28,18 +29,20 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
     # nav to weeklyTopics or Journal:
     socket =
       case get_active_weekly_topic(user_wStrategy) do
-        nil -> assign(socket, render_weekly_topics: false)
+        nil -> assign(socket,
+        render_weekly_topics: true,
+        u_weekly_topics: get_active_TGJ_uStrategy(user_wStrategy).u_weekly_topics)
         _topic -> assign(socket, render_journal: true)
       end
 
-    dbg(socket.assigns)
+    # dbg(socket.assigns)
     {:ok, socket}
   end
 
   def render(assigns) do
     ~H"""
     <h3>Themed Gratitude Journal 1.0 - private</h3>
-    <div :if={assigns[:render_weekly_topics]}> weekly topics</div>
+    <UWeeklyTopicsNew.index :if={assigns[:render_weekly_topics]} topics={@u_weekly_topics}/>
     <div :if={assigns[:render_journal]}> journal</div>
 
     <%!-- <.button phx-click="do">test_me</.button> --%>
