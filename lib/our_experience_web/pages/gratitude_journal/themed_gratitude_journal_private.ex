@@ -9,30 +9,33 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
   use OurExperienceWeb, :live_view
   on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
 
-  def mount(_params, _session, %{assigns: %{current_user: user} = assigns} = socket) do
+  @doc """
+  when new user comes to this url/liveview, new u_strategy (and u_weekly_topics_) will be auto-created for him
+  """
+  def mount(_params, _session, %{assigns: %{current_user: user}} = socket) do
 
-if !connected?(socket), do:    _user = Users.get_user_for_TGJ(user.id) |> dbg
-    user = if !connected?(socket), do: user_with_existing_active_TGJ_strategy_and_topics(user), else: user
-    socket = assign(socket, current_user: user)
+    # set new u_strategy and topics, if needed:
+    user_fromDb = Users.get_user_for_TGJ(user.id)
+    user_wStrategy = if !connected?(socket), do: user_with_existing_active_TGJ_strategy_and_topics(user_fromDb), else: user_fromDb
+    socket = assign(socket, current_user: user_wStrategy)
+    # dbg user_wStrategy
+    # nav to weeklyTopics or Journal:
+    socket = case get_active_weekly_topic(user_wStrategy) do
+      nil -> assign(socket, render_weekly_topics: true)
+      _topic -> assign(socket, render_journal: true)
+    end
+    dbg socket.assigns
 
-    # socket = case get_active_weekly_topic(user) do
-    #   nil -> assign(socket, render_weekly_topics: true)
-    #   _topic -> assign(socket, render_journal: true)
-    # end
-    # dbg socket.assigns
-
-    str = get_active_TGJ_Strategy(user)
-    # if connected?(socket), do: Users.initiate_weekly_topics_for_user(user.id, str.id)
 
     {:ok, socket}
   end
 
   @spec get_active_weekly_topic(%User{}) :: %U_WeeklyTopic{} | nil
   defp get_active_weekly_topic(user) do
-    strategy = get_active_TGJ_Strategy(user)
-
-    if !!strategy do
-      strategy.u_weekly_topics
+    u_strategy = get_active_TGJ_uStrategy(user)
+# dbg u_strategy
+    if !!u_strategy do
+      u_strategy.u_weekly_topics
       |> Enum.filter(&(&1.active == true))
       |> Enum.at(0)
     else
@@ -41,16 +44,15 @@ if !connected?(socket), do:    _user = Users.get_user_for_TGJ(user.id) |> dbg
   end
 
   defp user_with_existing_active_TGJ_strategy_and_topics(user) do
-    case get_active_TGJ_Strategy(user) do
+    case get_active_TGJ_uStrategy(user) do
       nil ->
-        U_Strategies.create_u__strategy_TGJ_without_changeset(user.id)
-
-        # copy topics here!!! all NOT active
-
-
+        # dbg "initiating u_str and topics"
+        new_u_strategy = U_Strategies.create_u__strategy_TGJ_without_changeset(user.id)
+        Users.initiate_weekly_topics_for_user(user.id, new_u_strategy.id)
         Users.get_user_for_TGJ(user.id)
 
       _strategy ->
+        # dbg "strategy exists"
         user
     end
   end
@@ -63,8 +65,8 @@ if !connected?(socket), do:    _user = Users.get_user_for_TGJ(user.id) |> dbg
     """
   end
 
-  @spec get_active_TGJ_Strategy(%User{}) :: %U_Strategy{} | nil
-  defp get_active_TGJ_Strategy(user) do
+  @spec get_active_TGJ_uStrategy(%User{}) :: %U_Strategy{} | nil
+  defp get_active_TGJ_uStrategy(user) do
     user.u_strategies
     |> Enum.filter(
       &(&1.strategy.name == OurExperience.CONSTANTS.strategies().name.themed_gratitude_journal &&
