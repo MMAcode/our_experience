@@ -2,8 +2,9 @@ defmodule OurExperience.Users.Users do
   @moduledoc """
   The Users context.
   """
-
   import Ecto.Query, warn: false
+  alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopics.WeeklyTopics
+  alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopics.U_WeeklyTopic
   alias OurExperience.Repo
 
   alias OurExperience.Users.User
@@ -62,14 +63,14 @@ defmodule OurExperience.Users.Users do
       left_join: s in assoc(u_s, :strategy),
       left_join: uwt in assoc(u_s, :u_weekly_topics), #not inner_joint because if there are no topics, it would not load user either
       preload: [u_strategies: {u_s, [strategy: s, u_weekly_topics: uwt]}]
-      ) |>dbg
+    )
 
       # Repo.get_by(User, id: id)
       # |> Repo.preload(u_strategies: [:strategy, :u_weekly_topics])
       # |> Repo.preload(u_strategies: [:strategy, :u_topics])
   end
 
-  def initiate_weekly_topics_for_user(id) do
+  def initiate_weekly_topics_for_user(user_id, u_strategy_id) do
       """
       get all topics
       for each map
@@ -77,6 +78,23 @@ defmodule OurExperience.Users.Users do
         through user - u_strategy? probably bad practice as not all strategies have this
         on its own ->
       """
+          weekly_topics = WeeklyTopics.list_weekly_topics()
+          |> Enum.map(& %U_WeeklyTopic{
+            active: false,
+            position: &1.default_position,
+            user_id: user_id,
+            u_strategy_id: u_strategy_id,
+            weekly_topic_id: &1.id
+            })
+            |> Enum.each(& Repo.insert!(&1))
+            # |> Enum.at(0)
+
+            # dbg weekly_topics
+
+            # Repo.insert_all(%U_WeeklyTopic{}, weekly_topics)
+            # Repo.insert_all("u_weekly_topics", weekly_topics)
+            # Repo.insert!(weekly_topics)
+            #  |> dbg
 
 
 

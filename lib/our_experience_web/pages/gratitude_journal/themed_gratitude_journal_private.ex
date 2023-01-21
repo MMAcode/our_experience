@@ -12,14 +12,18 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
   def mount(_params, _session, %{assigns: %{current_user: user} = assigns} = socket) do
 
     user = Users.get_user_for_TGJ(user.id)
-    user = if !connected?(socket), do: with_existing_active_TGJ_strategy(user), else: user
+    user = if !connected?(socket), do: user_with_existing_active_TGJ_strategy_and_topics(user), else: user
     socket = assign(socket, current_user: user)
 
-    socket = case get_active_weekly_topic(user) do
-      nil -> assign(socket, render_weekly_topics: true)
-      _topic -> assign(socket, render_journal: true)
-    end
-    dbg socket.assigns
+    # socket = case get_active_weekly_topic(user) do
+    #   nil -> assign(socket, render_weekly_topics: true)
+    #   _topic -> assign(socket, render_journal: true)
+    # end
+    # dbg socket.assigns
+
+    str = get_active_TGJ_Strategy(user)
+    if connected?(socket), do: Users.initiate_weekly_topics_for_user(user.id, str.id)
+
     {:ok, socket}
   end
 
@@ -36,16 +40,13 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
     end
   end
 
-  defp with_existing_active_TGJ_strategy(user) do
+  defp user_with_existing_active_TGJ_strategy_and_topics(user) do
     case get_active_TGJ_Strategy(user) do
       nil ->
         U_Strategies.create_u__strategy_TGJ_without_changeset(user.id)
 
         # copy topics here!!! all NOT active
 
-        """
-
-        """
 
         Users.get_user_for_TGJ(user.id)
 

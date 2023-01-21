@@ -51,11 +51,11 @@ defmodule OurExperience.U_Strategies.U_Strategies do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_u__strategy(attrs \\ %{}) do
-    %U_Strategy{}
-    |> U_Strategy.changeset(attrs)
-    |> Repo.insert()
-  end
+  # def create_u__strategy(attrs \\ %{}) do
+  #   %U_Strategy{}
+  #   |> U_Strategy.changeset(attrs)
+  #   |> Repo.insert()
+  # end
 
   # u_strategy could be also create using User struct: preload all u_strategies association and then in changeset use cast_assoc and append new
 
