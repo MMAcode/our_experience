@@ -62,7 +62,7 @@ defmodule OurExperience.U_Strategies.U_Strategies do
   def create_u__strategy_TGJ_without_changeset(user_id, status \\CONSTANTS.u_strategies.status.on) do
    u_s = %U_Strategy{
       user_id: user_id,
-      strategy_id: OurExperience.Strategies.get_strategy_themed_gratitude_journal.id,
+      strategy_id: OurExperience.Strategies.Strategies.get_strategy_themed_gratitude_journal.id,
       status: status
     }
 

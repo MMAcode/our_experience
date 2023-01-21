@@ -1,7 +1,7 @@
 defmodule OurExperience.StrategiesFixtures do
   @moduledoc """
   This module defines test helpers for creating
-  entities via the `OurExperience.Strategies` context.
+  entities via the `OurExperience.Strategies.Strategies` context.
   """
 
   @doc """
@@ -13,7 +13,7 @@ defmodule OurExperience.StrategiesFixtures do
       |> Enum.into(%{
         name: "some name"
       })
-      |> OurExperience.Strategies.create_strategy()
+      |> OurExperience.Strategies.Strategies.create_strategy()
 
     strategy
   end

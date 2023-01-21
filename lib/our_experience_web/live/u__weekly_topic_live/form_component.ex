@@ -1,7 +1,7 @@
 defmodule OurExperienceWeb.U_WeeklyTopicLive.FormComponent do
   use OurExperienceWeb, :live_component
 
-  alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopics
+  alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopics.U_WeeklyTopics
 
   @impl true
   def render(assigns) do

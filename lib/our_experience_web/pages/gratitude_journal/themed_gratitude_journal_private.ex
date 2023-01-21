@@ -84,7 +84,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
 
   def handle_event("start-gratitude-journal", _attrs, %{assigns: %{current_user: user}} = socket) do
     # create u_strategy
-    gj_strategy_id = OurExperience.Strategies.get_strategy_themed_gratitude_journal().id
+    gj_strategy_id = OurExperience.Strategies.Strategies.get_strategy_themed_gratitude_journal().id
 
     """
          1) check if user already has that strategy active

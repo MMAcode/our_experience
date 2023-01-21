@@ -1,7 +1,7 @@
-defmodule OurExperience.StrategiesTest do
+defmodule OurExperience.Strategies.StrategiesTest do
   use OurExperience.DataCase
 
-  alias OurExperience.Strategies
+  alias OurExperience.Strategies.Strategies
 
   describe "strategies" do
     alias OurExperience.Strategies.Strategy

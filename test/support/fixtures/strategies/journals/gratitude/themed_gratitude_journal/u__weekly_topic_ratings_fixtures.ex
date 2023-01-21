@@ -1,7 +1,7 @@
 defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopicRatingsFixtures do
   @moduledoc """
   This module defines test helpers for creating
-  entities via the `OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopicRatings` context.
+  entities via the `OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopicRatings.U_WeeklyTopicRatings` context.
   """
 
   @doc """
@@ -15,7 +15,7 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_W
         after_first_week: %{},
         manual_activations: %{}
       })
-      |> OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopicRatings.create_u__weekly_topic_rating()
+      |> OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopicRatings.U_WeeklyTopicRatings.create_u__weekly_topic_rating()
 
     u__weekly_topic_rating
   end

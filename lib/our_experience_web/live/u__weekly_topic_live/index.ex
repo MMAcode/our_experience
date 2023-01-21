@@ -1,7 +1,7 @@
 defmodule OurExperienceWeb.U_WeeklyTopicLive.Index do
   use OurExperienceWeb, :live_view
   alias OurExperience.CONSTANTS
-  alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopics
+  alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopics.U_WeeklyTopics
 
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopics.U_WeeklyTopic
 

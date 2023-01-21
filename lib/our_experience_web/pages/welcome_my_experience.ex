@@ -1,6 +1,6 @@
 defmodule OurExperienceWeb.Pages.WelcomeMyExperience do
   use OurExperienceWeb, :live_view
-  alias OurExperience.Strategies
+  alias OurExperience.Strategies.Strategies
   alias OurExperience.CONSTANTS
   alias OurExperience.Repo
   alias OurExperience.U_Strategies.U_Strategies

@@ -1,4 +1,4 @@
-defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopicRatings do
+defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopicRatings.U_WeeklyTopicRatings do
   @moduledoc """
   The Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopicRatings context.
   """
