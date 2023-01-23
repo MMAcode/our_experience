@@ -17,13 +17,13 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
       <:col :let={topic} label="Summary"><%= topic.weekly_topic.summary %></:col>
       <:col :let={topic} label="Active">
         <%= topic.weekly_topic.summary %>
-        <.input
+        <%!-- <.input
         type="checkbox"
         label="active"
         value="true"
         name="checkX"
         id="someid"
-        />
+        /> --%>
       </:col>
     </.table>
     """
