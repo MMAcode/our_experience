@@ -14,8 +14,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
   when new user comes to this url/liveview, new u_strategy (and u_weekly_topics_) will be auto-created for him
   """
   def mount(_params, _session, %{assigns: %{current_user: user}} = socket) do
-    # socket = assign(socket, render_weekly_topics: false, render_journal: false)
-
     # set new u_strategy and topics, if needed:
     user_fromDb = Users.get_user_for_TGJ(user.id)
 
@@ -26,13 +24,19 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
 
     socket = assign(socket, current_user: user_wStrategy)
 
+    dbg ["neee", user_wStrategy]
+
     # nav to weeklyTopics or Journal:
     socket =
       case get_active_weekly_topic(user_wStrategy) do
-        nil -> assign(socket,
-        render_weekly_topics: true,
-        u_weekly_topics: get_active_TGJ_uStrategy(user_wStrategy).u_weekly_topics)
-        _topic -> assign(socket, render_journal: true)
+        nil ->
+          assign(socket,
+            render_weekly_topics: true,
+            u_weekly_topics: get_active_TGJ_uStrategy(user_wStrategy).u_weekly_topics
+          )
+
+        _topic ->
+          assign(socket, render_journal: true)
       end
 
     # dbg(socket.assigns)
@@ -42,8 +46,16 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
   def render(assigns) do
     ~H"""
     <h3>Themed Gratitude Journal 1.0 - private</h3>
-    <UWeeklyTopicsNew.index :if={assigns[:render_weekly_topics]} topics={@u_weekly_topics}/>
-    <div :if={assigns[:render_journal]}> journal</div>
+    <%!-- <UWeeklyTopicsNew.index :if={assigns[:render_weekly_topics]} topics={@u_weekly_topics}/> --%>
+    <%!-- <UWeeklyTopicsNew.render :if={assigns[:render_weekly_topics]} topics={@u_weekly_topics}/> --%>
+    <.live_component
+      :if={assigns[:render_weekly_topics]}
+      module={UWeeklyTopicsNew}
+      id="u_weekly_topics"
+      topics={@u_weekly_topics}
+      current_user={@current_user}
+    />
+    <div :if={assigns[:render_journal]}>journal</div>
 
     <%!-- <.button phx-click="do">test_me</.button> --%>
     """
@@ -77,7 +89,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
   end
 
   @spec get_active_TGJ_uStrategy(%User{}) :: %U_Strategy{} | nil
-  defp get_active_TGJ_uStrategy(user) do
+  def get_active_TGJ_uStrategy(user) do
     user.u_strategies
     |> Enum.filter(
       &(&1.strategy.name == OurExperience.CONSTANTS.strategies().name.themed_gratitude_journal &&
@@ -96,17 +108,8 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
     {:noreply, socket}
   end
 
-  def handle_event("start-gratitude-journal", _attrs, %{assigns: %{current_user: user}} = socket) do
-    # create u_strategy
-    gj_strategy_id =
-      OurExperience.Strategies.Strategies.get_strategy_themed_gratitude_journal().id
-
-    """
-         1) check if user already has that strategy active
-         1.1) if no, create u_strategy and
-
-    """
-
-    {:noreply, socket}
-  end
+  # def handle_event("ahoj", _params, socket) do
+  #   dbg 123
+  #   {:noreply, socket}
+  # end
 end

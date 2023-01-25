@@ -10,7 +10,6 @@ defmodule OurExperienceWeb.CoreComponents do
   [heroicons_elixir](https://github.com/mveytsman/heroicons_elixir) project.
   """
   use Phoenix.Component
-
   alias Phoenix.LiveView.JS
   import OurExperienceWeb.Gettext
 
