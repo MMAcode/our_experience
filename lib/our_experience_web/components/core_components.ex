@@ -263,6 +263,7 @@ defmodule OurExperienceWeb.CoreComponents do
   slot :inner_block
 
   def input(%{field: {f, field}} = assigns) do
+    # dbg "ahoj123"
     assigns
     |> assign(field: nil)
     |> assign_new(:name, fn ->
@@ -273,6 +274,7 @@ defmodule OurExperienceWeb.CoreComponents do
     |> assign_new(:value, fn -> Phoenix.HTML.Form.input_value(f, field) end)
     |> assign_new(:errors, fn -> translate_errors(f.errors || [], field) end)
     |> input()
+    |> dbg
   end
 
   def input(%{type: "checkbox"} = assigns) do

@@ -24,7 +24,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
 
     socket = assign(socket, current_user: user_wStrategy)
 
-    dbg ["neee", user_wStrategy]
+    # dbg(["neee", user_wStrategy])
 
     # nav to weeklyTopics or Journal:
     socket =
@@ -33,12 +33,14 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
           assign(socket,
             render_weekly_topics: true,
             u_weekly_topics: get_active_TGJ_uStrategy(user_wStrategy).u_weekly_topics
-          )
+            )
 
-        _topic ->
-          assign(socket, render_journal: true)
-      end
+            _topic ->
+              assign(socket, render_journal: true)
+            end
 
+      # temp:
+    socket = assign(socket, u_weekly_topics: get_active_TGJ_uStrategy(user_wStrategy).u_weekly_topics)
     # dbg(socket.assigns)
     {:ok, socket}
   end
@@ -55,7 +57,15 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
       topics={@u_weekly_topics}
       current_user={@current_user}
     />
-    <div :if={assigns[:render_journal]}>journal</div>
+    <div :if={assigns[:render_journal]}>
+      journal
+      <.live_component
+        module={UWeeklyTopicsNew}
+        id="u_weekly_topics"
+        topics={@u_weekly_topics}
+        current_user={@current_user}
+      />
+    </div>
 
     <%!-- <.button phx-click="do">test_me</.button> --%>
     """

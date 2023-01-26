@@ -11,6 +11,7 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_W
   schema "u_weekly_topics" do
     field :active, :boolean, default: false
     field :position, :integer
+    field :counter, :integer, default: 0, virtual: true
 
     belongs_to :user, User
     belongs_to :u_strategy, U_Strategy
@@ -22,7 +23,7 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_W
   @doc false
   def changeset(u__weekly_topic, attrs) do
     u__weekly_topic
-    |> cast(attrs, [:active])
+    |> cast(attrs, [:active, :counter])
     |> validate_required([:position, :active])
     |> unique_constraint([:position])
   end
