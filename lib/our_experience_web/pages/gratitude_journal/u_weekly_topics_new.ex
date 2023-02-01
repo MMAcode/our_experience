@@ -18,10 +18,14 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
   end
 
   def update(%{current_user: user} = assigns, socket) do
+
+    # dbg user
     u_strategy = TGJ.get_active_TGJ_uStrategy(user)
     u_str_changeset = U_Strategy.changeset(u_strategy)
 
     socket = assign(socket, assigns) |> assign(:u_str_changeset, u_str_changeset)
+
+    # dbg u_str_changeset.data
 
     socket =
       socket
@@ -37,9 +41,8 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
   def render(assigns) do
     ~H"""
     <div>
-      <h1>Your Weekly topics (new)</h1>
-
-      <.button phx-click="ahoj" phx-target={@myself}>ahoj</.button>
+      <h1>Your Weekly topics</h1>
+<h3>(At least one topic must be active!)</h3>
       <.form
         :let={f}
         for={@u_str_changeset}
@@ -48,7 +51,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
         phx-target={@myself}
       >
         <.button>Save</.button>
-        <.table :if={@rerender? != nil} id="weekly_topics_new" rows={_topics_forms = inputs_for(f, :u_weekly_topics)}>
+        <.table id="weekly_topics_new" rows={_topics_forms = inputs_for(f, :u_weekly_topics)}>
           <:col :let={topic_form} label="Title"><%= topic_form.data.weekly_topic.title %></:col>
           <:col :let={topic_form} label="Summary"><%= topic_form.data.weekly_topic.summary %></:col>
           <:col :let={topic_form} label="Active?">
