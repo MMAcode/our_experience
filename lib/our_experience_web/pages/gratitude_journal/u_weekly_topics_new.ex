@@ -35,9 +35,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
   end
 
   def render(assigns) do
-    # def index(assigns) do
-    # dbg(["NEW", assigns])
-
     ~H"""
     <div>
       <h1>Your Weekly topics (new)</h1>
@@ -50,14 +47,12 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
         phx-submit="save"
         phx-target={@myself}
       >
-        <% topics_forms = inputs_for(f, :u_weekly_topics) %>
         <.button>Save</.button>
-        <.table :if={@rerender? != nil} id="weekly_topics_new" rows={topics_forms}>
+        <.table :if={@rerender? != nil} id="weekly_topics_new" rows={_topics_forms = inputs_for(f, :u_weekly_topics)}>
           <:col :let={topic_form} label="Title"><%= topic_form.data.weekly_topic.title %></:col>
           <:col :let={topic_form} label="Summary"><%= topic_form.data.weekly_topic.summary %></:col>
           <:col :let={topic_form} label="Active?">
             <%= hidden_input(topic_form, :id) %>
-            <%!-- <%= checkbox(topic_form, :active) %> --%>
             <.input field={{topic_form, :active}} type="checkbox" label="active?" />
           </:col>
           <:col :let={topic_form} label="View details">
