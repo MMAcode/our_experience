@@ -49,7 +49,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
 
   def render(assigns) do
     ~H"""
-    <h3>Themed Gratitude Journal 1.0 - private</h3>
+    <h3>Themed Gratitude Journal</h3>
     <%!-- <UWeeklyTopicsNew.index :if={assigns[:render_weekly_topics]} topics={@u_weekly_topics}/> --%>
     <%!-- <UWeeklyTopicsNew.render :if={assigns[:render_weekly_topics]} topics={@u_weekly_topics}/> --%>
     <.live_component
@@ -60,7 +60,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
       current_user={@current_user}
     />
     <div :if={assigns[:render_journal]}>
-      journal
       <.live_component
         module={UWeeklyTopicsNew}
         id="u_weekly_topics"
@@ -68,8 +67,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
         current_user={@current_user}
       />
     </div>
-
-    <%!-- <.button phx-click="do">test_me</.button> --%>
     """
   end
 
@@ -102,7 +99,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
 
   @spec get_active_TGJ_uStrategy(%User{}) :: %U_Strategy{} | nil
   def get_active_TGJ_uStrategy(user) do
-    us = user.u_strategies
+    user.u_strategies
     |> Enum.filter(
       &(&1.strategy.name == OurExperience.CONSTANTS.strategies().name.themed_gratitude_journal &&
           &1.status == OurExperience.CONSTANTS.u_strategies().status.on)
@@ -115,19 +112,5 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
           end
         end)
     |> Enum.at(0)
-
   end
-
-  def handle_event("do", _attrs, %{assigns: %{current_user: user}} = socket) do
-    # U_Strategies.create_u__strategy_TGJ_without_changeset(user.id)
-    # U_Strategies.create_u__strategy_TGJ_without_changeset(user.id)
-    # U_Strategies.create_u__strategy(%{user_id: user.id})
-
-    {:noreply, socket}
-  end
-
-  # def handle_event("ahoj", _params, socket) do
-  #   dbg 123
-  #   {:noreply, socket}
-  # end
 end
