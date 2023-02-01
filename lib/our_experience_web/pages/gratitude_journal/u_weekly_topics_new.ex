@@ -15,11 +15,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
   # when here, user already has an active TGJ strategy
   # def mount(%{assigns: %{current_user: user}} = socket) do
   def mount(socket) do
-    # dbg(socket)
-    # dbg "mounr123"
-    # dbg. socket
-
-    # dbg TGJ.get_active_TGJ_uStrategy(user)
     {:ok, socket}
   end
 
@@ -28,8 +23,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
     u_str_changeset = U_Strategy.changeset(u_strategy)
 
     socket = assign(socket, assigns) |> assign(:u_str_changeset, u_str_changeset)
-    # dbg socket.assigns.u_str_changeset.data
-    # dbg socket
     socket = socket
     |> assign(:counter, 0)
     |> assign(:rerender?, true)
@@ -47,14 +40,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
     <div>
       <h1>Your Weekly topics (new)</h1>
 
-      <%!-- <div :for={topic <- @topics}>
-      <.topic title={topic.weekly_topic.title} summary={topic.weekly_topic.summary} />
-    </div> --%>
-      <%!-- <.simple_form --%>
       <.button phx-click="ahoj" phx-target={@myself}>ahoj</.button>
-      <%!-- <.button type="button" phx-click="form-event2" phx-target={@myself} phx-value-topicidmiro={topic_form.data.id}>ahoj</.button> --%>
-      <%!-- <.button type="button" phx-click="form-event2" phx-target={@myself} phx-value-topicidmiro={123}>ahoj</.button> --%>
-      <%!-- <.button  phx-click="form-event2" phx-target={@myself}>ahoj2</.button> --%>
       <.form
         :let={f}
         for={@u_str_changeset}
@@ -62,32 +48,20 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
         phx-submit="save"
         phx-target={@myself}
       >
-        <%!-- <.input field={{f, :title}} type="text" label="title" /> --%>
-
         <% topics_forms = inputs_for(f, :u_weekly_topics) %>
-        <%!-- <% dbg Enum.at(topics_forms,0)%> --%>
-        <%!-- <%= dbg is_list(topics_forms)%> --%>
-        <%!-- <%= dbg f %> --%>
         <.button>Save</.button>
-
         <.table
         :if={@rerender? != nil} id="weekly_topics_new" rows={topics_forms}>
           <:col :let={topic_form} label="Title"><%= topic_form.data.weekly_topic.title %></:col>
           <:col :let={topic_form} label="Summary"><%= topic_form.data.weekly_topic.summary %></:col>
-          <%!-- <:col :let={topic_form} label="Active?"><%= input_value(topic_form, :active)%></:col> --%>
           <:col :let={topic_form} label="Active?">
             <%= hidden_input(topic_form, :id) %>
             <%!-- <%= checkbox(topic_form, :active) %> --%>
             <.input field={{topic_form, :active}} type="checkbox" label="active?" />
           </:col>
           <:col :let={topic_form} label="View details">
-          <%!-- <% dbg topic_form %> --%>
-              <%!-- phx-click="toggle-modal" --%>
-              <%!-- phx-click={JS.show(to: "#u-topic-modal")} --%>
-              <%!-- phx-click={JS.show(to: "u-topic-modal")} --%>
-              <%!-- phx-click="toggle-modal" --%>
             <.button
-            phx-click={JS.push("toggle-modal") |> show_modal(topic_form.id)}
+            phx-click={show_modal(topic_form.id)}
               type="button"
               phx-target={@myself}
               phx-value-topic-id={topic_form.data.weekly_topic.id}
@@ -97,15 +71,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
                   <.modal
       id={topic_form.id}
       >
-      <%!-- on_cancel={JS.hide(to: "#u-topic-modal", transition: "fade-out")} --%>
-        <p>lskj flwke fwle jflwk eflkw eflkwjf</p>
-        <%!-- <% dbg @clicked_topic %> --%>
-        <% dbg topic_form.data.weekly_topic.title %>
         <% wt = topic_form.data.weekly_topic %>
-        <% dbg wt %>
-
-
-
         <p> a:<%= topic_form.data.weekly_topic.id %> </p>
         <p> b: <%= wt.id %> </p>
         <h3> title </h3>
@@ -121,37 +87,8 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
           </:col>
         </.table>
       </.form>
-      <%!-- phx-mounted={JS.transition("animate-ping", time: 500)} --%>
-      <%!-- :if={@show_modal|>dbg} --%>
-      <%!-- :if={@counter > 0} --%>
-      <%!-- show={@show_modal|>dbg} --%>
-<%!-- show={true}} --%>
-
     </div>
     """
-  end
-
-
-  #   def handle_event("toggle-modal", attr, socket) do
-  #   dbg ["toggle-modal event triggered", attr]
-  #   {:noreply, socket}
-  # end
-
-  def handle_event("toggle-modal", %{"topic-id" => topic_id}, socket) do
-    #
-    u_str_changeset = socket.assigns.u_str_changeset
-    # dbg(topic_id)
-    # dbg(u_str_changeset.data)
-
-    topic = U_Strategy.get_weekly_topic_by_topic_id_from_loaded_data(u_str_changeset.data, String.to_integer(topic_id))
-    # dbg topic
-    socket = socket
-    |> assign(:show_modal, true)
-    |> assign(:counter, (socket.assigns.counter) + 1)
-    |> assign(:test, "ahoj")
-    |> assign(:clicked_topic, topic)
-
-    {:noreply, socket}
   end
 
   def handle_event("form_event", %{"u__strategy" => u_strategy_params}, socket) do
@@ -179,6 +116,11 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
     {:noreply, socket}
   end
 end
+
+
+
+
+
 
 # ARCHIVE:
 # def handle_event("form_event", %{"u__strategy" => %{"u_weekly_topics" => u_weekly_topics} = u_strategy_params} = params, socket) do
