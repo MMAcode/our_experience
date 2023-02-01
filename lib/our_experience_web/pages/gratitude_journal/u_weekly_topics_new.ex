@@ -4,11 +4,12 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
   # for text_input
   import Phoenix.HTML.Form
   import OurExperienceWeb.CoreComponents
+  import OurExperienceWeb.Pages.GratitudeJournal.WeeklyTopicModalComponent
   # import Phoenix.LiveView.Helpers #probably already imported but just in case...
   alias OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate, as: TGJ
   alias OurExperience.U_Strategies.U_Strategy
   alias OurExperience.U_Strategies.U_Strategies
-  alias Phoenix.LiveView.JS
+  # alias Phoenix.LiveView.JS
   on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
 
   # when here, user already has an active TGJ strategy
@@ -19,16 +20,11 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
 
   def update(%{current_user: user} = assigns, socket) do
     u_strategy = TGJ.get_active_TGJ_uStrategy(user)
-    u_str_changeset = U_Strategy.changeset(u_strategy)
 
-    socket = assign(socket, assigns) |> assign(:u_str_changeset, u_str_changeset)
     socket =
       socket
-      |> assign(:counter, 0)
-      |> assign(:rerender?, true)
-      |> assign(:show_modal, false)
-      |> assign(:clicked_topic, nil)
-      |> assign(:test, nil)
+      |> assign(assigns)
+      |> assign(:u_str_changeset, U_Strategy.changeset(u_strategy))
 
     {:ok, socket}
   end
@@ -37,7 +33,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
     ~H"""
     <div>
       <h1>Your Weekly topics</h1>
-<h3>(At least one topic must be active!)</h3>
+      <h3>(At least one topic must be active!)</h3>
       <.form
         :let={f}
         for={@u_str_changeset}
@@ -62,20 +58,10 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
             >
               View details
             </.button>
-            <.modal id={topic_form.id}>
-              <% wt = topic_form.data.weekly_topic %>
-              <p>a:<%= topic_form.data.weekly_topic.id %></p>
-              <p>b: <%= wt.id %></p>
-              <h3>title</h3>
-              <p><%= wt.title %></p>
-              <h3>summary</h3>
-              <p><%= wt.summary %></p>
-              <h3>content</h3>
-              <p><%= wt.content %></p>
-              <h3>day_by_day_instructions</h3>
-              <p><%= wt.day_by_day_instructions %></p>
-              <p>xxx <%= @test %>yyy</p>
-            </.modal>
+            <.weekly_topic_modal_component
+              id={topic_form.id}
+              weekly_topic={topic_form.data.weekly_topic}
+            />
           </:col>
         </.table>
       </.form>
@@ -96,13 +82,8 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
     dbg(["to save", u_strategy_params])
 
     case U_Strategies.update_u__strategy(socket.assigns.u_str_changeset.data, u_strategy_params) do
-      {:ok, _u_strategy} ->
-        dbg(["saved"])
-
-      # {:noreply, socket}
-      {:error, _changeset} ->
-        dbg("error")
-        # {:noreply, assign(socket, u_str_changeset: changeset)
+      {:ok, _u_strategy} -> dbg(["saved"])
+      {:error, _changeset} -> dbg("error")
     end
 
     {:noreply, socket}
