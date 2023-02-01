@@ -54,9 +54,20 @@ defmodule OurExperienceWeb.Auth.Ueberauth.UserFromAuth do
     # # %{id: auth.uid, name: name_from_auth(auth), avatar: avatar_from_auth(auth), email: email}
     # %{email: email}
 
-    user_from_db = Users.get_user_by_email(email)
+    user = if String.contains?(email, "@") do
+      get_or_create_user_from_valid_email(email)
+    else
+      dbg ["expected to get an email as a string but got:", email]
+      nil
+    end
 
-    user =
+    # dbg(["miromm", user])
+    # %{id: auth.uid, name: name_from_auth(auth), avatar: avatar_from_auth(auth), email: email}
+    user
+  end
+
+  defp get_or_create_user_from_valid_email(email) do
+    user_from_db = Users.get_user_by_email(email)
       if !user_from_db do
         case Users.create_user(email) do
           {:ok, new_user} ->
@@ -71,10 +82,6 @@ defmodule OurExperienceWeb.Auth.Ueberauth.UserFromAuth do
         dbg(["user retrieved from database: ", user_from_db])
         user_from_db
       end
-
-    # dbg(["miromm", user])
-    # %{id: auth.uid, name: name_from_auth(auth), avatar: avatar_from_auth(auth), email: email}
-    user
   end
 
   # defp name_from_auth(auth) do
