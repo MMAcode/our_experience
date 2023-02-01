@@ -33,14 +33,16 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
           assign(socket,
             render_weekly_topics: true,
             u_weekly_topics: get_active_TGJ_uStrategy(user_wStrategy).u_weekly_topics
-            )
+          )
 
-            _topic ->
-              assign(socket, render_journal: true)
-            end
+        _topic ->
+          assign(socket, render_journal: true)
+      end
 
-      # temp:
-    socket = assign(socket, u_weekly_topics: get_active_TGJ_uStrategy(user_wStrategy).u_weekly_topics)
+    # temp:
+    socket =
+      assign(socket, u_weekly_topics: get_active_TGJ_uStrategy(user_wStrategy).u_weekly_topics)
+
     # dbg(socket.assigns)
     {:ok, socket}
   end

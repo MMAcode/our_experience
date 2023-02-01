@@ -1,6 +1,6 @@
 defmodule OurExperienceWeb.RichTextEditors.Quill do
   use OurExperienceWeb, :live_view
-#   on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
+  #   on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
   alias OurExperience.RichTextStorageRepo
 
   @impl true

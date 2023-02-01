@@ -41,17 +41,20 @@ defmodule OurExperience.U_Strategies.U_Strategy do
     # |> unique_constraint(:strategy_id, name: :user_strategy)
 
     |> cast_assoc(:u_weekly_topics, with: &U_WeeklyTopic.changeset/2)
+
     # |> dbg
   end
 
   # May the first argument be the owner of the method
   def get_weekly_topic_by_topic_id_from_loaded_data(u__strategy, topic_id) do
-    Enum.find(u__strategy.u_weekly_topics,
+    Enum.find(
+      u__strategy.u_weekly_topics,
       fn u_weekly_topic ->
         u_weekly_topic.weekly_topic_id == topic_id
-      end)
-      |> List.wrap
-      |> Enum.map(& &1.weekly_topic)
-      |> List.first
+      end
+    )
+    |> List.wrap()
+    |> Enum.map(& &1.weekly_topic)
+    |> List.first()
   end
 end

@@ -37,6 +37,7 @@ defmodule OurExperience.U_Strategies.U_Strategies do
 
   """
   def get_u__strategy!(id), do: Repo.get!(U_Strategy, id)
+
   # def get_active_u_strategy_by_user_and__id(id), do: Repo.get_by(U_Strategy, [status: CONSTANTS.u_strategies.status.on])
 
   @doc """
@@ -51,6 +52,7 @@ defmodule OurExperience.U_Strategies.U_Strategies do
       {:error, %Ecto.Changeset{}}
 
   """
+
   # def create_u__strategy(attrs \\ %{}) do
   #   %U_Strategy{}
   #   |> U_Strategy.changeset(attrs)
@@ -59,10 +61,13 @@ defmodule OurExperience.U_Strategies.U_Strategies do
 
   # u_strategy could be also create using User struct: preload all u_strategies association and then in changeset use cast_assoc and append new
 
-  def create_u__strategy_TGJ_without_changeset(user_id, status \\CONSTANTS.u_strategies.status.on) do
-   u_s = %U_Strategy{
+  def create_u__strategy_TGJ_without_changeset(
+        user_id,
+        status \\ CONSTANTS.u_strategies().status.on
+      ) do
+    u_s = %U_Strategy{
       user_id: user_id,
-      strategy_id: OurExperience.Strategies.Strategies.get_strategy_themed_gratitude_journal.id,
+      strategy_id: OurExperience.Strategies.Strategies.get_strategy_themed_gratitude_journal().id,
       status: status
     }
 

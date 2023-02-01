@@ -9,8 +9,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
   alias OurExperience.U_Strategies.U_Strategy
   alias OurExperience.U_Strategies.U_Strategies
   alias Phoenix.LiveView.JS
-    on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
-
+  on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
 
   # when here, user already has an active TGJ strategy
   # def mount(%{assigns: %{current_user: user}} = socket) do
@@ -23,12 +22,15 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
     u_str_changeset = U_Strategy.changeset(u_strategy)
 
     socket = assign(socket, assigns) |> assign(:u_str_changeset, u_str_changeset)
-    socket = socket
-    |> assign(:counter, 0)
-    |> assign(:rerender?, true)
-    |> assign(:show_modal, false)
-    |> assign(:clicked_topic, nil)
-    |> assign(:test, nil)
+
+    socket =
+      socket
+      |> assign(:counter, 0)
+      |> assign(:rerender?, true)
+      |> assign(:show_modal, false)
+      |> assign(:clicked_topic, nil)
+      |> assign(:test, nil)
+
     {:ok, socket}
   end
 
@@ -50,8 +52,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
       >
         <% topics_forms = inputs_for(f, :u_weekly_topics) %>
         <.button>Save</.button>
-        <.table
-        :if={@rerender? != nil} id="weekly_topics_new" rows={topics_forms}>
+        <.table :if={@rerender? != nil} id="weekly_topics_new" rows={topics_forms}>
           <:col :let={topic_form} label="Title"><%= topic_form.data.weekly_topic.title %></:col>
           <:col :let={topic_form} label="Summary"><%= topic_form.data.weekly_topic.summary %></:col>
           <:col :let={topic_form} label="Active?">
@@ -61,29 +62,27 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
           </:col>
           <:col :let={topic_form} label="View details">
             <.button
-            phx-click={show_modal(topic_form.id)}
+              phx-click={show_modal(topic_form.id)}
               type="button"
               phx-target={@myself}
               phx-value-topic-id={topic_form.data.weekly_topic.id}
             >
               View details
             </.button>
-                  <.modal
-      id={topic_form.id}
-      >
-        <% wt = topic_form.data.weekly_topic %>
-        <p> a:<%= topic_form.data.weekly_topic.id %> </p>
-        <p> b: <%= wt.id %> </p>
-        <h3> title </h3>
-        <p> <%= wt.title%> </p>
-        <h3> summary </h3>
-        <p> <%= wt.summary%> </p>
-        <h3> content </h3>
-        <p> <%= wt.content%> </p>
-        <h3> day_by_day_instructions </h3>
-        <p> <%= wt.day_by_day_instructions%> </p>
-        <p>xxx <%= @test %>yyy</p>
-      </.modal>
+            <.modal id={topic_form.id}>
+              <% wt = topic_form.data.weekly_topic %>
+              <p>a:<%= topic_form.data.weekly_topic.id %></p>
+              <p>b: <%= wt.id %></p>
+              <h3>title</h3>
+              <p><%= wt.title %></p>
+              <h3>summary</h3>
+              <p><%= wt.summary %></p>
+              <h3>content</h3>
+              <p><%= wt.content %></p>
+              <h3>day_by_day_instructions</h3>
+              <p><%= wt.day_by_day_instructions %></p>
+              <p>xxx <%= @test %>yyy</p>
+            </.modal>
           </:col>
         </.table>
       </.form>
@@ -116,11 +115,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
     {:noreply, socket}
   end
 end
-
-
-
-
-
 
 # ARCHIVE:
 # def handle_event("form_event", %{"u__strategy" => %{"u_weekly_topics" => u_weekly_topics} = u_strategy_params} = params, socket) do

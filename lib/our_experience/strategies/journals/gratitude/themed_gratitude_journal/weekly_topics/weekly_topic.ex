@@ -22,7 +22,15 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.Wee
   @doc false
   def changeset(weekly_topic, attrs) do
     weekly_topic
-    |> cast(attrs, [:title, :summary, :introduction, :day_by_day_instructions, :content, :default_position, :default_active_status])
+    |> cast(attrs, [
+      :title,
+      :summary,
+      :introduction,
+      :day_by_day_instructions,
+      :content,
+      :default_position,
+      :default_active_status
+    ])
     |> validate_required([:title, :content, :default_position, :default_active_status])
     |> unique_constraint([:default_position])
   end

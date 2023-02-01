@@ -7,5 +7,4 @@ defmodule OurExperience.Seeds.StrategiesSeeds do
       name: "Themed Gratitude Journal_" <> (DateTime.utc_now() |> DateTime.to_string())
     })
   end
-
 end

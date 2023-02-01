@@ -8,7 +8,6 @@ defmodule OurExperience.CONSTANTS do
     }
   end
 
-
   def u_strategies do
     %{
       status: %{

@@ -32,7 +32,8 @@ defmodule OurExperienceWeb.MiroComponents do
 
   # <.b_link to={~p""}></.b_link>
   def b_link(assigns) do
-    dbg assigns
+    dbg(assigns)
+
     ~H"""
     <%!-- # <.link navigate={~p"/strategies/themed_gratitude_journal/"}> --%>
     <.link navigate={@to}>

@@ -52,16 +52,18 @@ defmodule OurExperience.Users.Users do
     #     preload: [u_strategies: {u_s, [strategy: s]}]
     # )
 
-     users=   Repo.all(
-      from u in User,
-        where: u.email == ^email
+    users =
+      Repo.all(
+        from u in User,
+          where: u.email == ^email
         # left_join: u_s in assoc(u, :u_strategies),
         # where: u_s.status == "on",
         # join: s in assoc(u_s, :strategy)
         # preload: [u_strategies: u_s]
-    )
-    dbg ["mmxx", users]
-    Enum.at(users,0)
+      )
+
+    dbg(["mmxx", users])
+    Enum.at(users, 0)
 
     # simpler, but 3 trips to db instead of 1 (and possibly no filtering?)
     # Repo.get_by(User, email: email)
@@ -79,17 +81,18 @@ defmodule OurExperience.Users.Users do
     #     preload: [u_strategies: {u_s, [strategy: s, u_weekly_topics: uwt]}]
     # )
 
-        Repo.one(
+    Repo.one(
       from u in User,
         where: u.id == ^id,
         left_join: u_s in assoc(u, :u_strategies),
-        on: u_s.status == "on", #not 'where' because that would remove the row regardles the left join
+        # not 'where' because that would remove the row regardles the left join
+        on: u_s.status == "on",
         left_join: s in assoc(u_s, :strategy),
-        left_join: uwt in assoc(u_s, :u_weekly_topics), #not inner_joint because if there are no topics, it would not load user either
+        # not inner_joint because if there are no topics, it would not load user either
+        left_join: uwt in assoc(u_s, :u_weekly_topics),
         left_join: wt in assoc(uwt, :weekly_topic),
         preload: [u_strategies: {u_s, [strategy: s, u_weekly_topics: {uwt, weekly_topic: wt}]}]
     )
-
 
     # as multiple queries
     # Repo.one(
