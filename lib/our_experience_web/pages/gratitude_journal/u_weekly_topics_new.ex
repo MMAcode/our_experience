@@ -34,6 +34,8 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
     |> assign(:counter, 0)
     |> assign(:rerender?, true)
     |> assign(:show_modal, false)
+    |> assign(:clicked_topic, nil)
+    |> assign(:test, nil)
     {:ok, socket}
   end
 
@@ -79,45 +81,75 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
             <.input field={{topic_form, :active}} type="checkbox" label="active?" />
           </:col>
           <:col :let={topic_form} label="View details">
+          <%!-- <% dbg topic_form %> --%>
               <%!-- phx-click="toggle-modal" --%>
               <%!-- phx-click={JS.show(to: "#u-topic-modal")} --%>
               <%!-- phx-click={JS.show(to: "u-topic-modal")} --%>
               <%!-- phx-click="toggle-modal" --%>
             <.button
-            phx-click={show_modal("u-topic-modal")}
+            phx-click={JS.push("toggle-modal") |> show_modal(topic_form.id)}
               type="button"
               phx-target={@myself}
-              phx-value-topic-id={topic_form.data.id}
+              phx-value-topic-id={topic_form.data.weekly_topic.id}
             >
               View details
             </.button>
+                  <.modal
+      id={topic_form.id}
+      >
+      <%!-- on_cancel={JS.hide(to: "#u-topic-modal", transition: "fade-out")} --%>
+        <p>lskj flwke fwle jflwk eflkw eflkwjf</p>
+        <%!-- <% dbg @clicked_topic %> --%>
+        <% dbg topic_form.data.weekly_topic.title %>
+        <% wt = topic_form.data.weekly_topic %>
+        <% dbg wt %>
+
+
+
+        <p> a:<%= topic_form.data.weekly_topic.id %> </p>
+        <p> b: <%= wt.id %> </p>
+        <h3> title </h3>
+        <p> <%= wt.title%> </p>
+        <h3> summary </h3>
+        <p> <%= wt.summary%> </p>
+        <h3> content </h3>
+        <p> <%= wt.content%> </p>
+        <h3> day_by_day_instructions </h3>
+        <p> <%= wt.day_by_day_instructions%> </p>
+        <p>xxx <%= @test %>yyy</p>
+      </.modal>
           </:col>
         </.table>
       </.form>
       <%!-- phx-mounted={JS.transition("animate-ping", time: 500)} --%>
       <%!-- :if={@show_modal|>dbg} --%>
       <%!-- :if={@counter > 0} --%>
-      show={@show_modal|>dbg}
+      <%!-- show={@show_modal|>dbg} --%>
 <%!-- show={true}} --%>
-      <.modal
-      id="u-topic-modal"
-      >
-      <%!-- on_cancel={JS.hide(to: "#u-topic-modal", transition: "fade-out")} --%>
-        <p>lskj flwke fwle jflwk eflkw eflkwjf</p>
-      </.modal>
+
     </div>
     """
   end
 
-  def handle_event("toggle-modal", %{"topic-id" => u_topic_id}, socket) do
+
+  #   def handle_event("toggle-modal", attr, socket) do
+  #   dbg ["toggle-modal event triggered", attr]
+  #   {:noreply, socket}
+  # end
+
+  def handle_event("toggle-modal", %{"topic-id" => topic_id}, socket) do
     #
     u_str_changeset = socket.assigns.u_str_changeset
-    dbg(u_topic_id)
-    show_modal("u-topic-modal")
+    # dbg(topic_id)
+    # dbg(u_str_changeset.data)
+
+    topic = U_Strategy.get_weekly_topic_by_topic_id_from_loaded_data(u_str_changeset.data, String.to_integer(topic_id))
+    # dbg topic
     socket = socket
     |> assign(:show_modal, true)
     |> assign(:counter, (socket.assigns.counter) + 1)
-    # |> assign(:counter, 9)
+    |> assign(:test, "ahoj")
+    |> assign(:clicked_topic, topic)
 
     {:noreply, socket}
   end

@@ -3,6 +3,7 @@
 @import "tailwindcss/utilities";
 @import "elements";
 @import "classes";
+@import "media_queries";
 
 /* This file is for your main application CSS */
 
