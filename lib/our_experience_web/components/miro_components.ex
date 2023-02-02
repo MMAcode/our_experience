@@ -31,10 +31,13 @@ defmodule OurExperienceWeb.MiroComponents do
   end
 
   # <.b_link to={~p""}></.b_link>
+  slot :inner_block
+  attr :to, :string, required: true
+  attr :class, :string, default: ""
   def b_link(assigns) do
     ~H"""
     <%!-- # <.link navigate={~p"/strategies/themed_gratitude_journal/"}> --%>
-    <.link navigate={@to}>
+    <.link navigate={@to} class={@class}>
       <.button><%= render_slot(@inner_block) %></.button>
     </.link>
     """
