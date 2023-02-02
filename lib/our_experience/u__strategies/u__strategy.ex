@@ -57,4 +57,12 @@ defmodule OurExperience.U_Strategies.U_Strategy do
     |> Enum.map(& &1.weekly_topic)
     |> List.first()
   end
+
+  def get_current_weekly_topic_from_loaded_data(u__strategy) do
+    u__strategy.u_weekly_topics
+    |> Enum.filter(&(&1.active == true))
+    |> Enum.sort_by(& &1.position, :asc)
+    |> Enum.at(0)
+    |> Map.get(:weekly_topic)
+  end
 end

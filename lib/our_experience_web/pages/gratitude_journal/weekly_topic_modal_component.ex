@@ -6,7 +6,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.WeeklyTopicModalComponent do
   attr :id, :string, doc: "Id of the html element of this specific modal"
   attr :weekly_topic, :map, doc: "Weekly topic to display in the modal"
   def weekly_topic_modal_component(assigns) do
-    dbg assigns
     ~H"""
     <.modal id={@id}>
       <h4>Title</h4>

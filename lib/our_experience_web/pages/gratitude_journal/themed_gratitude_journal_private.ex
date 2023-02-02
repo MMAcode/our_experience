@@ -4,6 +4,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
   alias OurExperience.U_Strategies.U_Strategies
   alias OurExperience.U_Strategies.U_Strategy
   alias OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew
+  alias OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal
 
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopics.U_WeeklyTopic
 
@@ -13,7 +14,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
   @doc """
   when new user comes to this url/liveview, new u_strategy (and u_weekly_topics_) will be auto-created for him
   """
-  def mount(_params, _session, %{assigns: %{current_user: user}} = socket) do
+  def mount(_params, _session, %{assigns: %{current_user: user, live_action: action}} = socket) do
     # set new u_strategy and topics, if needed:
     user_fromDb = Users.get_user_for_TGJ(user.id)
 
@@ -24,49 +25,41 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
 
     socket = assign(socket, current_user: user_wStrategy)
 
-    # dbg(["neee", user_wStrategy])
-
     # nav to weeklyTopics or Journal:
-    socket =
-      case get_active_weekly_topic(user_wStrategy) do
-        nil ->
-          assign(socket,
-            render_weekly_topics: true,
-            u_weekly_topics: get_active_TGJ_uStrategy(user_wStrategy).u_weekly_topics
-          )
 
-        _topic ->
-          assign(socket, render_journal: true)
+    socket =
+      case action do
+        :index -> default_path(socket, user_wStrategy)
+        # :journal -> assign(socket, render_journal: true)
+        :weekly_topics -> assign(socket, render_weekly_topics: true)
       end
 
-    # temp:
-    socket =
-      assign(socket, u_weekly_topics: get_active_TGJ_uStrategy(user_wStrategy).u_weekly_topics)
-
-    # dbg(socket.assigns)
     {:ok, socket}
+  end
+
+  defp default_path(socket, user_wStrategy) do
+      case get_active_weekly_topic(user_wStrategy) do
+        nil -> assign(socket,render_weekly_topics: true)
+        _topic -> assign(socket, render_journal: true)
+      end
   end
 
   def render(assigns) do
     ~H"""
+    <% dbg @live_action == :index %>
     <h3>Themed Gratitude Journal</h3>
-    <%!-- <UWeeklyTopicsNew.index :if={assigns[:render_weekly_topics]} topics={@u_weekly_topics}/> --%>
-    <%!-- <UWeeklyTopicsNew.render :if={assigns[:render_weekly_topics]} topics={@u_weekly_topics}/> --%>
     <.live_component
       :if={assigns[:render_weekly_topics]}
       module={UWeeklyTopicsNew}
       id="u_weekly_topics"
-      topics={@u_weekly_topics}
       current_user={@current_user}
     />
-    <div :if={assigns[:render_journal]}>
-      <.live_component
-        module={UWeeklyTopicsNew}
-        id="u_weekly_topics"
-        topics={@u_weekly_topics}
-        current_user={@current_user}
-      />
-    </div>
+    <.live_component
+      :if={assigns[:render_journal]}
+      module={Journal}
+      id="journal"
+      current_user={@current_user}
+    />
     """
   end
 

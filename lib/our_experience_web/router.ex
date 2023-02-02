@@ -46,8 +46,9 @@ defmodule OurExperienceWeb.Router do
       live "/u_weekly_topics/:id/show/edit", U_WeeklyTopicLive.Show, :edit
 
       scope "/strategies/themed_gratitude_journal", Pages.GratitudeJournal do
-        live "/", ThemedGratitudeJournalPrivate
-        live "/u_weekly_topics", UWeeklyTopics.Index
+        live "/", ThemedGratitudeJournalPrivate, :index, as: :ThemedGratitudeJournalPrivate
+        # live "/u_weekly_topics", UWeeklyTopics.Index
+        live "/u_weekly_topics", ThemedGratitudeJournalPrivate, :weekly_topics, as: :ThemedGratitudeJournalPrivate
       end
 
       # /my_experience/strategies/themed_gratitude_journal/weekly_topics
