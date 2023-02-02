@@ -2,7 +2,7 @@ defmodule OurExperienceWeb.WeeklyTopicLive.FormComponent do
   use OurExperienceWeb, :live_component
 
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopics
-
+  alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopics.WeeklyTopics
   @impl true
   def render(assigns) do
     ~H"""
