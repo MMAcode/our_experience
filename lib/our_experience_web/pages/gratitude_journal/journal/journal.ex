@@ -1,7 +1,8 @@
 defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   # use Phoenix.Component
   use Phoenix.LiveComponent
-  use OurExperienceWeb, :live_view #to be able to use ~p sigil
+  # to be able to use ~p sigil:
+  use OurExperienceWeb, :live_view
   # for text_input
   import Phoenix.HTML.Form
   import OurExperienceWeb.CoreComponents
@@ -25,7 +26,10 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       socket
       |> assign(assigns)
       |> assign(:u_str_changeset, U_Strategy.changeset(u_strategy))
-      |> assign(:current_weekly_topic, U_Strategy.get_current_weekly_topic_from_loaded_data(u_strategy))
+      |> assign(
+        :current_weekly_topic,
+        U_Strategy.get_current_weekly_topic_from_loaded_data(u_strategy)
+      )
 
     {:ok, socket}
   end
@@ -34,19 +38,37 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     ~H"""
     <div>
       <%!-- <% dbg(@u_str_changeset.data) %> --%>
-      <h1>Journal</h1>
+      <h1>My Journal</h1>
       <%!-- button to view modal of current active weekly topic --%>
-      <.weekly_topic_modal_component id="current_weekly_topic" weekly_topic={@current_weekly_topic} />
-      <.button
-        phx-click={show_modal("current_weekly_topic")}
-        type="button"
+      <div class="flex justify-center">
+        <.button phx-click={show_modal("current_weekly_topic")} type="button" phx-target={@myself}>
+          View current weekly topic
+        </.button>
+        <.weekly_topic_modal_component id="current_weekly_topic" weekly_topic={@current_weekly_topic}>
+          <div class="flex justify-center">
+            <.b_link to={~p"/my_experience/strategies/themed_gratitude_journal/u_weekly_topics"}>
+              <strong> Select different topic</strong>
+            </.b_link>
+          </div>
+        </.weekly_topic_modal_component>
+      </div>
+
+      <%!-- <new_journal_entry_component /> --%>
+      <%!-- <.form
+        :let={f}
+        for={@u_str_changeset}
+        phx-change="form_event"
+        phx-submit="save"
         phx-target={@myself}
       >
-        View current weekly topic
-      </.button>
-      <.b_link to={~p"/my_experience/strategies/themed_gratitude_journal/u_weekly_topics"}>
-        Start using <strong> Edit current weekly topic</strong>
-      </.b_link>
+        <.text_input f={f} field="journal_entry" />
+        <.button type="submit">Save</.button>
+        <.button phx-click="cancel" type="button">Cancel</.button>
+      </.form> --%>
+
+
+      <%!-- Exiting journal entries --%>
+
     </div>
     """
   end
