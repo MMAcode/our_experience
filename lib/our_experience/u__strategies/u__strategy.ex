@@ -58,7 +58,7 @@ defmodule OurExperience.U_Strategies.U_Strategy do
     |> Enum.map(& &1.weekly_topic)
     |> List.first()
   end
-
+@doc "from already loaded data - u__strategy.u_weekly_topics"
   def get_current_weekly_topic_from_loaded_data(u__strategy) do
     u__strategy.u_weekly_topics
     |> Enum.filter(&(&1.active == true))

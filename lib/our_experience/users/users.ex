@@ -81,7 +81,53 @@ defmodule OurExperience.Users.Users do
     #     preload: [u_strategies: {u_s, [strategy: s, u_weekly_topics: uwt]}]
     # )
 
-    Repo.one(
+
+
+    # Repo.one(
+    #   from u in User,
+    #     where: u.id == ^id,
+    #     left_join: u_s in assoc(u, :u_strategies),
+    #     # not 'where' because that would remove the row regardles the left join
+    #     on: u_s.status == "on",
+    #     left_join: s in assoc(u_s, :strategy),
+    #     # not inner_joint because if there are no topics, it would not load user either
+    #     left_join: uwt in assoc(u_s, :u_weekly_topics),
+    #     left_join: wt in assoc(uwt, :weekly_topic),
+    # original working time tested query with probably extra brackets:
+        # preload: [u_strategies: {u_s, [strategy: s, u_weekly_topics: {uwt, weekly_topic: wt}]}]
+        # preload: [u_strategies: {u_s, strategy: s, u_weekly_topics: {uwt, weekly_topic: wt}}]
+    # )
+
+
+  #   base_query =
+  #     from u in User,
+  #       where: u.id == ^id,
+  #       left_join: u_s in assoc(u, :u_strategies),
+  #       # not 'where' because that would remove the row regardles the left join
+  #       on: u_s.status == "on",
+  #       left_join: s in assoc(u_s, :strategy),
+  #       # not inner_joint because if there are no topics, it would not load user either
+  #       left_join: uwt in assoc(u_s, :u_weekly_topics)
+  #       # left_join: wt in assoc(uwt, :weekly_topic),
+  #       # preload: [u_strategies: {u_s, strategy: s, u_weekly_topics: {uwt, weekly_topic: wt}}]
+  #       # preload: [u_strategies: {u_s, strategy: s, u_weekly_topics: uwt}]
+
+  #       # works:
+  # #  new_query = base_query
+  # #   |> join(:left, [u, u_s, s, uwt], wt in assoc(uwt, :weekly_topic))
+  # #   |> preload([u, u_s, s, uwt, wt], u_strategies: {u_s, strategy: s, u_weekly_topics: {uwt, weekly_topic: wt}})
+
+  # # also works:
+  #     new_query = from [u, u_s, s, uwt] in base_query,
+  #       left_join: wt in assoc(uwt, :weekly_topic),
+  #       preload: [u_strategies: {u_s, strategy: s, u_weekly_topics: {uwt, weekly_topic: wt}}]
+
+  #    Repo.one(new_query)
+
+
+
+
+      base_query =
       from u in User,
         where: u.id == ^id,
         left_join: u_s in assoc(u, :u_strategies),
@@ -89,10 +135,39 @@ defmodule OurExperience.Users.Users do
         on: u_s.status == "on",
         left_join: s in assoc(u_s, :strategy),
         # not inner_joint because if there are no topics, it would not load user either
-        left_join: uwt in assoc(u_s, :u_weekly_topics),
+        left_join: uwt in assoc(u_s, :u_weekly_topics)
+
+        # works:
+  #  new_query = base_query
+  #   |> join(:left, [u, u_s, s, uwt], wt in assoc(uwt, :weekly_topic))
+  #   |> preload([u, u_s, s, uwt, wt], u_strategies: {u_s, strategy: s, u_weekly_topics: {uwt, weekly_topic: wt}})
+
+  # also works:
+      new_query = from [u, u_s, s, uwt] in base_query,
         left_join: wt in assoc(uwt, :weekly_topic),
-        preload: [u_strategies: {u_s, [strategy: s, u_weekly_topics: {uwt, weekly_topic: wt}]}]
-    )
+        preload: [u_strategies: {u_s, strategy: s, u_weekly_topics: {uwt, weekly_topic: wt}}]
+
+
+
+
+     Repo.one(new_query)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     # as multiple queries
     # Repo.one(

@@ -14,6 +14,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
   @doc """
   when new user comes to this url/liveview, new u_strategy (and u_weekly_topics_) will be auto-created for him
   """
+  @impl true
   def mount(_params, _session, %{assigns: %{current_user: user, live_action: action}} = socket) do
     # set new u_strategy and topics, if needed:
     user_fromDb = Users.get_user_for_TGJ(user.id)
