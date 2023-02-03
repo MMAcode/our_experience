@@ -46,8 +46,8 @@ defmodule OurExperienceWeb.RichTextEditors.Quill do
     <%!-- </script> --%>
     <h3>Add new:</h3>
     <%!-- commeted out to avoid possible troubles with non-unique IDs. --%>
-    <div id="editorWrapper1" phx-update="ignore"><%!--to persist editor accross liveview changes --%>
-      <div id="editor" phx-hook="TextEditor"/></div>
+    <%!-- <div id="editorWrapper1" phx-update="ignore">to persist editor accross liveview changes --%>
+      <%!-- <div id="editor" phx-hook="TextEditor"/></div> --%>
     <.button phx-click="save" phx-disable-with="Saving...">Save</.button>
     """
   end

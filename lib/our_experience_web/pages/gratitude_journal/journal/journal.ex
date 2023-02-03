@@ -38,7 +38,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   def render(assigns) do
     ~H"""
     <div>
-      <%!-- <% dbg(@u_str_changeset.data) %> --%>
+      <% dbg(@u_str_changeset.data) %>
       <h1>My Journal</h1>
       <%!-- button to view modal of current active weekly topic --%>
       <div class="flex justify-center">

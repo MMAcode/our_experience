@@ -12,9 +12,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPublic d
     <.b_link to={~p"/my_experience/strategies/themed_gratitude_journal"}>
       Start using <strong> Themed Gratitude Journal</strong>
     </.b_link>
-              <div id="editorWrapper" phx-update="ignore">
-        <div id="editor" phx-hook="TextEditor" />
-      </div>
     """
   end
 

@@ -1,7 +1,7 @@
 import Quill from 'quill';
 export let TextEditor = {
     mounted() {
-        console.log('Mounting');
+        console.log("Miro Mounting text editor", this.el, this);
 
         // console.log('miroPost:', miroPost);
 
