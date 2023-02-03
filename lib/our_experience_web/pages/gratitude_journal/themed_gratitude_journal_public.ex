@@ -12,16 +12,10 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPublic d
     <.b_link to={~p"/my_experience/strategies/themed_gratitude_journal"}>
       Start using <strong> Themed Gratitude Journal</strong>
     </.b_link>
-    <.button phx-click="do">test_me</.button>
+              <div id="editorWrapper" phx-update="ignore">
+        <div id="editor" phx-hook="TextEditor" />
+      </div>
     """
-  end
-
-  def handle_event("do", _attrs, %{assigns: %{current_user: user}} = socket) do
-    # U_Strategies.create_u__strategy_TGJ_without_changeset(user.id)
-    # U_Strategies.create_u__strategy_TGJ_without_changeset(user.id)
-    # U_Strategies.create_u__strategy(%{user_id: user.id})
-
-    {:noreply, socket}
   end
 
   def handle_event("start-gratitude-journal", _attrs, %{assigns: %{current_user: user}} = socket) do

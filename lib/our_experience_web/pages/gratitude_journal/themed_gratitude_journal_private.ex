@@ -60,7 +60,14 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
       id="journal"
       current_user={@current_user}
     />
+
     """
+  end
+
+    @impl true
+  def handle_event("text-editor", %{"text_content" => content}, socket) do
+    dbg(content)
+    {:noreply, assign(socket, quill: content)}
   end
 
   @spec get_active_weekly_topic(%User{}) :: %U_WeeklyTopic{} | nil

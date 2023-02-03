@@ -31,7 +31,7 @@ defmodule OurExperienceWeb.RichTextEditors.Quill do
   @impl true
   def render(assigns) do
     ~H"""
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet" />
+    <%!-- <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet" /> --%>
     <h1>Page 4</h1>
     <h2>Quill</h2>
 
@@ -45,9 +45,9 @@ defmodule OurExperienceWeb.RichTextEditors.Quill do
     <%!-- miroPost = <%= Jason.encode!(getQuill(@quills, 2)) %>; --%>
     <%!-- </script> --%>
     <h3>Add new:</h3>
-    <div id="editorWrapper" phx-update="ignore">
-      <div id="editor" phx-hook="TextEditor" />
-    </div>
+    <%!-- commeted out to avoid possible troubles with non-unique IDs. --%>
+    <div id="editorWrapper1" phx-update="ignore"><%!--to persist editor accross liveview changes --%>
+      <div id="editor" phx-hook="TextEditor"/></div>
     <.button phx-click="save" phx-disable-with="Saving...">Save</.button>
     """
   end

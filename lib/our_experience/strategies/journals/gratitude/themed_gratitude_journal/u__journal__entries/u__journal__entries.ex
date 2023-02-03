@@ -49,7 +49,7 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_J
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_u__journal__entry(attrs \\ %{}) do
+  def create(attrs \\ %{}) do
     %U_Journal_Entry{}
     |> U_Journal_Entry.changeset(attrs)
     |> Repo.insert()

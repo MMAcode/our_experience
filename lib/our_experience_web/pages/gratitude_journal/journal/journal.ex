@@ -65,11 +65,37 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
         <.button type="submit">Save</.button>
         <.button phx-click="cancel" type="button">Cancel</.button>
       </.form> --%>
-
+      <div id="editorWrapper" phx-update="ignore">
+        <h3 id="journal_entry">Add new journal entry</h3> <%!-- id="journal_entry" to link js event to this live component --%>
+        <div id="editor" phx-hook="TextEditor" phx-target={@myself}/>
+      </div>
+      <.button phx-click="save" phx-disable-with="Saving...">Save</.button>
 
       <%!-- Exiting journal entries --%>
-
     </div>
     """
   end
+
+  @impl true
+  def handle_event("text-editor", %{"text_content" => content}, socket) do
+    dbg(content)
+    {:noreply, assign(socket, quill: content)}
+  end
+
+  def handle_event("save", _params, socket) do
+    dbg(["handle save", socket.assigns.quill])
+
+    case OurExperience.RichTextStorageRepo.create(%{data: socket.assigns.quill}) do
+      {:ok, saved_quill} ->
+        {
+          :noreply,
+          socket
+          |> put_flash(:info, "Just map created successfully")
+          # |> assign(:quills, [saved_quill | socket.assigns.quills])
+        }
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:noreply, assign(socket, :changeset, changeset)}
+    end
+  end
+
 end
