@@ -12,6 +12,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   alias OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate, as: TGJ
   alias OurExperience.U_Strategies.U_Strategy
   alias OurExperience.U_Strategies.U_Strategies
+  alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_Journal_Entries.U_Journal_Entries
   # alias Phoenix.LiveView.JS
   on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
 
@@ -69,7 +70,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
         <h3 id="journal_entry">Add new journal entry</h3> <%!-- id="journal_entry" to link js event to this live component --%>
         <div id="editor" phx-hook="TextEditor" phx-target={@myself}/>
       </div>
-      <.button phx-click="save" phx-disable-with="Saving...">Save</.button>
+      <.button phx-click="save" phx-disable-with="Saving..." phx-target={@myself}>Save</.button>
 
       <%!-- Exiting journal entries --%>
     </div>
@@ -85,8 +86,9 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   def handle_event("save", _params, socket) do
     dbg(["handle save", socket.assigns.quill])
 
-    case OurExperience.RichTextStorageRepo.create(%{data: socket.assigns.quill}) do
+    case U_Journal_Entries.create(%{content: socket.assigns.quill}) do
       {:ok, saved_quill} ->
+        dbg "journal entry SAVED"
         {
           :noreply,
           socket
@@ -94,6 +96,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
           # |> assign(:quills, [saved_quill | socket.assigns.quills])
         }
       {:error, %Ecto.Changeset{} = changeset} ->
+        dbg "ERROR - journal entry NOT SAVED"
         {:noreply, assign(socket, :changeset, changeset)}
     end
   end
