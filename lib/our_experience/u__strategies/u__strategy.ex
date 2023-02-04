@@ -18,7 +18,7 @@ defmodule OurExperience.U_Strategies.U_Strategy do
 
     # only for themed_gratitude_journal strategy!
     has_many :u_weekly_topics, U_WeeklyTopic, foreign_key: :u_strategy_id
-    has_many :u_journal_entries, U_Journal_Entry, foreign_key: :u_journal_entry_id
+    has_many :u_journal_entries, U_Journal_Entry, foreign_key: :u_strategy_id
 
     timestamps()
   end

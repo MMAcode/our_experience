@@ -2,11 +2,14 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_J
   use Ecto.Schema
   use StructAccess
   import Ecto.Changeset
+  alias OurExperience.U_Strategies.U_Strategy
+  alias OurExperience.Users.User
 
   schema "u_journal_entries" do
     field :content, :map
-    field :user_id, :id
-    field :u_strategy_id, :id
+
+    belongs_to :user, User
+    belongs_to :u_strategy, U_Strategy
 
     timestamps()
   end

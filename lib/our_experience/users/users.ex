@@ -5,11 +5,9 @@ defmodule OurExperience.Users.Users do
   import Ecto.Query, warn: false
 
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopics.WeeklyTopics
-
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopics.U_WeeklyTopic
-
+  alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_Journal_Entries.U_Journal_Entry
   alias OurExperience.Repo
-
   alias OurExperience.Users.User
 
   @doc """
@@ -124,17 +122,22 @@ defmodule OurExperience.Users.Users do
 
   #    Repo.one(new_query)
 
+  # also works:
+  # !!! order of arguments matters, name of the argument does not (in 'from' statement)
+    # q_wWT = from [..., anyNameForUWT] in base_query,
+    #         left_join: wt in assoc(anyNameForUWT, :weekly_topic)
+    # new_query = from [u, u_s, s, uwt, wt] in q_wWT,
+    #                 preload: [u_strategies: {u_s, strategy: s, u_weekly_topics: {uwt, weekly_topic: wt}}]
+    # Repo.one(new_query)
 
 
 
       base_query =
       from u in User,
         where: u.id == ^id,
-        left_join: u_s in assoc(u, :u_strategies),
-        # not 'where' because that would remove the row regardles the left join
+        left_join: u_s in assoc(u, :u_strategies), as: :u_s,
         on: u_s.status == "on",
         left_join: s in assoc(u_s, :strategy),
-        # not inner_joint because if there are no topics, it would not load user either
         left_join: uwt in assoc(u_s, :u_weekly_topics)
 
         # works:
@@ -143,9 +146,23 @@ defmodule OurExperience.Users.Users do
   #   |> preload([u, u_s, s, uwt, wt], u_strategies: {u_s, strategy: s, u_weekly_topics: {uwt, weekly_topic: wt}})
 
   # also works:
-      new_query = from [u, u_s, s, uwt] in base_query,
-        left_join: wt in assoc(uwt, :weekly_topic),
-        preload: [u_strategies: {u_s, strategy: s, u_weekly_topics: {uwt, weekly_topic: wt}}]
+  # !!! order of arguments matters, name of the argument does not (in 'from' statement)
+      q_wWT = from [..., anyNameForUWT] in base_query,
+              left_join: wt in assoc(anyNameForUWT, :weekly_topic)
+
+      # journal_entries_preload = from je in U_Journal_Entry
+
+      q_wJE = from [u_s: us] in q_wWT,
+              left_join: je in assoc(us, :u_journal_entries)
+
+      new_query = from [u, u_s, s, uwt, wt, je] in q_wJE,
+                        preload: [u_strategies: {
+                          u_s,
+                          strategy: s,
+                          u_weekly_topics: {uwt, weekly_topic: wt},
+                          u_journal_entries: je
+                        }
+                        ]
 
 
 
