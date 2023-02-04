@@ -1,6 +1,6 @@
 defmodule OurExperienceWeb.RichTextEditors.Quill do
   use OurExperienceWeb, :live_view
-  #   on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
+  on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
   alias OurExperience.RichTextStorageRepo
 
   @impl true
@@ -35,7 +35,9 @@ defmodule OurExperienceWeb.RichTextEditors.Quill do
     <h1>Page 4</h1>
     <h2>Quill</h2>
 
+    <%!-- commented out to avoid id conflicts: --%>
     <%!-- <div id="editor" phx-hook="TextEditor" phx-target={@myself} /> --%>
+    <div id="editor" phx-hook="TextEditor" />
     <h3>Existing:</h3>
     <%= for row <- printable_quills(@quills) do %>
       <div><%= row %></div>

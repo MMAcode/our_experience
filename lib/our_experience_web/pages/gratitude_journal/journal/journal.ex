@@ -72,7 +72,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       <div id="existing_journal_entries_wrapper">
         <h2>History</h2>
 
-        <div id="existing_journal_entry_wrapper" :for={existing_JE <- @u_strategy[:u_journal_entries]}>
+        <div class="existing_journal_entry_wrapper" :for={existing_JE <- @u_strategy[:u_journal_entries]}>
           <%!-- <p><%= existing_JE.id %></p> --%>
           <p>Date: <%= existing_JE.inserted_at %></p>
           <p><%= Quill.printable_quill(existing_JE.content) %></p>

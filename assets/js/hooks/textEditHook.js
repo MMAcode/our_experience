@@ -46,7 +46,7 @@ export let TextEditor = {
         window.addEventListener("phx:miroFromServer", (e) => {
             console.log("miro: e from server received:", e)
             let quill0 = JSON.parse(e.detail.savedQuills[0])
-            console.log("miro: quill0 :", quill0)
+            console.log("miro: quill 0 :", quill0);
             // quill.setContents(quill0)
         })
 
