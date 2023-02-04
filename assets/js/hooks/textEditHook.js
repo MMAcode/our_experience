@@ -65,25 +65,25 @@ export let TextEditor = {
       //   //   });
 
       console.log("miro: e from server received:", e);
-      let je = JSON.parse(e.detail.savedJE);
-      //   text = quill.getText(je.content);
-      textContent = je.content;
-      id = je.id;
+      //   let je = JSON.parse(e.detail.savedJE);
+      //   //   text = quill.getText(je.content);
+      //   textContent = je.content;
+      //   id = je.id;
 
-      el_id = "#existing_journal_entry_id_" + id;
-      console.log("miro: el_id :", el_id);
-      let quill1 = new Quill(el_id);
-      //   el = document.querySelector(`#${el_id}`);
-      el = document.querySelector(el_id);
-      console.log("miro: el :", el);
+      //   el_id = "#content_of_existing_journal_entry_id_" + id;
+      //   console.log("miro: el_id :", el_id);
+      //   let quill1 = new Quill(el_id);
+      //   //   el = document.querySelector(`#${el_id}`);
+      //   el = document.querySelector(el_id);
+      //   console.log("miro: el :", el);
 
-      //   console.log("miro: je :", id, textContent);
-      // document.getElementById("journal_entry").value = je;
-      quill1.setContents(textContent);
-      //   console.log("miro: quill 0 text:", asText);
-      //   this.pushEventTo("#journal_entry", "existingJE_as_text", {
-      //     text_content: asText,
-      //   });
+      //   //   console.log("miro: je :", id, textContent);
+      //   // document.getElementById("journal_entry").value = je;
+      //   quill1.setContents(textContent);
+      //   //   console.log("miro: quill 0 text:", asText);
+      //   //   this.pushEventTo("#journal_entry", "existingJE_as_text", {
+      //   //     text_content: asText,
+      //   //   });
     });
   },
   updated() {
