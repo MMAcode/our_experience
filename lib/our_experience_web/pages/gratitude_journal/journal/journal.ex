@@ -28,10 +28,10 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   @impl true
   def update(%{current_user: user} = assigns, socket) do
     u_strategy = TGJ.get_active_TGJ_uStrategy(user)
-        entriesStructs = u_strategy[:u_journal_entries]
-    socket = addToSocket(socket, entriesStructs)
+
     socket =
       socket
+      |> addToSocket(u_strategy[:u_journal_entries])
       |> assign(assigns)
       |> assign(:u_strategy, u_strategy)
       |> assign(
@@ -42,14 +42,16 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     {:ok, socket}
   end
 
-  def addToSocket(socket, [el|tail]) do
-    socket = push_event(socket, "miroFromServer", %{savedJE: Jason.encode!(%{id: el.id, content: el.content})})
+  def addToSocket(socket, [el | tail]) do
+    socket =
+      push_event(socket, "miroFromServer", %{
+        existingJE: Jason.encode!(%{id: el.id, content: el.content})
+      })
+
     addToSocket(socket, tail)
   end
 
-  def addToSocket(socket, []) do
-    socket
-  end
+  def addToSocket(socket, []), do: socket
 
 
   @impl true
@@ -75,7 +77,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       <div id="new_journal_entry_wrapper">
         <div id="editorWrapper" phx-update="ignore">
           <h3 id="journal_entry">Add new journal entry</h3>
-           <%!-- id="journal_entry" to link js event to this live component --%>
+          <%!-- id="journal_entry" to link js event to this live component --%>
           <div id="editor" phx-hook="TextEditor" phx-target={@myself} />
         </div>
         <.button phx-click="save" phx-disable-with="Saving..." phx-target={@myself}>Save</.button>
@@ -83,12 +85,14 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       <div id="existing_journal_entries_wrapper">
         <h2>History</h2>
 
-        <div class="existing_journal_entry_wrapper" :for={existing_JE <- @u_strategy[:u_journal_entries]}>
+        <div
+          :for={existing_JE <- @u_strategy[:u_journal_entries]}
+          class="existing_journal_entry_wrapper"
+        >
           <%!-- <p><%= existing_JE.id %></p> --%>
           <p>Date: <%= existing_JE.inserted_at %></p>
           <div id={"content_of_existing_journal_entry_id_#{existing_JE.id}"}>c</div>
           <%!-- <p><%= Quill.printable_quill(existing_JE.content) %></p> --%>
-
         </div>
       </div>
     </div>
@@ -101,7 +105,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     {:noreply, assign(socket, quill: content)}
   end
 
-    @impl true
+  @impl true
   def handle_event("existingJE_as_text", %{"text_content" => content}, socket) do
     dbg(content)
     # socket = socket
