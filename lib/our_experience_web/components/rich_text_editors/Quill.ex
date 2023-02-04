@@ -17,8 +17,9 @@ defmodule OurExperienceWeb.RichTextEditors.Quill do
 
     {:ok,
      assign(socket, quills: list_quills(), quill: nil, count: 0, page: "connected")
-     #  |> push_event("miroFromServer", %{savedQuills: nil})}
-     |> push_event("miroFromServer", %{savedQuills: quills})}
+      # |> push_event("miroFromServer", %{savedQuills: nil})
+     |> push_event("miroFromServer", %{savedQuills: quills})
+  }
   end
 
   @impl true

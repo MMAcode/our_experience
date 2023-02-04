@@ -21,16 +21,28 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
   @impl true
   def mount(socket) do
+    # push_event(socket, "miroFromServer", %{savedQuills: ["ahoj"]})
     {:ok, socket}
   end
 
   @impl true
   def update(%{current_user: user} = assigns, socket) do
     u_strategy = TGJ.get_active_TGJ_uStrategy(user)
-    push_event(socket, "miroFromServer", %{savedQuills: u_strategy[:u_journal_entries]})
+
+      entries =  u_strategy[:u_journal_entries]
+    |> Enum.map(fn je -> Jason.encode!(je.content) end)
+
+    entryStruct = Enum.at(u_strategy[:u_journal_entries],0)
+    # entryMap = Map.from_struct(entryStruct)
+    entryMap = [entryStruct]
+    |> Enum.map(fn je -> %{id: je.id, content: je.content} end)
+    |> Enum.at(0)
+    entry = Jason.encode!(entryMap)
 
     socket =
       socket
+      # |> push_event("miroFromServer", %{savedQuills: entries})
+      |> push_event("miroFromServer", %{savedJE: entry})
       |> assign(assigns)
       |> assign(:u_strategy, u_strategy)
       |> assign(
@@ -75,7 +87,8 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
         <div class="existing_journal_entry_wrapper" :for={existing_JE <- @u_strategy[:u_journal_entries]}>
           <%!-- <p><%= existing_JE.id %></p> --%>
           <p>Date: <%= existing_JE.inserted_at %></p>
-          <p><%= Quill.printable_quill(existing_JE.content) %></p>
+          <div id={"existing_journal_entry_id_#{existing_JE.id}"}>c</div>
+          <%!-- <p><%= Quill.printable_quill(existing_JE.content) %></p> --%>
 
         </div>
       </div>
@@ -87,6 +100,14 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   def handle_event("text-editor", %{"text_content" => content}, socket) do
     dbg(content)
     {:noreply, assign(socket, quill: content)}
+  end
+
+    @impl true
+  def handle_event("existingJE_as_text", %{"text_content" => content}, socket) do
+    dbg(content)
+    # socket = socket
+    # |> assign(:existingJES_as_text, )
+    {:noreply, socket}
   end
 
   def handle_event("save", _params, socket) do
