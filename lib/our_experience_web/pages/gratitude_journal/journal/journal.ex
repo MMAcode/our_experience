@@ -28,52 +28,10 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   @impl true
   def update(%{current_user: user} = assigns, socket) do
     u_strategy = TGJ.get_active_TGJ_uStrategy(user)
-
-    #   entries =  u_strategy[:u_journal_entries]
-    # |> Enum.map(fn je -> Jason.encode!(je.content) end)
-
-    # SINGLE ENTRY:
-    # entryStruct = Enum.at(u_strategy[:u_journal_entries],0)
-    # # entryMap = Map.from_struct(entryStruct)
-    # entryMap = [entryStruct]
-    # |> Enum.map(fn je -> %{id: je.id, content: je.content} end)
-    # |> Enum.at(0)
-    # entry = Jason.encode!(entryMap)
-
-    # socket =
-    #   socket
-    #   # |> push_event("miroFromServer", %{savedQuills: entries})
-    #   |> push_event("miroFromServer", %{savedJE: entry})
-    #   |> assign(assigns)
-    #   |> assign(:u_strategy, u_strategy)
-    #   |> assign(
-    #     :current_weekly_topic,
-    #     U_Strategy.get_current_weekly_topic_from_loaded_data(u_strategy)
-    #   )
-
-    # MULTIPLE ENTRIES EACH BY SINGLE EVENT
         entriesStructs = u_strategy[:u_journal_entries]
-    # # entryMap = Map.from_struct(entryStruct)
-    # encodedEntriesMap = entriesStructs
-    # |> Enum.map(fn jeS -> %{id: je.id, content: je.content} end)
-    # |> Enum.map(fn jeM -> Jason.encode!(jeM) end)
-    # # |> Enum.at(0)
-
-    # socket = for encodedEntry <- encodedEntriesMap do
-    # socket = for jeS <- entriesStructs do
-    #   socket
-    #   |> push_event("miroFromServer", %{savedJE: Jason.encode!(%{id: jeS.id, content: jeS.content})})
-    # end
-    e = Enum.at(entriesStructs,0)
-    # socket = addToSocket(socket, [e])
     socket = addToSocket(socket, entriesStructs)
-
     socket =
       socket
-      #|> push_event("miroFromServer", %{savedJE: Jason.encode!(%{id: jeS.id, content: jeS.content})})
-      # |>push_event("miroFromServer", %{savedJE: Jason.encode!(%{id: e.id, content: e.content})})
-      # |> push_event("miroFromServer", %{savedQuills: entries})
-      # |> push_event("miroFromServer", %{savedJE: entries})
       |> assign(assigns)
       |> assign(:u_strategy, u_strategy)
       |> assign(
