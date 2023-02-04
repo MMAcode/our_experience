@@ -12,7 +12,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   # import Phoenix.LiveView.Helpers #probably already imported but just in case...
   alias OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate, as: TGJ
   alias OurExperience.U_Strategies.U_Strategy
-  alias OurExperience.Utilities.RichTextEditors.Quill.Quill
+  alias OurExperience.Utilities.ForSocket
 
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_Journal_Entries.U_Journal_Entries
 
@@ -21,7 +21,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
   @impl true
   def mount(socket) do
-    # push_event(socket, "miroFromServer", %{savedQuills: ["ahoj"]})
     {:ok, socket}
   end
 
@@ -31,7 +30,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
     socket =
       socket
-      |> addToSocket(u_strategy[:u_journal_entries])
+      |> ForSocket.addFromListToSocket(u_strategy[:u_journal_entries], &pushJE/2)
       |> assign(assigns)
       |> assign(:u_strategy, u_strategy)
       |> assign(
@@ -42,16 +41,11 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     {:ok, socket}
   end
 
-  def addToSocket(socket, [el | tail]) do
-    socket =
-      push_event(socket, "miroFromServer", %{
-        existingJE: Jason.encode!(%{id: el.id, content: el.content})
-      })
-
-    addToSocket(socket, tail)
+  defp pushJE(socket, item) do
+    push_event(socket, "existingJournalEntryFromServer", %{
+      existingJE: Jason.encode!(%{id: item.id, content: item.content})
+    })
   end
-
-  def addToSocket(socket, []), do: socket
 
 
   @impl true
@@ -76,27 +70,44 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
       <div id="new_journal_entry_wrapper">
         <div id="editorWrapper" phx-update="ignore">
-          <h3 id="journal_entry">Add new journal entry</h3>
+          <h3 id="new_journal_entry">Add new journal entry</h3>
           <%!-- id="journal_entry" to link js event to this live component --%>
           <div id="editor" phx-hook="TextEditor" phx-target={@myself} />
         </div>
         <.button phx-click="save" phx-disable-with="Saving..." phx-target={@myself}>Save</.button>
       </div>
+
       <div id="existing_journal_entries_wrapper">
         <h2>History</h2>
-
         <div
           :for={existing_JE <- @u_strategy[:u_journal_entries]}
           class="existing_journal_entry_wrapper"
         >
           <%!-- <p><%= existing_JE.id %></p> --%>
           <p>Date: <%= existing_JE.inserted_at %></p>
-          <div id={"content_of_existing_journal_entry_id_#{existing_JE.id}"}>c</div>
-          <%!-- <p><%= Quill.printable_quill(existing_JE.content) %></p> --%>
+          <div id={"content_of_existing_journal_entry_id_#{existing_JE.id}"}/>
+          <div class="existingJEoptions">
+            <.button phx-click="editExistingJE" phx-target={@myself} phx-value-id={existing_JE.id}>
+              Edit
+            </.button>
+            <.button phx-click="deleteExistingJE" phx-target={@myself} phx-value-id={existing_JE.id}>
+              Delete
+            </.button>
+          </div>
         </div>
       </div>
     </div>
     """
+  end
+
+  def handle_event("editExistingJE", %{"id" => id}, socket) do
+    dbg(["editExistingJE", id])
+    {:noreply, socket}
+  end
+
+  def handle_event("deleteExistingJE", %{"id" => id}, socket) do
+    dbg(["deleteExistingJE", id])
+    {:noreply, socket}
   end
 
   @impl true
