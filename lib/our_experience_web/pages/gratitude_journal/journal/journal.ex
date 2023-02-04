@@ -38,7 +38,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   def render(assigns) do
     ~H"""
     <div>
-      <% dbg(@u_str_changeset.data) %>
+      <%!-- <% dbg(@u_str_changeset.data) %> --%>
       <h1>My Journal</h1>
       <%!-- button to view modal of current active weekly topic --%>
       <div class="flex justify-center">
@@ -85,9 +85,11 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
   def handle_event("save", _params, socket) do
     dbg(["handle save", socket.assigns.quill])
+    u_str = socket.assigns.u_str_changeset.data
 
-    case U_Journal_Entries.create(%{content: socket.assigns.quill}) do
-      {:ok, saved_quill} ->
+
+    case U_Journal_Entries.create_in(u_str, %{content: socket.assigns.quill}) do
+      {:ok, _saved_quill} ->
         dbg "journal entry SAVED"
         {
           :noreply,
@@ -99,6 +101,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
         dbg "ERROR - journal entry NOT SAVED"
         {:noreply, assign(socket, :changeset, changeset)}
     end
+    # {:noreply, socket}
   end
 
 end

@@ -8,7 +8,7 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_J
   schema "u_journal_entries" do
     field :content, :map
 
-    belongs_to :user, User
+    # belongs_to :user, User
     belongs_to :u_strategy, U_Strategy
 
     timestamps()
@@ -16,10 +16,19 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_J
 
   @doc false
   # def changeset(%U_Journal_Entry{} = u__journal__entry, attrs) do
-  def changeset(entry, attrs) do
+  # def changeset(entry, attrs) do
+  #   attrs = decode_content_if_needed(attrs)
+
+  #   entry
+  #   |> cast(attrs, [:content])
+  #   |> validate_required([:content])
+  # end
+
+    def changeset(%U_Strategy{} = u_strategy, attrs) do
     attrs = decode_content_if_needed(attrs)
 
-    entry
+    u_strategy
+    |> Ecto.build_assoc(:u_journal_entries)
     |> cast(attrs, [:content])
     |> validate_required([:content])
   end
