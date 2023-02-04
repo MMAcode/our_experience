@@ -16,17 +16,19 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   # alias Phoenix.LiveView.JS
   on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
 
+  @impl true
   def mount(socket) do
     {:ok, socket}
   end
 
+  @impl true
   def update(%{current_user: user} = assigns, socket) do
     u_strategy = TGJ.get_active_TGJ_uStrategy(user)
 
     socket =
       socket
       |> assign(assigns)
-      |> assign(:u_str_changeset, U_Strategy.changeset(u_strategy))
+      |> assign(:u_TGJ_strategy, u_strategy)
       |> assign(
         :current_weekly_topic,
         U_Strategy.get_current_weekly_topic_from_loaded_data(u_strategy)
@@ -35,10 +37,11 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     {:ok, socket}
   end
 
+  @impl true
   def render(assigns) do
     ~H"""
     <div>
-      <%!-- <% dbg(@u_str_changeset.data) %> --%>
+      <%!-- <% dbg(@u_TGJ_strategy.data) %> --%>
       <h1>My Journal</h1>
       <%!-- button to view modal of current active weekly topic --%>
       <div class="flex justify-center">
@@ -57,7 +60,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       <%!-- <new_journal_entry_component /> --%>
       <%!-- <.form
         :let={f}
-        for={@u_str_changeset}
+        for={@u_TGJ_strategy}
         phx-change="form_event"
         phx-submit="save"
         phx-target={@myself}
@@ -70,7 +73,9 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
         <h3 id="journal_entry">Add new journal entry</h3> <%!-- id="journal_entry" to link js event to this live component --%>
         <div id="editor" phx-hook="TextEditor" phx-target={@myself}/>
       </div>
-      <.button phx-click="save" phx-disable-with="Saving..." phx-target={@myself}>Save</.button>
+      <.button phx-click="save"
+      phx-disable-with="Saving..."
+      phx-target={@myself}>Save</.button>
 
       <%!-- Exiting journal entries --%>
     </div>
@@ -85,21 +90,26 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
   def handle_event("save", _params, socket) do
     dbg(["handle save", socket.assigns.quill])
-    u_str = socket.assigns.u_str_changeset.data
+    u_str = socket.assigns.u_TGJ_strategy.data
 
 
     case U_Journal_Entries.create_in(u_str, %{content: socket.assigns.quill}) do
-      {:ok, _saved_quill} ->
+      {:ok, saved_quill} ->
         dbg "journal entry SAVED"
-        {
-          :noreply,
+        {:noreply,
           socket
-          |> put_flash(:info, "Just map created successfully")
+          |> put_flash(:info, "Journal entry created successfully")
           # |> assign(:quills, [saved_quill | socket.assigns.quills])
+          |> assign(:quills, saved_quill)
         }
-      {:error, %Ecto.Changeset{} = changeset} ->
-        dbg "ERROR - journal entry NOT SAVED"
-        {:noreply, assign(socket, :changeset, changeset)}
+        {:error, %Ecto.Changeset{} = changeset} ->
+          dbg "ERROR - journal entry NOT SAVED"
+
+          {:noreply,
+          socket
+          |> put_flash(:error, "Journal entry not saved.")
+          |> assign(:changeset, changeset)
+          }
     end
     # {:noreply, socket}
   end

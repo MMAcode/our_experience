@@ -47,7 +47,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
 
   def render(assigns) do
     ~H"""
-    <% dbg @live_action == :index %>
+    <%!-- <% dbg @live_action == :index %> --%>
     <h3>Themed Gratitude Journal</h3>
     <.live_component
       :if={assigns[:render_weekly_topics]}
