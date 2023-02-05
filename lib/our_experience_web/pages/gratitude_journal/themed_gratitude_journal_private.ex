@@ -73,7 +73,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
 
   @spec get_active_weekly_topic(%User{}) :: %U_WeeklyTopic{} | nil
   defp get_active_weekly_topic(user) do
-    u_strategy = get_active_TGJ_uStrategy(user)
+    u_strategy = get_active_TGJ_uStrategy_fromLoadedData(user)
     # dbg u_strategy
     if !!u_strategy do
       u_strategy.u_weekly_topics
@@ -85,7 +85,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
   end
 
   defp user_with_existing_active_TGJ_strategy_and_topics(user) do
-    case get_active_TGJ_uStrategy(user) do
+    case get_active_TGJ_uStrategy_fromLoadedData(user) do
       nil ->
         # dbg "initiating u_str and topics"
         new_u_strategy = U_Strategies.create_u__strategy_TGJ_without_changeset(user.id)
@@ -98,8 +98,8 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
     end
   end
 
-  @spec get_active_TGJ_uStrategy(%User{}) :: %U_Strategy{} | nil
-  def get_active_TGJ_uStrategy(user) do
+  @spec get_active_TGJ_uStrategy_fromLoadedData(%User{}) :: %U_Strategy{} | nil
+  def get_active_TGJ_uStrategy_fromLoadedData(user) do
     user.u_strategies
     |> Enum.filter(
       &(&1.strategy.name == OurExperience.CONSTANTS.strategies().name.themed_gratitude_journal &&

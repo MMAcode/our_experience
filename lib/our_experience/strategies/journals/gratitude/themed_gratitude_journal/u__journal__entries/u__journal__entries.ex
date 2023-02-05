@@ -89,6 +89,14 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_J
     Repo.delete(u__journal__entry)
   end
 
+   def delete_using_id(id) do
+    # u__journal__entry = get_u__journal__entry!(id)
+    # Repo.delete(u__journal__entry)
+
+    result = from(uje in U_Journal_Entry, where: uje.id == ^id) |> Repo.delete_all
+    dbg result
+  end
+
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking u__journal__entry changes.
 

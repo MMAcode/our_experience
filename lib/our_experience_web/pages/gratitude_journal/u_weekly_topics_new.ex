@@ -19,7 +19,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.UWeeklyTopicsNew do
   end
 
   def update(%{current_user: user} = assigns, socket) do
-    u_strategy = TGJ.get_active_TGJ_uStrategy(user)
+    u_strategy = TGJ.get_active_TGJ_uStrategy_fromLoadedData(user)
 
     socket =
       socket

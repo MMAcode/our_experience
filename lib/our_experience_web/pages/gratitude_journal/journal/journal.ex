@@ -1,6 +1,7 @@
 defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   # use Phoenix.Component
   use Phoenix.LiveComponent
+  alias Phoenix.LiveView.JS
   use OurExperienceWeb, :verified_routes
   # to be able to use ~p sigil:
   # use OurExperienceWeb, :live_view
@@ -8,7 +9,9 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   # import Phoenix.HTML.Form
   import OurExperienceWeb.CoreComponents
   import OurExperienceWeb.MiroComponents
+  alias OurExperience.Users.Users
   import OurExperienceWeb.Pages.GratitudeJournal.WeeklyTopicModalComponent
+  import OurExperienceWeb.Pages.GratitudeJournal.Journal.UJournalEntryModalComponent
   # import Phoenix.LiveView.Helpers #probably already imported but just in case...
   alias OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate, as: TGJ
   alias OurExperience.U_Strategies.U_Strategy
@@ -26,13 +29,14 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
   @impl true
   def update(%{current_user: user} = assigns, socket) do
-    u_strategy = TGJ.get_active_TGJ_uStrategy(user)
+    u_strategy = TGJ.get_active_TGJ_uStrategy_fromLoadedData(user)
 
     socket =
       socket
       |> ForSocket.addFromListToSocket(u_strategy[:u_journal_entries], &pushJE/2)
       |> assign(assigns)
       |> assign(:u_strategy, u_strategy)
+      |> assign(:user, user)
       |> assign(
         :current_weekly_topic,
         U_Strategy.get_current_weekly_topic_from_loaded_data(u_strategy)
@@ -46,7 +50,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       existingJE: Jason.encode!(%{id: item.id, content: item.content})
     })
   end
-
 
   @impl true
   def render(assigns) do
@@ -85,16 +88,30 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
         >
           <%!-- <p><%= existing_JE.id %></p> --%>
           <p>Date: <%= existing_JE.inserted_at %></p>
-          <div id={"content_of_existing_journal_entry_id_#{existing_JE.id}"}/>
+          <div id={"content_of_existing_journal_entry_id_#{existing_JE.id}"} />
           <div class="existingJEoptions">
             <.button phx-click="editExistingJE" phx-target={@myself} phx-value-id={existing_JE.id}>
               Edit
             </.button>
-            <.button phx-click="deleteExistingJE" phx-target={@myself} phx-value-id={existing_JE.id}>
+
+            <.button
+              phx-click={
+                JS.push("showDeleteJEModal", value: %{id: existing_JE.id}, target: @myself)
+                |> show_modal("modal_for_existing_journal_entry_to_delete")
+              }
+              phx-target={@myself}
+              phx-value-id={existing_JE.id}
+            >
               Delete
             </.button>
           </div>
         </div>
+        <.modal id="modal_for_existing_journal_entry_to_delete">
+              <div class="miroQuillContainer"></div>
+              <.button phx-click="deleteExistingJEFinal" phx-target={@myself} class="miro_confirm_deleteJE">
+                confirm Delete
+              </.button>
+        </.modal>
       </div>
     </div>
     """
@@ -105,9 +122,24 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     {:noreply, socket}
   end
 
-  def handle_event("deleteExistingJE", %{"id" => id}, socket) do
-    dbg(["deleteExistingJE", id])
+  def handle_event("showDeleteJEModal", %{"id" => id}, socket) do
+    dbg(["showDeleteJEModal", id])
+    socket = socket
+    |> push_event("existingJournalEntryIdForDeleteModalFromServer", %{id: id})
     {:noreply, socket}
+  end
+  def handle_event("deleteExistingJEFinal", %{"je_id_to_delete" => id}, socket) do
+    id = String.to_integer(id)
+    dbg(["deleteExistingJEFinal", id])
+    U_Journal_Entries.delete_using_id(id)
+    user = Users.get_user_for_TGJ(socket.assigns.user.id)
+    u_strategy = TGJ.get_active_TGJ_uStrategy_fromLoadedData(user)
+    socket = socket |> assign(:u_strategy, u_strategy)
+    {:noreply, socket}
+  end
+
+  defp pushModalDeleteJE(socket, id) do
+
   end
 
   @impl true

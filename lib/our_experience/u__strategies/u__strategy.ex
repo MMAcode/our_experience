@@ -66,4 +66,13 @@ defmodule OurExperience.U_Strategies.U_Strategy do
     |> Enum.at(0)
     |> Map.get(:weekly_topic)
   end
+
+  def get_journal_entry_by_id_from_loaded_data(u__strategy, wanted_JE_id) do
+    Enum.find(
+      u__strategy.u_journal_entries,
+      fn je ->
+        je.id == wanted_JE_id
+      end
+    )
+  end
 end
