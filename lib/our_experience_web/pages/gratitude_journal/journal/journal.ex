@@ -30,12 +30,13 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   @impl true
   def update(%{current_user: user} = assigns, socket) do
     u_strategy = TGJ.get_active_TGJ_uStrategy_fromLoadedData(user)
-
+    journals = u_strategy[:u_journal_entries]
     socket =
       socket
-      |> ForSocket.addFromListToSocket(u_strategy[:u_journal_entries], &pushJE/2)
+      |> ForSocket.addFromListToSocket(journals, &pushJE/2)
       |> assign(assigns)
       |> assign(:u_strategy, u_strategy)
+      |> assign(:journals, journals)
       |> assign(:user, user)
       |> assign(
         :current_weekly_topic,
@@ -83,7 +84,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       <div id="existing_journal_entries_wrapper">
         <h2>History</h2>
         <div
-          :for={existing_JE <- @u_strategy[:u_journal_entries]}
+          :for={existing_JE <- @journals}
           class="existing_journal_entry_wrapper"
         >
           <%!-- <p><%= existing_JE.id %></p> --%>
@@ -108,7 +109,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
         </div>
         <.modal id="modal_for_existing_journal_entry_to_delete">
               <div class="miroQuillContainer"></div>
-              <.button phx-click="deleteExistingJEFinal" phx-target={@myself} class="miro_confirm_deleteJE">
+              <.button phx-click={JS.push("deleteExistingJEFinal")|> hide_modal("modal_for_existing_journal_entry_to_delete") } phx-target={@myself} class="miro_confirm_deleteJE">
                 confirm Delete
               </.button>
         </.modal>
@@ -131,12 +132,24 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   def handle_event("deleteExistingJEFinal", %{"je_id_to_delete" => id}, socket) do
     id = String.to_integer(id)
     dbg(["deleteExistingJEFinal", id])
-    U_Journal_Entries.delete_using_id(id)
+
+    # socket = case U_Journal_Entries.delete_using_id(id) do
+    #   {1,_} -> dbg("deleted ok"); put_flash(socket, :info, "deleted")
+    #   x -> dbg(x); put_flash(socket, :error, "error")
+    # end
+    dbg socket
     user = Users.get_user_for_TGJ(socket.assigns.user.id)
     u_strategy = TGJ.get_active_TGJ_uStrategy_fromLoadedData(user)
-    socket = socket |> assign(:u_strategy, u_strategy)
+    journals = u_strategy[:u_journal_entries]
+    socket = socket
+    |> assign(:u_strategy, u_strategy)
+    |> assign(:journals, journals)
+    |> ForSocket.addFromListToSocket(journals, &pushJE/2) # to improve: only push deleted je update?
     {:noreply, socket}
   end
+
+
+
 
   defp pushModalDeleteJE(socket, id) do
 
