@@ -68,11 +68,6 @@ defmodule OurExperience.U_Strategies.U_Strategy do
   end
 
   def get_journal_entry_by_id_from_loaded_data(u__strategy, wanted_JE_id) do
-    Enum.find(
-      u__strategy.u_journal_entries,
-      fn je ->
-        je.id == wanted_JE_id
-      end
-    )
+    Enum.find(u__strategy.u_journal_entries, & &1.id == wanted_JE_id)
   end
 end

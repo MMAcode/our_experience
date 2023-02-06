@@ -191,6 +191,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   @impl true
   def handle_event("text-editor", %{"text_content" => content, "journalEntryId" => id} = _att, socket) do
     dbg(["handle text-editor", id, content])
+    # dbg [socket.assigns[:edited_quill]]
     socket = case id do
       nil -> assign(socket, quill: content) # new JE edited
       id -> socket |> assign(edited_quill: %{id: id, content: content})
@@ -234,7 +235,42 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   end
 
   def handle_event("editExistingJEFinal", %{"je_id_to_edit" => id}, socket) do
+    id = String.to_integer(id)
     dbg ["editExistingJEFinal", id]
+
+    editedJE = socket.assigns.edited_quill
+    origEntry = U_Strategy.get_journal_entry_by_id_from_loaded_data(socket.assigns.u_strategy, id)
+
+    if editedJE.id != id do
+      dbg ["editExistingJEFinal", "ERROR - ids do not match. journal entry NOT SAVED"]
+      {:noreply, socket}
+    else
+      U_Journal_Entries.update_u__journal__entry(origEntry, %{content: editedJE.content})
+
+
+      # case  do
+      #   {:ok, _} ->
+      #     dbg("journal entry SAVED")
+
+      #     {:noreply,
+      #      socket
+      #      |> put_flash(:info, "Journal entry edited successfully")
+      #      |> assign(:quills, editedJE)}
+
+      #   {:error, %Ecto.Changeset{} = changeset} ->
+      #     dbg("ERROR - journal entry NOT SAVED")
+
+      #     {:noreply,
+      #      socket
+      #      |> put_flash(:error, "Journal entry not saved.")
+      #      |> assign(:changeset, changeset)}
+      # end
+    end
+
+
+
+
+
     {:noreply, socket}
   end
 end

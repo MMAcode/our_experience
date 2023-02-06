@@ -15,14 +15,14 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_J
   end
 
   @doc false
-  # def changeset(%U_Journal_Entry{} = u__journal__entry, attrs) do
+  def changeset(%__MODULE__{} = existingJE, attrs) do
   # def changeset(entry, attrs) do
-  #   attrs = decode_content_if_needed(attrs)
+    # attrs = decode_content_if_needed(attrs)
 
-  #   entry
-  #   |> cast(attrs, [:content])
-  #   |> validate_required([:content])
-  # end
+    existingJE
+    |> cast(attrs, [:content])
+    |> validate_required([:content])
+  end
 
     def changeset(%U_Strategy{} = u_strategy, attrs) do
     attrs = decode_content_if_needed(attrs)

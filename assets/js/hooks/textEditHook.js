@@ -18,7 +18,7 @@ export let TextEditor = {
           console.log("An API call triggered this change.");
         } else if (source == "user") {
           this.pushEventTo("#new_journal_entry", eventName, {
-            text_content: quill_newJE.getContents(),
+            text_content: quill.getContents(),
             journalEntryId: id,
           });
         }

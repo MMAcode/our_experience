@@ -68,6 +68,7 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_J
 
   """
   def update_u__journal__entry(%U_Journal_Entry{} = u__journal__entry, attrs) do
+    dbg ["update_u__journal__entry", u__journal__entry, attrs]
     u__journal__entry
     |> U_Journal_Entry.changeset(attrs)
     |> Repo.update()
