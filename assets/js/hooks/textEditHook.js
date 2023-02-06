@@ -8,8 +8,23 @@ let toolbarOptions = [
   ["clean"],
 ];
 
+
+
 export let TextEditor = {
   mounted() {
+    const sendChangesToServer = (quill, eventName, id = null) => {
+      quill.on("text-change", (delta, oldDelta, source) => {
+        if (source == "api") {
+          console.log("An API call triggered this change.");
+        } else if (source == "user") {
+          this.pushEventTo("#new_journal_entry", eventName, {
+            text_content: quill_newJE.getContents(),
+            journalEntryId: id,
+          });
+        }
+      });
+    };
+
     let existingJEs = {};
     let deleteModalQuill;
     console.log("Miro Mounting text editor", this.el, this);
@@ -23,24 +38,9 @@ export let TextEditor = {
       theme: "snow",
     });
 
-    // https://quilljs.com/docs/api/#setcontents
-    // quill_newJE.setContents(delta: Delta, source: String = 'api'): Delta
-    // dbData = { "ops": [{ "insert": "xx\n" }] }
-    // quill_newJE.setContents(dbData)
-    // quill_newJE.setContents({ "ops": [{ "insert": "xox\n" }] })
+    sendChangesToServer(quill_newJE, "text-editor");
 
-    quill_newJE.on("text-change", (delta, oldDelta, source) => {
-      if (source == "api") {
-        console.log("An API call triggered this change.");
-      } else if (source == "user") {
-        // this below works: (those above probably don't)
-        // this.pushEvent("text-editor", { "text_content": quill_newJE.getContents() })
-        this.pushEventTo("#new_journal_entry", "text-editor", {
-          text_content: quill_newJE.getContents(),
-        });
-      }
-    });
-
+    // list existing JE
     window.addEventListener("phx:existingJournalEntryFromServer", (e) => {
       let je = JSON.parse(e.detail.existingJE);
       let quill1 = new Quill(`#content_of_existing_journal_entry_id_${je.id}`, {
@@ -51,6 +51,7 @@ export let TextEditor = {
       //   console.log("existingJEs", existingJEs);
     });
 
+    // delete
     window.addEventListener(
       "phx:existingJournalEntryIdForDeleteModalFromServer",
       ({ detail: { id } }) => {
@@ -64,9 +65,36 @@ export let TextEditor = {
 
         document
           .querySelector(
-            "#modal_for_existing_journal_entry_to_delete .miro_confirm_deleteJE"
+            "#modal_for_existing_journal_entry_to_delete .confirm_action_button"
           )
           .setAttribute("phx-value-je_id_to_delete", id);
+      }
+    );
+
+    // edit
+
+    editModalQuill = new Quill(
+      "#modal_for_existing_journal_entry_to_edit .miroQuillContainer",
+      {
+        modules: {
+          toolbar: toolbarOptions,
+        },
+        theme: "snow",
+      }
+    );
+    window.addEventListener(
+      "phx:existingJournalEntryIdForEditModalFromServer",
+      ({ detail: { id } }) => {
+        console.log("id", id);
+        editModalQuill.setContents(existingJEs[id].getContents());
+
+        document
+          .querySelector(
+            "#modal_for_existing_journal_entry_to_edit .confirm_action_button"
+          )
+          .setAttribute("phx-value-je_id_to_edit", id);
+
+        sendChangesToServer(editModalQuill, "text-editor", id);
       }
     );
   },

@@ -31,6 +31,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   def update(%{current_user: user} = assigns, socket) do
     u_strategy = TGJ.get_active_TGJ_uStrategy_fromLoadedData(user)
     journals = u_strategy[:u_journal_entries]
+
     socket =
       socket
       |> ForSocket.addFromListToSocket(journals, &pushJE/2)
@@ -77,89 +78,125 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
           <%!-- id="journal_entry" to link js event to this live component --%>
           <div id="editor" phx-hook="TextEditor" phx-target={@myself} />
         </div>
-        <.button phx-click="save" phx-disable-with="Saving..." phx-target={@myself}>Save</.button>
+        <.button phx-click="saveNewJE" phx-disable-with="Saving..." phx-target={@myself}>
+          Save
+        </.button>
       </div>
 
       <div id="existing_journal_entries_wrapper">
         <h2>History</h2>
-        <div
-          :for={existing_JE <- @journals}
-          class="existing_journal_entry_wrapper"
-        >
+        <div :for={existing_JE <- @journals} class="existing_journal_entry_wrapper">
           <%!-- <p><%= existing_JE.id %></p> --%>
           <p>Date: <%= existing_JE.inserted_at %></p>
           <div id={"content_of_existing_journal_entry_id_#{existing_JE.id}"} />
           <div class="existingJEoptions">
-            <.button phx-click="editExistingJE" phx-target={@myself} phx-value-id={existing_JE.id}>
+            <.button phx-click={
+              JS.push("showEditJEModal", value: %{id: existing_JE.id}, target: @myself)
+              |> show_modal("modal_for_existing_journal_entry_to_edit")
+            }>
               Edit
             </.button>
 
-            <.button
-              phx-click={
-                JS.push("showDeleteJEModal", value: %{id: existing_JE.id}, target: @myself)
-                |> show_modal("modal_for_existing_journal_entry_to_delete")
-              }
-            >
+            <.button phx-click={
+              JS.push("showDeleteJEModal", value: %{id: existing_JE.id}, target: @myself)
+              |> show_modal("modal_for_existing_journal_entry_to_delete")
+            }>
               Delete
             </.button>
           </div>
         </div>
         <.modal id="modal_for_existing_journal_entry_to_edit">
-              <div class="miroQuillContainer"/>
+          <div class="miroQuillContainer" />
+          <.button
+            phx-click={
+              JS.push("editExistingJEFinal")
+              |> hide_modal("modal_for_existing_journal_entry_to_edit")
+            }
+            phx-target={@myself}
+            class="confirm_action_button"
+          >
+            Save changes
+          </.button>
         </.modal>
         <.modal id="modal_for_existing_journal_entry_to_delete">
-              <div class="miroQuillContainer"/>
-              <.button phx-click={JS.push("deleteExistingJEFinal")|> hide_modal("modal_for_existing_journal_entry_to_delete") } phx-target={@myself} class="miro_confirm_deleteJE">
-                confirm Delete
-              </.button>
+          <div class="miroQuillContainer" />
+          <.button
+            phx-click={
+              JS.push("deleteExistingJEFinal")
+              |> hide_modal("modal_for_existing_journal_entry_to_delete")
+            }
+            phx-target={@myself}
+            class="confirm_action_button"
+          >
+            confirm Delete
+          </.button>
         </.modal>
-
       </div>
     </div>
     """
   end
 
-  def handle_event("editExistingJE", %{"id" => id}, socket) do
-    dbg(["editExistingJE", id])
+  def handle_event("showEditJEModal", %{"id" => id}, socket) do
+    # dbg(["editExistingJE", id])
+
+    socket =
+      socket
+      |> push_event("existingJournalEntryIdForEditModalFromServer", %{id: id})
+
     {:noreply, socket}
   end
+
+  # def handle_event("editExistingJEFinal", %{})
 
   def handle_event("showDeleteJEModal", %{"id" => id}, socket) do
-    dbg(["showDeleteJEModal", id])
-    socket = socket
-    |> push_event("existingJournalEntryIdForDeleteModalFromServer", %{id: id})
+    # dbg(["showDeleteJEModal", id])
+
+    socket =
+      socket
+      |> push_event("existingJournalEntryIdForDeleteModalFromServer", %{id: id})
+
     {:noreply, socket}
   end
+
   def handle_event("deleteExistingJEFinal", %{"je_id_to_delete" => id}, socket) do
     id = String.to_integer(id)
-    dbg(["deleteExistingJEFinal", id])
+    # dbg(["deleteExistingJEFinal", id])
 
-    socket = case U_Journal_Entries.delete_using_id(id) do
-      {1,_} -> dbg("deleted ok"); put_flash(socket, :info, "deleted")
-      x -> dbg(x); put_flash(socket, :error, "error")
-    end
-    dbg socket
+    socket =
+      case U_Journal_Entries.delete_using_id(id) do
+        {1, _} ->
+          dbg("deleted ok")
+          put_flash(socket, :info, "deleted")
+
+        x ->
+          dbg(x)
+          put_flash(socket, :error, "error")
+      end
+
+    # dbg(socket)
     user = Users.get_user_for_TGJ(socket.assigns.user.id)
     u_strategy = TGJ.get_active_TGJ_uStrategy_fromLoadedData(user)
     journals = u_strategy[:u_journal_entries]
-    socket = socket
-    |> assign(:u_strategy, u_strategy)
-    |> assign(:journals, journals)
-    |> ForSocket.addFromListToSocket(journals, &pushJE/2) # to improve: only push deleted je update?
+
+    socket =
+      socket
+      |> assign(:u_strategy, u_strategy)
+      |> assign(:journals, journals)
+      # to improve: only push deleted je update?
+      |> ForSocket.addFromListToSocket(journals, &pushJE/2)
+
     {:noreply, socket}
   end
 
-
-
-
-  defp pushModalDeleteJE(socket, id) do
-
-  end
-
   @impl true
-  def handle_event("text-editor", %{"text_content" => content}, socket) do
-    dbg(content)
-    {:noreply, assign(socket, quill: content)}
+  def handle_event("text-editor", %{"text_content" => content, "journalEntryId" => id} = _att, socket) do
+    dbg(["handle text-editor", id, content])
+    socket = case id do
+      nil -> assign(socket, quill: content) # new JE edited
+      id -> socket |> assign(edited_quill: %{id: id, content: content})
+    end
+
+    {:noreply, socket}
   end
 
   @impl true
@@ -170,7 +207,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     {:noreply, socket}
   end
 
-  def handle_event("save", _params, socket) do
+  def handle_event("saveNewJE", _params, socket) do
     dbg(["handle save", socket.assigns.quill])
     u_str = socket.assigns.u_strategy
 
@@ -194,5 +231,10 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     end
 
     # {:noreply, socket}
+  end
+
+  def handle_event("editExistingJEFinal", %{"je_id_to_edit" => id}, socket) do
+    dbg ["editExistingJEFinal", id]
+    {:noreply, socket}
   end
 end
