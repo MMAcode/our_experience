@@ -56,7 +56,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   def render(assigns) do
     ~H"""
     <div>
-      <%!-- <% dbg(@u_strategy.data) %> --%>
       <h1>My Journal</h1>
       <%!-- button to view modal of current active weekly topic --%>
       <div class="flex justify-center">
@@ -100,19 +99,21 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
                 JS.push("showDeleteJEModal", value: %{id: existing_JE.id}, target: @myself)
                 |> show_modal("modal_for_existing_journal_entry_to_delete")
               }
-              phx-target={@myself}
-              phx-value-id={existing_JE.id}
             >
               Delete
             </.button>
           </div>
         </div>
+        <.modal id="modal_for_existing_journal_entry_to_edit">
+              <div class="miroQuillContainer"/>
+        </.modal>
         <.modal id="modal_for_existing_journal_entry_to_delete">
-              <div class="miroQuillContainer"></div>
+              <div class="miroQuillContainer"/>
               <.button phx-click={JS.push("deleteExistingJEFinal")|> hide_modal("modal_for_existing_journal_entry_to_delete") } phx-target={@myself} class="miro_confirm_deleteJE">
                 confirm Delete
               </.button>
         </.modal>
+
       </div>
     </div>
     """
@@ -133,10 +134,10 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     id = String.to_integer(id)
     dbg(["deleteExistingJEFinal", id])
 
-    # socket = case U_Journal_Entries.delete_using_id(id) do
-    #   {1,_} -> dbg("deleted ok"); put_flash(socket, :info, "deleted")
-    #   x -> dbg(x); put_flash(socket, :error, "error")
-    # end
+    socket = case U_Journal_Entries.delete_using_id(id) do
+      {1,_} -> dbg("deleted ok"); put_flash(socket, :info, "deleted")
+      x -> dbg(x); put_flash(socket, :error, "error")
+    end
     dbg socket
     user = Users.get_user_for_TGJ(socket.assigns.user.id)
     u_strategy = TGJ.get_active_TGJ_uStrategy_fromLoadedData(user)
@@ -171,7 +172,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
   def handle_event("save", _params, socket) do
     dbg(["handle save", socket.assigns.quill])
-    u_str = socket.assigns.u_strategy.data
+    u_str = socket.assigns.u_strategy
 
     case U_Journal_Entries.create_in(u_str, %{content: socket.assigns.quill}) do
       {:ok, saved_quill} ->
