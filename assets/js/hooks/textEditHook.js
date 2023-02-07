@@ -14,6 +14,16 @@ let triggerJS = (querySelector) => {
   window.liveSocket.execJS(el, el.getAttribute("miro-js-to-trigger"));
 };
 
+let quillForEditingModal = new Quill(
+  "#modal_for_existing_journal_entry_to_edit .miroQuillContainer",
+  {
+    modules: {
+      toolbar: toolbarOptions,
+    },
+    theme: "snow",
+  }
+);
+
 console.log("miro - outside of mounted");
 export let TextEditor = {
   mounted() {
@@ -85,30 +95,16 @@ export let TextEditor = {
     );
 
     // edit
-    let quillForEditingModal = new Quill(
-      "#modal_for_existing_journal_entry_to_edit .miroQuillContainer",
-      {
-        modules: {
-          toolbar: toolbarOptions,
-        },
-        theme: "snow",
-      }
-    );
+
     window.addEventListener(
       "phx:existingJournalEntryIdForEditModalFromServer",
       ({ detail: { id } }) => {
-        // console.log("id", id);
-
         quillForEditingModal.setContents(existingJEs[id].getContents());
-
-        // console.log("editingQuiil text", quillForEditingModal.getText());
-
         document
           .querySelector(
             "#modal_for_existing_journal_entry_to_edit .confirm_action_button"
           )
           .setAttribute("phx-value-je_id_to_edit", id);
-
         triggerJS("#hiddenTriggerForViewingEditModal");
         sendChangesToServer(quillForEditingModal, "text-editor", id);
       }

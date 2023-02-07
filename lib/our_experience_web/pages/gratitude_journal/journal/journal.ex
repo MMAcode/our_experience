@@ -155,8 +155,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   # EDIT  ******************************************************************
   # def handle_event("showEditJEModal", %{"id" => id}, socket) do
   def handle_event("showEditJEModal", %{"value" => id}, socket) do
-    # dbg att
-    # dbg(["editExistingJE", id])
+     id = String.to_integer(id)
 
     socket =
       socket
@@ -169,7 +168,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     id = String.to_integer(id)
     dbg(["editExistingJEFinal", id])
 
-    editedJE = socket.assigns.edited_quill
+    editedJE = socket.assigns.edited_quill |> dbg
 
     origEntry =
       journals(socket.assigns.user)
@@ -247,13 +246,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
           put_flash(socket, :error, "error")
       end
 
-    # u = dbUser(socket)
-
-    # socket =
-    #   socket
-    #   |> assign(:user, u)
-    #   |> assign(:journals, journals(u))
-
     {:noreply, socket}
   end
 
@@ -264,6 +256,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
         %{"text_content" => content, "journalEntryId" => id} = _att,
         socket
       ) do
+        # id = String.to_integer(id)
     dbg(["handle text-editor", id, content])
     # dbg [socket.assigns[:edited_quill]]
     socket =
