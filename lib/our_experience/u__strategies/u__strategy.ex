@@ -59,7 +59,7 @@ defmodule OurExperience.U_Strategies.U_Strategy do
     |> List.first()
   end
 @doc "from already loaded data - u__strategy.u_weekly_topics"
-  def get_current_weekly_topic_from_loaded_data(u__strategy) do
+  def current_weekly_topic(u__strategy) do
     u__strategy.u_weekly_topics
     |> Enum.filter(&(&1.active == true))
     |> Enum.sort_by(& &1.position, :asc)

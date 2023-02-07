@@ -1,3 +1,9 @@
+defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_Journal_Entries.U_Journal_Entries.L do
+    def get_JE_by_id(journals, id) do
+    Enum.find(journals, & &1.id == id)
+  end
+end
+
 defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_Journal_Entries.U_Journal_Entries do
   @moduledoc """
   The Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_Journal_Entries.U_Journal_Entries context.

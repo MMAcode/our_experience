@@ -18,7 +18,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   alias OurExperience.U_Strategies.U_Strategy
   alias OurExperience.Utilities.ForSocket
 
-  alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_Journal_Entries.U_Journal_Entries
+  alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_Journal_Entries.U_Journal_Entries, as: JEs
 
   # alias Phoenix.LiveView.JS
   on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
@@ -28,26 +28,21 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     {:ok, socket}
   end
 
-
-
-
   @impl true
   def update(%{current_user: user} = assigns, socket) do
-    u_strategy = U.gj_strategy(user)
-    journals = u_strategy[:u_journal_entries]
+    journals = journals(user)
 
     socket =
       socket
       |> ForSocket.addFromListToSocket(journals, &pushJE/2)
       |> assign(assigns)
-      |> assign(:u_strategy, u_strategy)
       |> assign(:journals, journals)
       |> assign(:user, user)
       |> assign(:quill, nil)
       |> assign(:edited_quill, nil)
       |> assign(
         :current_weekly_topic,
-        U_Strategy.get_current_weekly_topic_from_loaded_data(u_strategy)
+        U_Strategy.current_weekly_topic(strategy(user))
       )
 
     {:ok, socket}
@@ -164,14 +159,17 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     dbg(["editExistingJEFinal", id])
 
     editedJE = socket.assigns.edited_quill
-    origEntry = U_Strategy.get_journal_entry_by_id_from_loaded_data(socket.assigns.u_strategy, id)
+
+    origEntry =
+      journals(socket.assigns.user)
+      |> JEs.L.get_JE_by_id(id)
 
     if !editedJE || editedJE.id != id do
       dbg(["editExistingJEFinal", "ERROR - ids do not match. journal entry NOT SAVED"])
       {:noreply, socket}
     else
       dbg(editedJE)
-      U_Journal_Entries.update_u__journal__entry(origEntry, %{content: editedJE.content})
+      JEs.update_u__journal__entry(origEntry, %{content: editedJE.content})
 
       # case  do
       #   {:ok, _} ->
@@ -211,7 +209,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     # dbg(["deleteExistingJEFinal", id])
 
     socket =
-      case U_Journal_Entries.delete_using_id(id) do
+      case JEs.delete_using_id(id) do
         {1, _} ->
           dbg("deleted ok")
           put_flash(socket, :info, "deleted")
@@ -223,12 +221,11 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
     # dbg(socket)
     user = Users.get_user_for_TGJ(socket.assigns.user.id)
-    u_strategy = U.gj_strategy(user)
-    journals = u_strategy[:u_journal_entries]
+    journals = journals(user)
 
     socket =
       socket
-      |> assign(:u_strategy, u_strategy)
+      |> assign(:user, user)
       |> assign(:journals, journals)
       # to improve: only push deleted je update?
       |> ForSocket.addFromListToSocket(journals, &pushJE/2)
@@ -266,9 +263,8 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   # NEW
   def handle_event("saveNewJE", _params, socket) do
     dbg(["handle save", socket.assigns.quill])
-    u_str = socket.assigns.u_strategy
 
-    case U_Journal_Entries.create_in(u_str, %{content: socket.assigns.quill}) do
+    case JEs.create_in(strategy(socket.assigns.user), %{content: socket.assigns.quill}) do
       {:ok, _saved_quill} ->
         dbg("journal entry SAVED")
 
@@ -293,4 +289,11 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   end
 
 
+  defp strategy(user) do
+    U.gj_strategy(user)
+  end
+
+  defp journals(user) do
+    strategy(user)[:u_journal_entries]
+  end
 end
