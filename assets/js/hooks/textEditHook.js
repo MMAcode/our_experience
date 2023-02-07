@@ -1,3 +1,4 @@
+import { LiveSocket } from "phoenix_live_view";
 import Quill from "quill";
 
 let toolbarOptions = [
@@ -8,6 +9,10 @@ let toolbarOptions = [
   ["clean"],
 ];
 
+let triggerJS = (querySelector) => {
+  el = document.querySelector(querySelector);
+  window.liveSocket.execJS(el, el.getAttribute("miro-js-to-trigger"));
+};
 
 console.log("miro - outside of mounted");
 export let TextEditor = {
@@ -74,6 +79,8 @@ export let TextEditor = {
             "#modal_for_existing_journal_entry_to_delete .confirm_action_button"
           )
           .setAttribute("phx-value-je_id_to_delete", id);
+
+        triggerJS("#hiddenTriggerForViewingDeleteModal");
       }
     );
 
@@ -122,6 +129,7 @@ export let TextEditor = {
           )
           .setAttribute("phx-value-je_id_to_edit", id);
 
+        triggerJS("#hiddenTriggerForViewingEditModal");
         sendChangesToServer(quillForEditingModal, "text-editor", id);
       }
     );

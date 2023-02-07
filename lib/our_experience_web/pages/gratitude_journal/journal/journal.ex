@@ -57,6 +57,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   def render(assigns) do
     ~H"""
     <div id="my_journal_wrapper">
+    <.hiddenModalTriggers />
       <h1>My Journal</h1>
       <%!-- button to view modal of current active weekly topic --%>
       <div class="flex justify-center">
@@ -89,22 +90,16 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
       <div id="existing_journal_entries_wrapper">
         <h2>History</h2>
+
         <div :for={existing_JE <- @journals} class="existing_journal_entry_wrapper">
           <%!-- <p><%= existing_JE.id %></p> --%>
           <p>Date: <%= existing_JE.inserted_at %></p>
           <div id={"content_of_existing_journal_entry_id_#{existing_JE.id}"} phx-update="ignore" />
           <div class="existingJEoptions">
-            <.button phx-click={
-              JS.push("showEditJEModal", value: %{id: existing_JE.id}, target: @myself)
-              |> show_modal("modal_for_existing_journal_entry_to_edit")
-            }>
+            <.button phx-click="showEditJEModal" value={existing_JE.id} phx-target={@myself}>
               Edit
             </.button>
-
-            <.button phx-click={
-              JS.push("showDeleteJEModal", value: %{id: existing_JE.id}, target: @myself)
-              |> show_modal("modal_for_existing_journal_entry_to_delete")
-            }>
+            <.button phx-click="showDeleteJEModal" phx-value-id={existing_JE.id} phx-target={@myself}>
               Delete
             </.button>
           </div>
@@ -142,8 +137,25 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     """
   end
 
-  # EDIT
-  def handle_event("showEditJEModal", %{"id" => id}, socket) do
+  defp hiddenModalTriggers(assigns) do
+    ~H"""
+    <div
+      style="hidden"
+      id="hiddenTriggerForViewingEditModal"
+      miro-js-to-trigger={show_modal("modal_for_existing_journal_entry_to_edit")}
+    />
+    <div
+      style="hidden"
+      id="hiddenTriggerForViewingDeleteModal"
+      miro-js-to-trigger={show_modal("modal_for_existing_journal_entry_to_delete")}
+    />
+    """
+  end
+
+  # EDIT  ******************************************************************
+  # def handle_event("showEditJEModal", %{"id" => id}, socket) do
+  def handle_event("showEditJEModal", %{"value" => id}, socket) do
+    # dbg att
     # dbg(["editExistingJE", id])
 
     socket =
@@ -174,8 +186,13 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
           dbg(["journal entry UPDATED", updatedJE])
           # u = dbUser(socket)
           user = socket.assigns.user
-          newJournals = Enum.map(journals(user), fn je -> if je.id == updatedJE.id, do: updatedJE, else: je end)
-          u= update_user_journals_localy(user, newJournals)
+
+          newJournals =
+            Enum.map(journals(user), fn je ->
+              if je.id == updatedJE.id, do: updatedJE, else: je
+            end)
+
+          u = update_user_journals_localy(user, newJournals)
 
           {:noreply,
            socket
@@ -196,7 +213,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     # {:noreply, socket}
   end
 
-  # DELETE
+  # DELETE ******************************************************************
   def handle_event("showDeleteJEModal", %{"id" => id}, socket) do
     # dbg(["showDeleteJEModal", id])
 
@@ -207,7 +224,11 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     {:noreply, socket}
   end
 
-  def handle_event("deleteExistingJEFinal", %{"je_id_to_delete" => id}, %{assigns: %{user: user}}= socket) do
+  def handle_event(
+        "deleteExistingJEFinal",
+        %{"je_id_to_delete" => id},
+        %{assigns: %{user: user}} = socket
+      ) do
     id = String.to_integer(id)
 
     socket =
@@ -236,7 +257,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     {:noreply, socket}
   end
 
-  # DATA
+  # DATA ******************************************************************
   @impl true
   def handle_event(
         "text-editor",
@@ -263,7 +284,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     {:noreply, socket}
   end
 
-  # NEW
+  # NEW ******************************************************************
   def handle_event("saveNewJE", _params, socket) do
     dbg(["handle save", socket.assigns.quill])
 
@@ -296,9 +317,11 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     # {:noreply, socket}
   end
 
+  # private ******************************************************************
   defp update_user_journals_localy(user, newJournals) do
     str = put_in(strategy(user)[:u_journal_entries], newJournals)
-    put_in(user[:u_strategies], [str]) #returns updated user
+    # returns updated user
+    put_in(user[:u_strategies], [str])
   end
 
   defp strategy(user) do
