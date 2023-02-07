@@ -29,20 +29,19 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   end
 
   @impl true
-  def update(%{current_user: user} = assigns, socket) do
-    journals = journals(user)
+  def update(%{current_user: u} = assigns, socket) do
 
     socket =
       socket
-      |> ForSocket.addFromListToSocket(journals, &pushJE/2)
+      |> ForSocket.addFromListToSocket(journals(u), &pushJE/2)
       |> assign(assigns)
-      |> assign(:journals, journals)
-      |> assign(:user, user)
+      |> assign(:journals, journals(u))
+      |> assign(:user, u)
       |> assign(:quill, nil)
       |> assign(:edited_quill, nil)
       |> assign(
         :current_weekly_topic,
-        U_Strategy.current_weekly_topic(strategy(user))
+        U_Strategy.current_weekly_topic(strategy(u))
       )
 
     {:ok, socket}
@@ -220,15 +219,14 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       end
 
     # dbg(socket)
-    user = Users.get_user_for_TGJ(socket.assigns.user.id)
-    journals = journals(user)
+    u = Users.get_user_for_TGJ(socket.assigns.user.id)
 
     socket =
       socket
-      |> assign(:user, user)
-      |> assign(:journals, journals)
+      |> assign(:user, u)
+      |> assign(:journals, journals(u))
       # to improve: only push deleted je update?
-      |> ForSocket.addFromListToSocket(journals, &pushJE/2)
+      |> ForSocket.addFromListToSocket(journals(u), &pushJE/2)
 
     {:noreply, socket}
   end
