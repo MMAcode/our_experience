@@ -19,7 +19,9 @@ defmodule OurExperienceWeb.Pages.WelcomeMyExperience do
       <p class="">(Created by Miroslav Makarov)</p>
       <br />
       <p>...work in progress...</p>
-      <.b_link to={~p"/my_experience/u_weekly_topics/"}>My weekly_topics</.b_link>
+      <.b_link to={~p"/my_experience/strategies/themed_gratitude_journal"}>
+        <strong> Themed Gratitude Journal</strong>
+      </.b_link>
       <br />
     </div>
     """

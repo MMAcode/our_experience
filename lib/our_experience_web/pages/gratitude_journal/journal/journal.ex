@@ -39,6 +39,8 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       |> assign(:u_strategy, u_strategy)
       |> assign(:journals, journals)
       |> assign(:user, user)
+      |> assign(:quill, nil)
+      |> assign(:edited_quill, nil)
       |> assign(
         :current_weekly_topic,
         U_Strategy.get_current_weekly_topic_from_loaded_data(u_strategy)
@@ -56,12 +58,15 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   @impl true
   def render(assigns) do
     ~H"""
-    <div>
+    <div id="my_journal_wrapper">
       <h1>My Journal</h1>
       <%!-- button to view modal of current active weekly topic --%>
       <div class="flex justify-center">
+        <.b_link to={~p"/my_experience/strategies/themed_gratitude_journal/u_weekly_topics/"}>
+          Themes ->
+        </.b_link>
         <.button phx-click={show_modal("current_weekly_topic")} type="button" phx-target={@myself}>
-          View current weekly topic
+          Current theme ->
         </.button>
         <.weekly_topic_modal_component id="current_weekly_topic" weekly_topic={@current_weekly_topic}>
           <div class="flex justify-center">
@@ -78,9 +83,10 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
           <%!-- id="journal_entry" to link js event to this live component --%>
           <div id="editor" phx-hook="TextEditor" phx-target={@myself} />
         </div>
-        <.button phx-click="saveNewJE" phx-disable-with="Saving..." phx-target={@myself}>
+        <.button phx-click="saveNewJE" phx-target={@myself}>
           Save
         </.button>
+        <%!-- phx-disable-with="Saving..."  --%>
       </div>
 
       <div id="existing_journal_entries_wrapper">
@@ -106,7 +112,9 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
           </div>
         </div>
         <.modal id="modal_for_existing_journal_entry_to_edit">
-          <div class="miroQuillContainer" />
+          <div class="miroQuillWrapper" id="wrapper_for_quill_in_editing_modal" phx-update="ignore">
+            <div class="miroQuillContainer" />
+          </div>
           <.button
             phx-click={
               JS.push("editExistingJEFinal")
@@ -169,7 +177,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
           put_flash(socket, :info, "deleted")
 
         x ->
-          dbg(x)
+          dbg(["issue deleting JE with id", id, "error?:", x])
           put_flash(socket, :error, "error")
       end
 
@@ -189,13 +197,19 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   end
 
   @impl true
-  def handle_event("text-editor", %{"text_content" => content, "journalEntryId" => id} = _att, socket) do
+  def handle_event(
+        "text-editor",
+        %{"text_content" => content, "journalEntryId" => id} = _att,
+        socket
+      ) do
     dbg(["handle text-editor", id, content])
     # dbg [socket.assigns[:edited_quill]]
-    socket = case id do
-      nil -> assign(socket, quill: content) # new JE edited
-      id -> socket |> assign(edited_quill: %{id: id, content: content})
-    end
+    socket =
+      case id do
+        # new JE edited
+        nil -> assign(socket, quill: content)
+        id -> socket |> assign(edited_quill: %{id: id, content: content})
+      end
 
     {:noreply, socket}
   end
@@ -213,14 +227,16 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     u_str = socket.assigns.u_strategy
 
     case U_Journal_Entries.create_in(u_str, %{content: socket.assigns.quill}) do
-      {:ok, saved_quill} ->
+      {:ok, _saved_quill} ->
         dbg("journal entry SAVED")
 
-        {:noreply,
-         socket
-         |> put_flash(:info, "Journal entry created successfully")
-         # |> assign(:quills, [saved_quill | socket.assigns.quills])
-         |> assign(:quills, saved_quill)}
+        {
+          :noreply,
+          socket
+          |> put_flash(:info, "Journal entry created successfully")
+          # |> assign(:quills, [saved_quill | socket.assigns.quills])
+          #  |> assign(:quills, saved_quill)}
+        }
 
       {:error, %Ecto.Changeset{} = changeset} ->
         dbg("ERROR - journal entry NOT SAVED")
@@ -236,17 +252,17 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
   def handle_event("editExistingJEFinal", %{"je_id_to_edit" => id}, socket) do
     id = String.to_integer(id)
-    dbg ["editExistingJEFinal", id]
+    dbg(["editExistingJEFinal", id])
 
     editedJE = socket.assigns.edited_quill
     origEntry = U_Strategy.get_journal_entry_by_id_from_loaded_data(socket.assigns.u_strategy, id)
 
-    if editedJE.id != id do
-      dbg ["editExistingJEFinal", "ERROR - ids do not match. journal entry NOT SAVED"]
+    if !editedJE || editedJE.id != id do
+      dbg(["editExistingJEFinal", "ERROR - ids do not match. journal entry NOT SAVED"])
       {:noreply, socket}
     else
+      dbg(editedJE)
       U_Journal_Entries.update_u__journal__entry(origEntry, %{content: editedJE.content})
-
 
       # case  do
       #   {:ok, _} ->
@@ -266,10 +282,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       #      |> assign(:changeset, changeset)}
       # end
     end
-
-
-
-
 
     {:noreply, socket}
   end
