@@ -81,7 +81,10 @@ defmodule OurExperience.Users.Users do
               left_join: wt in assoc(anyNameForUWT, :weekly_topic)
 
       q_wJE = from [u_s: us] in q_wWT,
-              left_join: je in assoc(us, :u_journal_entries)
+              left_join: je in assoc(us, :u_journal_entries),
+              order_by: [desc: je.inserted_at]
+
+
 
       preloaded = from [u, u_s, s, uwt, wt, je] in q_wJE,
                         preload: [u_strategies: {

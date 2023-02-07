@@ -10,6 +10,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   import OurExperienceWeb.CoreComponents
   import OurExperienceWeb.MiroComponents
   alias OurExperience.Users.Users
+  alias OurExperience.Users.User, as: U
   import OurExperienceWeb.Pages.GratitudeJournal.WeeklyTopicModalComponent
   import OurExperienceWeb.Pages.GratitudeJournal.Journal.UJournalEntryModalComponent
   # import Phoenix.LiveView.Helpers #probably already imported but just in case...
@@ -27,9 +28,12 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     {:ok, socket}
   end
 
+
+
+
   @impl true
   def update(%{current_user: user} = assigns, socket) do
-    u_strategy = TGJ.get_active_TGJ_uStrategy_fromLoadedData(user)
+    u_strategy = U.gj_strategy(user)
     journals = u_strategy[:u_journal_entries]
 
     socket =
@@ -144,6 +148,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     """
   end
 
+  # EDIT
   def handle_event("showEditJEModal", %{"id" => id}, socket) do
     # dbg(["editExistingJE", id])
 
@@ -152,102 +157,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       |> push_event("existingJournalEntryIdForEditModalFromServer", %{id: id})
 
     {:noreply, socket}
-  end
-
-  # def handle_event("editExistingJEFinal", %{})
-
-  def handle_event("showDeleteJEModal", %{"id" => id}, socket) do
-    # dbg(["showDeleteJEModal", id])
-
-    socket =
-      socket
-      |> push_event("existingJournalEntryIdForDeleteModalFromServer", %{id: id})
-
-    {:noreply, socket}
-  end
-
-  def handle_event("deleteExistingJEFinal", %{"je_id_to_delete" => id}, socket) do
-    id = String.to_integer(id)
-    # dbg(["deleteExistingJEFinal", id])
-
-    socket =
-      case U_Journal_Entries.delete_using_id(id) do
-        {1, _} ->
-          dbg("deleted ok")
-          put_flash(socket, :info, "deleted")
-
-        x ->
-          dbg(["issue deleting JE with id", id, "error?:", x])
-          put_flash(socket, :error, "error")
-      end
-
-    # dbg(socket)
-    user = Users.get_user_for_TGJ(socket.assigns.user.id)
-    u_strategy = TGJ.get_active_TGJ_uStrategy_fromLoadedData(user)
-    journals = u_strategy[:u_journal_entries]
-
-    socket =
-      socket
-      |> assign(:u_strategy, u_strategy)
-      |> assign(:journals, journals)
-      # to improve: only push deleted je update?
-      |> ForSocket.addFromListToSocket(journals, &pushJE/2)
-
-    {:noreply, socket}
-  end
-
-  @impl true
-  def handle_event(
-        "text-editor",
-        %{"text_content" => content, "journalEntryId" => id} = _att,
-        socket
-      ) do
-    dbg(["handle text-editor", id, content])
-    # dbg [socket.assigns[:edited_quill]]
-    socket =
-      case id do
-        # new JE edited
-        nil -> assign(socket, quill: content)
-        id -> socket |> assign(edited_quill: %{id: id, content: content})
-      end
-
-    {:noreply, socket}
-  end
-
-  @impl true
-  def handle_event("existingJE_as_text", %{"text_content" => content}, socket) do
-    dbg(content)
-    # socket = socket
-    # |> assign(:existingJES_as_text, )
-    {:noreply, socket}
-  end
-
-  def handle_event("saveNewJE", _params, socket) do
-    dbg(["handle save", socket.assigns.quill])
-    u_str = socket.assigns.u_strategy
-
-    case U_Journal_Entries.create_in(u_str, %{content: socket.assigns.quill}) do
-      {:ok, _saved_quill} ->
-        dbg("journal entry SAVED")
-
-        {
-          :noreply,
-          socket
-          |> put_flash(:info, "Journal entry created successfully")
-          # |> assign(:quills, [saved_quill | socket.assigns.quills])
-          #  |> assign(:quills, saved_quill)}
-        }
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        dbg("ERROR - journal entry NOT SAVED")
-
-        {:noreply,
-         socket
-         |> put_flash(:error, "Journal entry not saved.")
-         |> assign(:changeset, changeset)}
-    end
-
-    # {:noreply, socket}
   end
 
   def handle_event("editExistingJEFinal", %{"je_id_to_edit" => id}, socket) do
@@ -285,4 +194,103 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
     {:noreply, socket}
   end
+
+  # DELETE
+  def handle_event("showDeleteJEModal", %{"id" => id}, socket) do
+    # dbg(["showDeleteJEModal", id])
+
+    socket =
+      socket
+      |> push_event("existingJournalEntryIdForDeleteModalFromServer", %{id: id})
+
+    {:noreply, socket}
+  end
+
+  def handle_event("deleteExistingJEFinal", %{"je_id_to_delete" => id}, socket) do
+    id = String.to_integer(id)
+    # dbg(["deleteExistingJEFinal", id])
+
+    socket =
+      case U_Journal_Entries.delete_using_id(id) do
+        {1, _} ->
+          dbg("deleted ok")
+          put_flash(socket, :info, "deleted")
+
+        x ->
+          dbg(["issue deleting JE with id", id, "error?:", x])
+          put_flash(socket, :error, "error")
+      end
+
+    # dbg(socket)
+    user = Users.get_user_for_TGJ(socket.assigns.user.id)
+    u_strategy = U.gj_strategy(user)
+    journals = u_strategy[:u_journal_entries]
+
+    socket =
+      socket
+      |> assign(:u_strategy, u_strategy)
+      |> assign(:journals, journals)
+      # to improve: only push deleted je update?
+      |> ForSocket.addFromListToSocket(journals, &pushJE/2)
+
+    {:noreply, socket}
+  end
+
+  # DATA
+  @impl true
+  def handle_event(
+        "text-editor",
+        %{"text_content" => content, "journalEntryId" => id} = _att,
+        socket
+      ) do
+    dbg(["handle text-editor", id, content])
+    # dbg [socket.assigns[:edited_quill]]
+    socket =
+      case id do
+        # new JE edited
+        nil -> assign(socket, quill: content)
+        id -> socket |> assign(edited_quill: %{id: id, content: content})
+      end
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("existingJE_as_text", %{"text_content" => content}, socket) do
+    dbg(content)
+    # socket = socket
+    # |> assign(:existingJES_as_text, )
+    {:noreply, socket}
+  end
+
+  # NEW
+  def handle_event("saveNewJE", _params, socket) do
+    dbg(["handle save", socket.assigns.quill])
+    u_str = socket.assigns.u_strategy
+
+    case U_Journal_Entries.create_in(u_str, %{content: socket.assigns.quill}) do
+      {:ok, _saved_quill} ->
+        dbg("journal entry SAVED")
+
+        {
+          :noreply,
+          socket
+          |> put_flash(:info, "Journal entry created successfully")
+          # |> assign(:quills, [saved_quill | socket.assigns.quills])
+          #  |> assign(:quills, saved_quill)}
+        }
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        dbg("ERROR - journal entry NOT SAVED")
+
+        {:noreply,
+         socket
+         |> put_flash(:error, "Journal entry not saved.")
+         |> assign(:changeset, changeset)}
+    end
+
+    # {:noreply, socket}
+  end
+
+
 end

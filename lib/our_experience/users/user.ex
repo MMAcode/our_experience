@@ -19,4 +19,25 @@ defmodule OurExperience.Users.User do
     |> validate_required([:email])
     |> unique_constraint(:email)
   end
+
+
+  def gj_strategy(user) do
+    get_active_TGJ_uStrategy_fromLoadedData(user)
+  end
+  @spec get_active_TGJ_uStrategy_fromLoadedData(%__MODULE__{}) :: %U_Strategy{} | nil
+  def get_active_TGJ_uStrategy_fromLoadedData(user) do
+    user.u_strategies
+    |> Enum.filter(
+      &(&1.strategy.name == OurExperience.CONSTANTS.strategies().name.themed_gratitude_journal &&
+          &1.status == OurExperience.CONSTANTS.u_strategies().status.on)
+    )
+    # newest/biggest date will be first in the list (position 0)
+    |> Enum.sort(fn a, b ->
+      case Date.compare(a.updated_at, b.updated_at) do
+        :lt -> false
+        _ -> true
+      end
+    end)
+    |> Enum.at(0)
+  end
 end
