@@ -17,6 +17,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   alias OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate, as: TGJ
   alias OurExperience.U_Strategies.U_Strategy
   alias OurExperience.Utilities.ForSocket
+  alias OurExperienceWeb.ExtraComponents.ButtonComponents
 
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_Journal_Entries.U_Journal_Entries,
     as: JEs
@@ -59,6 +60,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     <div id="my_journal_wrapper">
     <.hiddenModalTriggers />
       <h1>My Journal</h1>
+      <ButtonComponents.button text="test it"/>
       <%!-- button to view modal of current active weekly topic --%>
       <div class="flex justify-center">
         <.b_link to={~p"/my_experience/strategies/themed_gratitude_journal/u_weekly_topics/"}>
