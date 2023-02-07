@@ -18,7 +18,8 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   alias OurExperience.U_Strategies.U_Strategy
   alias OurExperience.Utilities.ForSocket
 
-  alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_Journal_Entries.U_Journal_Entries, as: JEs
+  alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_Journal_Entries.U_Journal_Entries,
+    as: JEs
 
   # alias Phoenix.LiveView.JS
   on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
@@ -30,7 +31,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
   @impl true
   def update(%{current_user: u} = assigns, socket) do
-
     socket =
       socket
       |> ForSocket.addFromListToSocket(journals(u), &pushJE/2)
@@ -92,7 +92,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
         <div :for={existing_JE <- @journals} class="existing_journal_entry_wrapper">
           <%!-- <p><%= existing_JE.id %></p> --%>
           <p>Date: <%= existing_JE.inserted_at %></p>
-          <div id={"content_of_existing_journal_entry_id_#{existing_JE.id}"} />
+          <div id={"content_of_existing_journal_entry_id_#{existing_JE.id}"} phx-update="ignore" />
           <div class="existingJEoptions">
             <.button phx-click={
               JS.push("showEditJEModal", value: %{id: existing_JE.id}, target: @myself)
@@ -168,28 +168,29 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       {:noreply, socket}
     else
       dbg(editedJE)
-      JEs.update_u__journal__entry(origEntry, %{content: editedJE.content})
 
-      # case  do
-      #   {:ok, _} ->
-      #     dbg("journal entry SAVED")
+      case JEs.update_u__journal__entry(origEntry, %{content: editedJE.content}) do
+        {:ok, updatedJE} ->
+          dbg(["journal entry UPDATED", updatedJE])
+          u = dbUser(socket)
 
-      #     {:noreply,
-      #      socket
-      #      |> put_flash(:info, "Journal entry edited successfully")
-      #      |> assign(:quills, editedJE)}
+          {:noreply,
+           socket
+           |> put_flash(:info, "Journal entry edited successfully")
+           |> assign(:user, u)
+           |> assign(:journals, journals(u))
+           |> ForSocket.addFromListToSocket([updatedJE], &pushJE/2)}
 
-      #   {:error, %Ecto.Changeset{} = changeset} ->
-      #     dbg("ERROR - journal entry NOT SAVED")
+        {:error, %Ecto.Changeset{} = changeset} ->
+          dbg("ERROR - journal entry NOT SAVED")
 
-      #     {:noreply,
-      #      socket
-      #      |> put_flash(:error, "Journal entry not saved.")
-      #      |> assign(:changeset, changeset)}
-      # end
+          {:noreply,
+           socket
+           |> put_flash(:error, "Journal entry not saved.")}
+      end
     end
 
-    {:noreply, socket}
+    # {:noreply, socket}
   end
 
   # DELETE
@@ -219,14 +220,12 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       end
 
     # dbg(socket)
-    u = Users.get_user_for_TGJ(socket.assigns.user.id)
+    u = dbUser(socket)
 
     socket =
       socket
       |> assign(:user, u)
       |> assign(:journals, journals(u))
-      # to improve: only push deleted je update?
-      |> ForSocket.addFromListToSocket(journals(u), &pushJE/2)
 
     {:noreply, socket}
   end
@@ -263,15 +262,17 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     dbg(["handle save", socket.assigns.quill])
 
     case JEs.create_in(strategy(socket.assigns.user), %{content: socket.assigns.quill}) do
-      {:ok, _saved_quill} ->
+      {:ok, newJE} ->
         dbg("journal entry SAVED")
+        u = dbUser(socket)
 
         {
           :noreply,
           socket
           |> put_flash(:info, "Journal entry created successfully")
-          # |> assign(:quills, [saved_quill | socket.assigns.quills])
-          #  |> assign(:quills, saved_quill)}
+          |> assign(:user, u)
+          |> assign(:journals, journals(u))
+          |> ForSocket.addFromListToSocket([newJE], &pushJE/2)
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -286,12 +287,15 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     # {:noreply, socket}
   end
 
-
   defp strategy(user) do
     U.gj_strategy(user)
   end
 
   defp journals(user) do
     strategy(user)[:u_journal_entries]
+  end
+
+  defp dbUser(socket) do
+    Users.get_user_for_TGJ(socket.assigns.user.id)
   end
 end
