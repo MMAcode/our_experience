@@ -172,7 +172,10 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       case JEs.update_u__journal__entry(origEntry, %{content: editedJE.content}) do
         {:ok, updatedJE} ->
           dbg(["journal entry UPDATED", updatedJE])
-          u = dbUser(socket)
+          # u = dbUser(socket)
+          user = socket.assigns.user
+          newJournals = Enum.map(journals(user), fn je -> if je.id == updatedJE.id, do: updatedJE, else: je end)
+          u= update_user_journals_localy(user, newJournals)
 
           {:noreply,
            socket
@@ -204,28 +207,31 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     {:noreply, socket}
   end
 
-  def handle_event("deleteExistingJEFinal", %{"je_id_to_delete" => id}, socket) do
+  def handle_event("deleteExistingJEFinal", %{"je_id_to_delete" => id}, %{assigns: %{user: user}}= socket) do
     id = String.to_integer(id)
-    # dbg(["deleteExistingJEFinal", id])
 
     socket =
       case JEs.delete_using_id(id) do
         {1, _} ->
           dbg("deleted ok")
-          put_flash(socket, :info, "deleted")
+          u = update_user_journals_localy(user, journals(user) |> Enum.filter(&(&1.id != id)))
+
+          socket
+          |> put_flash(:info, "deleted")
+          |> assign(:user, u)
+          |> assign(:journals, journals(u))
 
         x ->
           dbg(["issue deleting JE with id", id, "error?:", x])
           put_flash(socket, :error, "error")
       end
 
-    # dbg(socket)
-    u = dbUser(socket)
+    # u = dbUser(socket)
 
-    socket =
-      socket
-      |> assign(:user, u)
-      |> assign(:journals, journals(u))
+    # socket =
+    #   socket
+    #   |> assign(:user, u)
+    #   |> assign(:journals, journals(u))
 
     {:noreply, socket}
   end
@@ -263,8 +269,11 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
     case JEs.create_in(strategy(socket.assigns.user), %{content: socket.assigns.quill}) do
       {:ok, newJE} ->
+        user = socket.assigns.user
         dbg("journal entry SAVED")
-        u = dbUser(socket)
+        # u = dbUser(socket)
+        # update user localy
+        u = update_user_journals_localy(user, [newJE | journals(user)])
 
         {
           :noreply,
@@ -285,6 +294,11 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     end
 
     # {:noreply, socket}
+  end
+
+  defp update_user_journals_localy(user, newJournals) do
+    str = put_in(strategy(user)[:u_journal_entries], newJournals)
+    put_in(user[:u_strategies], [str]) #returns updated user
   end
 
   defp strategy(user) do
