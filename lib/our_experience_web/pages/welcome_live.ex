@@ -16,7 +16,7 @@ defmodule OurExperienceWeb.Pages.WelcomeLive do
       <p class="">(Created by Miroslav Makarov)</p>
       <p>...work in progress...</p>
     </div>
-    <.admin_level current_user={@current_user}>
+    <.admin_level current_user={@current_user} minimum_admin_level={100}>
       <.b_link to={~p"/strategies/themed_gratitude_journal/"}>
         Learn more about Themed Gratitude Journal
       </.b_link>
