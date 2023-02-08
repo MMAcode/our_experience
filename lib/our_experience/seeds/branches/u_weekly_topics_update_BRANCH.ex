@@ -9,16 +9,11 @@ defmodule OurExperience.Seeds.Branches.UWeeklyTopicsUpdate_BRANCH do
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopics.WeeklyTopics
 
   import Ecto.Query
-
+# delete bad weekly topics first;
+# update this to load only active weekly topics!, not those in dev
+  # mix run priv/repo/branches.exs
   def update_user_weekly_topics() do
-    """
-    1)get all users with their TGJ strategy and u_weekly_topics (as stream, one by one)
-    2) get all weekly_topics
-    3)for each user...
-    4)  get all topics ids
-    5)  filter weekly_topic_ids by user topic ids so that only new remains
-    6)  for each new topic add to user's u_weekly_topics
-    """
+
 
     # get all weekly topics
     wt_ids = WeeklyTopics.list_all_ids()
@@ -45,6 +40,7 @@ defmodule OurExperience.Seeds.Branches.UWeeklyTopicsUpdate_BRANCH do
       u_wt = Map.get(str, :u_weekly_topics, [])
       # get size of u_wt
       u_wt_size = Enum.count(u_wt)
+      u_wt_highest_position = u_wt |> Enum.max_by(fn u_wt -> u_wt.position end) |> Map.get(:position, 0)
 
       wt_ids_on_user = u_wt |> Enum.map(fn u_wt -> u_wt.weekly_topic_id end)
       #  %{str_id: str.id, wt_ids: wt_ids_on_user}
@@ -55,7 +51,8 @@ defmodule OurExperience.Seeds.Branches.UWeeklyTopicsUpdate_BRANCH do
         u_id: user.id,
         u_str_id: str.id,
         missing_wt_ids: missing_wt_ids,
-        nr_of_existing_u_wt: u_wt_size
+        nr_of_existing_u_wt: u_wt_size,
+        u_wt_highest_position: u_wt_highest_position
       }
 
       # new_u_wts =
@@ -70,7 +67,7 @@ defmodule OurExperience.Seeds.Branches.UWeeklyTopicsUpdate_BRANCH do
         |> Enum.map(
           &%U_WeeklyTopic{
             active: false,
-            position: (u_wt_size + &1.index + 10),
+            position: (u_wt_highest_position + 1 + &1.index),
             user_id: user.id,
             u_strategy_id: str.id,
             weekly_topic_id: &1.id
