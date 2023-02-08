@@ -17,6 +17,13 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.Wee
     Repo.all(WeeklyTopic)
   end
 
+  def list_all_ids do
+    Repo.all(
+      from w in WeeklyTopic,
+        select: w.id
+    )
+  end
+
   @doc """
   Gets a single weekly_topic.
 

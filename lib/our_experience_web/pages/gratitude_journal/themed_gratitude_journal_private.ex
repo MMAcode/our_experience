@@ -18,7 +18,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
   def mount(_params, _session, %{assigns: %{current_user: user, live_action: action}} = socket) do
     # set new u_strategy and topics, if needed:
     user_fromDb = Users.get_user_for_TGJ(user.id)
-    user_wStrategy =user_with_existing_active_TGJ_strategy_and_topics(user_fromDb),
+    user_wStrategy =user_with_existing_active_TGJ_strategy_and_topics(user_fromDb)
     socket = assign(socket, current_user: user_wStrategy)
 
     # nav to weeklyTopics or Journal:

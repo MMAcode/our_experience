@@ -243,7 +243,7 @@ defmodule OurExperience.Users.Users do
           weekly_topic_id: &1.id
         }
       )
-      |> Enum.each(&Repo.insert!(&1))
+      |> Enum.each(&Repo.insert!(&1))#may be better to use: |> Repo.insert_all()
 
     # |> Enum.at(0)
 

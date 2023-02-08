@@ -1,0 +1,3 @@
+alias OurExperience.Seeds.Branches.UWeeklyTopicsUpdate_BRANCH
+
+UWeeklyTopicsUpdate_BRANCH.update_user_weekly_topics()
