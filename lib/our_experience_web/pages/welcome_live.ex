@@ -3,6 +3,7 @@ defmodule OurExperienceWeb.Pages.WelcomeLive do
   alias OurExperienceWeb.Pages.Public.Intro.InformationTexts
   alias OurExperienceWeb.Pages.GratitudeJournal.GJ_texts
   # alias OurExperienceWeb.MiroComponents
+  alias OurExperienceWeb.ExtraComponents.ButtonComponents
   on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
 
   def mount(_params, _session, socket) do
@@ -22,6 +23,7 @@ defmodule OurExperienceWeb.Pages.WelcomeLive do
       </.b_link>
       <.b_link to={~p"/admin/weekly_topics/"}>weekly_topics</.b_link>
       <.b_link to={~p"/my_experience/u_weekly_topics/"}>My weekly_topics</.b_link>
+      <ButtonComponents.button text="test it"/>
     </.admin_level>
     <InformationTexts.introduction />
     <GJ_texts.public_introduction /> ÷ƒ
