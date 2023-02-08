@@ -54,7 +54,8 @@ defmodule OurExperience.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:ueberauth, "~> 0.10"},
       {:ueberauth_auth0, "~> 2.1"},
-      {:struct_access, "~> 1.1.2"}
+      {:struct_access, "~> 1.1.2"},
+      # {:ex_fontawesome, "~> 0.7.2"} #https://hexdocs.pm/ex_fontawesome/FontAwesome.html
     ]
   end
 

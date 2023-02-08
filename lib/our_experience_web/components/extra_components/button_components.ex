@@ -125,6 +125,9 @@ defmodule OurExperienceWeb.ExtraComponents.ButtonComponents do
 
       <span :if={@screenreader_text} class="sr-only"><%= @screenreader_text %></span>
       <i :if={@loading || @done} class={icon_classes(@loading, @done)} />
+      <%= if (@loading && !@done) do  %>
+      <p> LLLLL</p>
+      <% end %>
     </button>
     """
   end

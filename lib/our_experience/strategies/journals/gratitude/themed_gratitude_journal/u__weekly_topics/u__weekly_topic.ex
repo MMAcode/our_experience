@@ -25,6 +25,6 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_W
     u__weekly_topic
     |> cast(attrs, [:active, :counter])
     |> validate_required([:position, :active])
-    |> unique_constraint([:position])
+    # |> unique_constraint([:position]) #NOT, various users can have the same position
   end
 end
