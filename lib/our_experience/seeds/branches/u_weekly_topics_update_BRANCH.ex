@@ -9,12 +9,10 @@ defmodule OurExperience.Seeds.Branches.UWeeklyTopicsUpdate_BRANCH do
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopics.WeeklyTopics
 
   import Ecto.Query
-# delete bad weekly topics first;
-# update this to load only active weekly topics!, not those in dev
+  # delete bad weekly topics first;
+  # update this to load only active weekly topics!, not those in dev
   # mix run priv/repo/branches.exs
   def update_user_weekly_topics() do
-
-
     # get all weekly topics
     wt_ids = WeeklyTopics.list_all_public_ids()
 
@@ -31,52 +29,66 @@ defmodule OurExperience.Seeds.Branches.UWeeklyTopicsUpdate_BRANCH do
           preload: [u_strategies: {u_s, strategy: s, u_weekly_topics: u_wt}]
       )
 
-    dbg "users ids:"
-    Enum.each(users, &dbg(&1.id))
+    # dbg("users ids:")
+    # Enum.each(users, &dbg(&1.id))
     # 2)
 
-    maps_with_results = users
-    |> Stream.map(fn user ->
-      str = ThemedGratitudeJournalPrivate.get_active_TGJ_uStrategy_fromLoadedData(user)
-      u_wt = Map.get(str, :u_weekly_topics, [])
-      # get size of u_wt
-      u_wt_size = Enum.count(u_wt)
-      u_wt_highest_position = u_wt |> Enum.max_by(fn u_wt -> u_wt.position end) |> Map.get(:position, 0)
+    maps_with_results =
+      users
+      |> Stream.map(fn user ->
+        str = ThemedGratitudeJournalPrivate.get_active_TGJ_uStrategy_fromLoadedData(user)
+        u_wt = Map.get(str, :u_weekly_topics, [])
+        # get size of u_wt
+        u_wt_size = Enum.count(u_wt)
 
-      wt_ids_on_user = u_wt |> Enum.map(fn u_wt -> u_wt.weekly_topic_id end)
-      missing_wt_ids = get_missing_wt_ids(wt_ids, wt_ids_on_user)
-      new_inserted_u_wts =
-        missing_wt_ids
-        |> Enum.with_index(fn id, i ->
-          # dbg([i, id])
-          # dbg((u_wt_size + i))
-          %{id: id, index: i}
-        end)
-        |> Enum.map(fn x -> dbg(x) end)
-        |> Enum.map(
-          &%U_WeeklyTopic{
-            active: false,
-            position: (u_wt_highest_position + 1 + &1.index),
-            user_id: user.id,
-            u_strategy_id: str.id,
-            weekly_topic_id: &1.id
-          }
-        )
-       |> Enum.map(&Repo.insert!(&1))
+        u_wt_highest_position =
+          case u_wt_size do
+            0 -> -1
+            _ -> u_wt |> Enum.max_by(fn u_wt -> u_wt.position end) |> Map.get(:position, 0)
+          end
 
-      # results = Repo.insert_all(U_WeeklyTopic, new_u_wts)
+        wt_ids_on_user = u_wt |> Enum.map(fn u_wt -> u_wt.weekly_topic_id end)
+        missing_wt_ids = get_missing_wt_ids(wt_ids, wt_ids_on_user)
 
-      _result = %{
-        u_id: user.id,
-        u_str_id: str.id,
-        missing_wt_ids: missing_wt_ids,
-        nr_of_existing_u_wt: u_wt_size,
-        result_new_inserted_u_WTs: new_inserted_u_wts
-      }
-    end)
-    |> Enum.to_list()
+        new_inserted_u_wts =
+          missing_wt_ids
+          |> Enum.with_index(fn id, i ->
+            # dbg([i, id])
+            # dbg((u_wt_size + i))
+            %{id: id, index: i}
+          end)
+          |> Enum.map(fn x -> dbg(x) end)
+          |> Enum.map(
+            &%U_WeeklyTopic{
+              active: false,
+              position: u_wt_highest_position + 1 + &1.index,
+              user_id: user.id,
+              u_strategy_id: str.id,
+              weekly_topic_id: &1.id
+            }
+          )
+          |> Enum.map(&Repo.insert!(&1))
 
-    dbg maps_with_results
+        # results = Repo.insert_all(U_WeeklyTopic, new_u_wts)
+
+        _result = %{
+          u_id: user.id,
+          u_str_id: str.id,
+          missing_wt_ids: Enum.map(missing_wt_ids, fn id -> Integer.to_string(id) end), #else it print char instead of ints
+          nr_of_existing_u_wt: u_wt_size,
+          new_inserted_u_WTs:
+            Enum.map(new_inserted_u_wts, fn u_wt ->
+              %{
+                wt_id: u_wt.weekly_topic_id,
+                position: u_wt.position,
+                id: u_wt.id
+              }
+            end)
+        }
+      end)
+      |> Enum.to_list()
+
+    dbg(maps_with_results)
     # |> dbg
   end
 
