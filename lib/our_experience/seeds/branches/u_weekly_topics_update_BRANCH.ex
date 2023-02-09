@@ -44,20 +44,8 @@ defmodule OurExperience.Seeds.Branches.UWeeklyTopicsUpdate_BRANCH do
       u_wt_highest_position = u_wt |> Enum.max_by(fn u_wt -> u_wt.position end) |> Map.get(:position, 0)
 
       wt_ids_on_user = u_wt |> Enum.map(fn u_wt -> u_wt.weekly_topic_id end)
-      #  %{str_id: str.id, wt_ids: wt_ids_on_user}
-
       missing_wt_ids = get_missing_wt_ids(wt_ids, wt_ids_on_user)
-
-      %{
-        u_id: user.id,
-        u_str_id: str.id,
-        missing_wt_ids: missing_wt_ids,
-        nr_of_existing_u_wt: u_wt_size,
-        u_wt_highest_position: u_wt_highest_position
-      }
-
-      # new_u_wts =
-      results =
+      new_inserted_u_wts =
         missing_wt_ids
         |> Enum.with_index(fn id, i ->
           # dbg([i, id])
@@ -78,12 +66,12 @@ defmodule OurExperience.Seeds.Branches.UWeeklyTopicsUpdate_BRANCH do
 
       # results = Repo.insert_all(U_WeeklyTopic, new_u_wts)
 
-      %{
+      _result = %{
         u_id: user.id,
         u_str_id: str.id,
         missing_wt_ids: missing_wt_ids,
         nr_of_existing_u_wt: u_wt_size,
-        result: results
+        result_new_inserted_u_WTs: new_inserted_u_wts
       }
     end)
     |> Enum.to_list()
