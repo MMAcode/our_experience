@@ -17,6 +17,17 @@ defmodule OurExperience.CONSTANTS do
     }
   end
 
+  def weekly_topics do
+    %{
+      stages: %{
+        prepare: "prepare",
+        review: "review", #may be
+        partially_public_prototype: "partially_public_prototype", #may be
+        public: "public"
+      }
+    }
+  end
+
   def url_paths do
     %{
       base_for: %{

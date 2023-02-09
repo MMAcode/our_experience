@@ -7,6 +7,7 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.Wee
 
   schema "weekly_topics" do
     field :default_active_status, :boolean, default: false
+    field :stage, :string
     field :default_position, :integer
     field :title, :string
     field :summary, :string

@@ -64,10 +64,11 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       <%!-- button to view modal of current active weekly topic --%>
       <div class="flex justify-center">
         <.b_link to={~p"/my_experience/strategies/themed_gratitude_journal/u_weekly_topics/"}>
-          Themes ->
+          All Weekly Themes ->
         </.b_link>
         <.button phx-click={show_modal("current_weekly_topic")} type="button" phx-target={@myself}>
-          Current theme ->
+          <p>Current theme -></p>
+          <p class="text-xs">(<%= @current_weekly_topic.title %>)</p>
         </.button>
         <.weekly_topic_modal_component id="current_weekly_topic" weekly_topic={@current_weekly_topic}>
           <div class="flex justify-center">
