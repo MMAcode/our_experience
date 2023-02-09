@@ -99,7 +99,8 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
           <p>Date: <%= existing_JE.inserted_at %></p>
           <div id={"content_of_existing_journal_entry_id_#{existing_JE.id}"} phx-update="ignore" />
           <div class="existingJEoptions">
-            <.button phx-click="showEditJEModal" value={existing_JE.id} phx-target={@myself}>
+            <%!-- <.button phx-click="showEditJEModal" value={existing_JE.id} phx-target={@myself}> --%>
+            <.button phx-click="showEditJEModal" phx-value-id={existing_JE.id} phx-target={@myself}>
               Edit
             </.button>
             <.button phx-click="showDeleteJEModal" phx-value-id={existing_JE.id} phx-target={@myself}>
@@ -156,9 +157,9 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   end
 
   # EDIT  ******************************************************************
-  # def handle_event("showEditJEModal", %{"id" => id}, socket) do
-  def handle_event("showEditJEModal", %{"value" => id}, socket) do
-     id = String.to_integer(id)
+  def handle_event("showEditJEModal", %{"id" => id}, socket) do
+  # def handle_event("showEditJEModal", %{"value" => id}, socket) do
+    #  id = String.to_integer(id)
 
     socket =
       socket

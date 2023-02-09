@@ -14,6 +14,10 @@ let triggerJS = (querySelector) => {
   window.liveSocket.execJS(el, el.getAttribute("miro-js-to-trigger"));
 };
 
+let deleteModalQuill = new Quill(
+  "#modal_for_existing_journal_entry_to_delete .miroQuillContainer"
+);
+
 let quillForEditingModal = new Quill(
   "#modal_for_existing_journal_entry_to_edit .miroQuillContainer",
   {
@@ -28,7 +32,7 @@ console.log("miro - outside of mounted");
 export let TextEditor = {
   mounted() {
     console.log("Miro - in Mounted");
-    const sendChangesToServer = (quill, eventName, id = null) => {
+    const activateSendingChangesToServer = (quill, eventName, id = null) => {
       quill.on("text-change", (delta, oldDelta, source) => {
         if (source == "api") {
           console.log("An API call triggered this change.");
@@ -55,7 +59,7 @@ export let TextEditor = {
       theme: "snow",
     });
 
-    sendChangesToServer(quill_newJE, "text-editor");
+    activateSendingChangesToServer(quill_newJE, "text-editor");
 
     // list existing JE
     window.addEventListener("phx:existingJournalEntryFromServer", (e) => {
@@ -78,9 +82,6 @@ export let TextEditor = {
       ({ detail: { id } }) => {
         console.log("id", id);
         // console.log("existingJEs", existingJEs[id].getText());
-        deleteModalQuill = new Quill(
-          "#modal_for_existing_journal_entry_to_delete .miroQuillContainer"
-        );
         deleteModalQuill.enable(false);
         deleteModalQuill.setContents(existingJEs[id].getContents());
 
@@ -106,7 +107,7 @@ export let TextEditor = {
           )
           .setAttribute("phx-value-je_id_to_edit", id);
         triggerJS("#hiddenTriggerForViewingEditModal");
-        sendChangesToServer(quillForEditingModal, "text-editor", id);
+        activateSendingChangesToServer(quillForEditingModal, "text-editor", id);
       }
     );
   },
