@@ -27,7 +27,7 @@ defmodule OurExperience.Seeds.Branches.UWeeklyTopicsUpdate_BRANCH do
           join: s in assoc(u_s, :strategy),
           where: s.name == "Themed Gratitude Journal",
           where: u_s.status == ^CONSTANTS.u_strategies().status.on,
-          join: u_wt in assoc(u_s, :u_weekly_topics),
+          left_join: u_wt in assoc(u_s, :u_weekly_topics),
           preload: [u_strategies: {u_s, strategy: s, u_weekly_topics: u_wt}]
       )
 
