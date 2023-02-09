@@ -232,8 +232,7 @@ defmodule OurExperience.Users.Users do
       on its own ->
     """
 
-    weekly_topics =
-      WeeklyTopics.list_weekly_topics()
+      WeeklyTopics.list_public_weekly_topics()
       |> Enum.map(
         &%U_WeeklyTopic{
           active: false,

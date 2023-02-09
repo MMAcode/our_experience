@@ -16,10 +16,24 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.Wee
   def list_weekly_topics do
     Repo.all(WeeklyTopic)
   end
+  def list_public_weekly_topics do
+    Repo.all(
+      from w in WeeklyTopic,
+        where: w.stage == "public"
+    )
+  end
 
   def list_all_ids do
     Repo.all(
       from w in WeeklyTopic,
+        select: w.id
+    )
+  end
+
+  def list_all_public_ids do
+    Repo.all(
+      from w in WeeklyTopic,
+        where: w.stage == "public",
         select: w.id
     )
   end

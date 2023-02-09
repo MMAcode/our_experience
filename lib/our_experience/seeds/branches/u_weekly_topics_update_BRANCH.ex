@@ -16,7 +16,7 @@ defmodule OurExperience.Seeds.Branches.UWeeklyTopicsUpdate_BRANCH do
 
 
     # get all weekly topics
-    wt_ids = WeeklyTopics.list_all_ids()
+    wt_ids = WeeklyTopics.list_all_public_ids()
 
     # 1)
     users =
