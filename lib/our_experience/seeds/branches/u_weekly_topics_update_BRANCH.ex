@@ -31,7 +31,8 @@ defmodule OurExperience.Seeds.Branches.UWeeklyTopicsUpdate_BRANCH do
           preload: [u_strategies: {u_s, strategy: s, u_weekly_topics: u_wt}]
       )
 
-    # dbg users
+    dbg "users ids:"
+    Enum.each(users, &dbg(&1.id))
     # 2)
 
     maps_with_results = users
