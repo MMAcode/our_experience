@@ -30,9 +30,10 @@ defmodule OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.Wee
       :day_by_day_instructions,
       :content,
       :default_position,
-      :default_active_status
+      :default_active_status,
+      :stage
     ])
     |> validate_required([:title, :content, :default_position, :default_active_status])
-    |> unique_constraint([:default_position])
+    # |> unique_constraint([:default_position])
   end
 end
