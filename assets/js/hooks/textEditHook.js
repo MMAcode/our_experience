@@ -14,7 +14,7 @@ let triggerJSon = (querySelector) => {
   window.liveSocket.execJS(el, el.getAttribute("miro-js-to-trigger"));
 };
 
-console.log("miro - outside of mounted");
+console.log("miro - outside of mounted, NA HLAVU!!:-(");
 export let TextEditor = {
   mounted() {
     let thisHook = this;
