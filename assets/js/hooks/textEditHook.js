@@ -19,6 +19,22 @@ export let TextEditor = {
   mounted() {
     let thisHook = this;
     console.log("Miro hook mounted, hook:", thisHook);
+
+    let existingJEs = {};
+    let currentlyEditedJEid;
+
+    // console.log('miroPost:', miroPost);
+
+    // let quill_newJE = new Quill(this.el, {
+    console.log(document.querySelector("#editor_for_new_journal_entry"));
+    let quill_newJE = new Quill("#editor_for_new_journal_entry", {
+      modules: {
+        toolbar: toolbarOptions,
+      },
+      theme: "snow",
+    });
+    console.log("quill_newJE", quill_newJE);
+
     let deleteModalQuill = new Quill(
       "#modal_for_existing_journal_entry_to_delete .miroQuillContainer"
     );
@@ -34,35 +50,43 @@ export let TextEditor = {
     );
 
     console.log("Miro - in Mounted");
-    const activateSendingChangesToServer = (quill, eventName, id = null) => {
-      quill.on("text-change", (delta, oldDelta, source) => {
-        if (source == "api") {
-          console.log("An API call triggered this change.");
-        } else if (source == "user") {
-          // this.pushEventTo("#new_journal_entry", eventName, {
-          thisHook.pushEventTo("#my_journal_wrapper", eventName, {
-            text_content: quill.getContents(),
-            journalEntryId: id,
-          });
-        }
-      });
-    };
-
-    let existingJEs = {};
-
-    // console.log('miroPost:', miroPost);
-
-    // let quill_newJE = new Quill(this.el, {
-    console.log(document.querySelector("#editor_for_new_journal_entry"));
-    let quill_newJE = new Quill("#editor_for_new_journal_entry", {
-      modules: {
-        toolbar: toolbarOptions,
-      },
-      theme: "snow",
+    // const activateSendingChangesToServer = (quill, eventName, id = null) => {
+    //   quill.on("text-change", (delta, oldDelta, source) => {
+    //     if (source == "api") {
+    //       console.log("An API call triggered this change.");
+    //     } else if (source == "user") {
+    //       // this.pushEventTo("#new_journal_entry", eventName, {
+    //       thisHook.pushEventTo("#my_journal_wrapper", eventName, {
+    //         text_content: quill.getContents(),
+    //         journalEntryId: id,
+    //       });
+    //     }
+    //   });
+    // };
+    quill_newJE.on("text-change", (delta, oldDelta, source) => {
+      if (source == "api") {
+        console.log("An API call triggered this change.");
+      } else if (source == "user") {
+        // this.pushEventTo("#new_journal_entry", eventName, {
+        thisHook.pushEventTo("#my_journal_wrapper", "text-editor", {
+          text_content: quill_newJE.getContents(),
+          journalEntryId: null,
+        });
+      }
     });
-    console.log("quill_newJE", quill_newJE);
+    quillForEditingModal.on("text-change", (delta, oldDelta, source) => {
+      if (source == "api") {
+        console.log("An API call triggered this change.");
+      } else if (source == "user") {
+        // this.pushEventTo("#new_journal_entry", eventName, {
+        thisHook.pushEventTo("#my_journal_wrapper", "text-editor", {
+          text_content: quillForEditingModal.getContents(),
+          journalEntryId: currentlyEditedJEid,
+        });
+      }
+    });
 
-    activateSendingChangesToServer(quill_newJE, "text-editor");
+    // activateSendingChangesToServer(quill_newJE, "text-editor");
 
     // list existing JE
     window.addEventListener("phx:existingJournalEntryFromServer", (e) => {
@@ -71,11 +95,13 @@ export let TextEditor = {
         JSON.parse(e.detail.existingJE).id
       );
       let je = JSON.parse(e.detail.existingJE);
-      let quill1 = new Quill(`#content_of_existing_journal_entry_id_${je.id}`, {
-        readOnly: true,
-      });
-      quill1.setContents(je.content);
-      existingJEs[je.id] = quill1;
+      existingJEs[je.id] = new Quill(
+        `#content_of_existing_journal_entry_id_${je.id}`,
+        {
+          readOnly: true,
+        }
+      );
+      existingJEs[je.id].setContents(je.content);
       //   console.log("existingJEs", existingJEs);
     });
 
@@ -110,7 +136,8 @@ export let TextEditor = {
           )
           .setAttribute("phx-value-je_id_to_edit", id);
         triggerJSon("#hiddenTriggerForViewingEditModal");
-        activateSendingChangesToServer(quillForEditingModal, "text-editor", id);
+        currentlyEditedJEid = id;
+        // activateSendingChangesToServer(quillForEditingModal, "text-editor", id);
       }
     );
   },

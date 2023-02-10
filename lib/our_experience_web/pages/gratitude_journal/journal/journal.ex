@@ -262,14 +262,14 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
         %{"text_content" => content, "journalEntryId" => id} = _att,
         socket
       ) do
+        dbg(["handle text-editor", id, content])
         # id = String.to_integer(id)
-    dbg(["handle text-editor", id, content])
     # dbg [socket.assigns[:edited_quill]]
     socket =
       case id do
         # new JE edited
         nil -> assign(socket, quill: content)
-        id -> socket |> assign(edited_quill: %{id: id, content: content})
+        id -> socket |> assign(edited_quill: %{id: String.to_integer(id), content: content})
       end
 
     {:noreply, socket}
