@@ -18,7 +18,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   alias OurExperience.U_Strategies.U_Strategy
   alias OurExperience.Utilities.ForSocket
 
-
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_Journal_Entries.U_Journal_Entries,
     as: JEs
 
@@ -58,7 +57,8 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   def render(assigns) do
     ~H"""
     <div id="my_journal_wrapper">
-    <.hiddenModalTriggers />
+      <div id="newJournalEntryEditor" />
+      <.hiddenModalTriggers />
       <h1>My Journal</h1>
 
       <%!-- button to view modal of current active weekly topic --%>
@@ -83,7 +83,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
         <div id="editorWrapper" phx-update="ignore">
           <h3 id="new_journal_entry">Add new journal entry</h3>
           <%!-- id="journal_entry" to link js event to this live component --%>
-          <div id="editor" phx-hook="TextEditor" phx-target={@myself} />
         </div>
         <.button phx-click="saveNewJE" phx-target={@myself}>
           Save
@@ -137,6 +136,8 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
           </.button>
         </.modal>
       </div>
+
+      <div id="quillTextEditorForEverything" phx-hook="TextEditor" phx-target={@myself} />
     </div>
     """
   end
@@ -158,7 +159,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
   # EDIT  ******************************************************************
   def handle_event("showEditJEModal", %{"id" => id}, socket) do
-  # def handle_event("showEditJEModal", %{"value" => id}, socket) do
+    # def handle_event("showEditJEModal", %{"value" => id}, socket) do
     #  id = String.to_integer(id)
 
     socket =
@@ -260,7 +261,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
         %{"text_content" => content, "journalEntryId" => id} = _att,
         socket
       ) do
-        # id = String.to_integer(id)
+    # id = String.to_integer(id)
     dbg(["handle text-editor", id, content])
     # dbg [socket.assigns[:edited_quill]]
     socket =

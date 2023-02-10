@@ -26,7 +26,8 @@ config :our_experience, OurExperienceWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "Sn4+TiKREMa0OXI3PMo7s6zFJ45KtWMwJEO8AkNmOTJGN8qUQbdXL9BU6cdoR+D2",
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
+    node: ["esbuild.js", "--watch", cd: Path.expand("../assets", __DIR__)],
+    # esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
   ]
 

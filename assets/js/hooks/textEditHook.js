@@ -19,48 +19,62 @@ let triggerJS = (querySelector) => {
 console.log("miro - outside of mounted");
 export let TextEditor = {
   mounted() {
-    let deleteModalQuill = new Quill(
-      "#modal_for_existing_journal_entry_to_delete .miroQuillContainer"
-    );
+     console.log("Miro - in Mounted");
+     console.log(document.querySelector("#newJournalEntryEditor"));
+     let activateSendingChangesToServer = (
+       hook,
+       quill,
+       eventName,
+       id = null
+     ) => {
+       console.log("activateSendingChangesToServer", hook, quill, eventName);
+       quill.on("text-change", (delta, oldDelta, source) => {
+         if (source == "api") {
+           console.log("An API call triggered this change.");
+         } else if (source == "user") {
+           // this.pushEventTo("#new_journal_entry", eventName, {
+           // https://hexdocs.pm/phoenix_live_view/js-interop.html
+           hook.pushEventTo("#my_journal_wrapper", eventName, {
+             text_content: quill.getContents(),
+             journalEntryId: id,
+           });
+         }
+       });
+     };
 
-    let quillForEditingModal = new Quill(
-      "#modal_for_existing_journal_entry_to_edit .miroQuillContainer",
-      {
-        modules: {
-          toolbar: toolbarOptions,
-        },
-        theme: "snow",
-      }
-    );
+     thisHook = this;
+     // let quill_newJE = new Quill(this.el, {
 
-    console.log("Miro - in Mounted");
-    const activateSendingChangesToServer = (quill, eventName, id = null) => {
-      quill.on("text-change", (delta, oldDelta, source) => {
-        if (source == "api") {
-          console.log("An API call triggered this change.");
-        } else if (source == "user") {
-          // this.pushEventTo("#new_journal_entry", eventName, {
-          this.pushEventTo("#my_journal_wrapper", eventName, {
-            text_content: quill.getContents(),
-            journalEntryId: id,
-          });
-        }
-      });
-    };
+     let quill_newJE = new Quill("#newJournalEntryEditor", {
+       modules: {
+         toolbar: toolbarOptions,
+       },
+       theme: "snow",
+     });
+     console.log("quill_newJE", quill_newJE);
+
+     let deleteModalQuill = new Quill(
+       "#modal_for_existing_journal_entry_to_delete .miroQuillContainer"
+     );
+
+     let quillForEditingModal = new Quill(
+       "#modal_for_existing_journal_entry_to_edit .miroQuillContainer",
+       {
+         modules: {
+           toolbar: toolbarOptions,
+         },
+         theme: "snow",
+       }
+     );
+
+   
 
     let existingJEs = {};
     console.log("Miro Mounting text editor", this.el, this);
 
     // console.log('miroPost:', miroPost);
 
-    let quill_newJE = new Quill(this.el, {
-      modules: {
-        toolbar: toolbarOptions,
-      },
-      theme: "snow",
-    });
-
-    activateSendingChangesToServer(quill_newJE, "text-editor");
+    activateSendingChangesToServer(thisHook, quill_newJE, "text-editor");
 
     // list existing JE
     window.addEventListener("phx:existingJournalEntryFromServer", (e) => {
@@ -109,7 +123,12 @@ export let TextEditor = {
           )
           .setAttribute("phx-value-je_id_to_edit", id);
         triggerJS("#hiddenTriggerForViewingEditModal");
-        activateSendingChangesToServer(quillForEditingModal, "text-editor", id);
+        activateSendingChangesToServer(
+          thisHook,
+          quillForEditingModal,
+          "text-editor",
+          id
+        );
       }
     );
   },
