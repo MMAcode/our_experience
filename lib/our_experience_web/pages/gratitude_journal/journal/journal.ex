@@ -82,8 +82,8 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       <div id="new_journal_entry_wrapper">
         <div id="editorWrapper" phx-update="ignore">
           <h3 id="new_journal_entry">Add new journal entry</h3>
+          <div id="editor_for_new_journal_entry" />
           <%!-- id="journal_entry" to link js event to this live component --%>
-          <div id="editor" phx-hook="TextEditor" phx-target={@myself} />
         </div>
         <.button phx-click="saveNewJE" phx-target={@myself}>
           Save
@@ -93,6 +93,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
       <div id="existing_journal_entries_wrapper">
         <h2>History</h2>
+
 
         <div :for={existing_JE <- @journals} class="existing_journal_entry_wrapper">
           <%!-- <p><%= existing_JE.id %></p> --%>
@@ -137,6 +138,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
           </.button>
         </.modal>
       </div>
+      <div id="editor_trigger" phx-hook="TextEditor" phx-target={@myself} />
     </div>
     """
   end

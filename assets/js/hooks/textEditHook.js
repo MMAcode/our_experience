@@ -9,12 +9,10 @@ let toolbarOptions = [
   ["clean"],
 ];
 
-let triggerJS = (querySelector) => {
+let triggerJSon = (querySelector) => {
   el = document.querySelector(querySelector);
   window.liveSocket.execJS(el, el.getAttribute("miro-js-to-trigger"));
 };
-
-
 
 console.log("miro - outside of mounted");
 export let TextEditor = {
@@ -53,7 +51,8 @@ export let TextEditor = {
 
     // console.log('miroPost:', miroPost);
 
-    let quill_newJE = new Quill(this.el, {
+    // let quill_newJE = new Quill(this.el, {
+    let quill_newJE = new Quill("#editor_for_new_journal_entry", {
       modules: {
         toolbar: toolbarOptions,
       },
@@ -92,12 +91,11 @@ export let TextEditor = {
           )
           .setAttribute("phx-value-je_id_to_delete", id);
 
-        triggerJS("#hiddenTriggerForViewingDeleteModal");
+        triggerJSon("#hiddenTriggerForViewingDeleteModal");
       }
     );
 
     // edit
-
     window.addEventListener(
       "phx:existingJournalEntryIdForEditModalFromServer",
       ({ detail: { id } } = e) => {
@@ -108,7 +106,7 @@ export let TextEditor = {
             "#modal_for_existing_journal_entry_to_edit .confirm_action_button"
           )
           .setAttribute("phx-value-je_id_to_edit", id);
-        triggerJS("#hiddenTriggerForViewingEditModal");
+        triggerJSon("#hiddenTriggerForViewingEditModal");
         activateSendingChangesToServer(quillForEditingModal, "text-editor", id);
       }
     );
