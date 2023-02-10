@@ -17,6 +17,8 @@ let triggerJSon = (querySelector) => {
 console.log("miro - outside of mounted");
 export let TextEditor = {
   mounted() {
+    let thisHook = this;
+    console.log("Miro hook mounted, hook:", thisHook);
     let deleteModalQuill = new Quill(
       "#modal_for_existing_journal_entry_to_delete .miroQuillContainer"
     );
@@ -38,7 +40,7 @@ export let TextEditor = {
           console.log("An API call triggered this change.");
         } else if (source == "user") {
           // this.pushEventTo("#new_journal_entry", eventName, {
-          this.pushEventTo("#my_journal_wrapper", eventName, {
+          thisHook.pushEventTo("#my_journal_wrapper", eventName, {
             text_content: quill.getContents(),
             journalEntryId: id,
           });
@@ -47,7 +49,6 @@ export let TextEditor = {
     };
 
     let existingJEs = {};
-    console.log("Miro Mounting text editor", this.el, this);
 
     // console.log('miroPost:', miroPost);
 
