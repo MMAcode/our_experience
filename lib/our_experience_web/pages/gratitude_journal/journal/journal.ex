@@ -299,6 +299,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
           :noreply,
           socket
           |> put_flash(:info, "Journal entry created successfully")
+          |> push_event("existingJournalEntrySaved_clearContent", %{})
           |> assign(:user, u)
           |> assign(:journals, journals(u))
           |> ForSocket.addFromListToSocket([newJE], &pushJE/2)

@@ -140,6 +140,17 @@ export let TextEditor = {
         // activateSendingChangesToServer(quillForEditingModal, "text-editor", id);
       }
     );
+
+    // clear new
+    window.addEventListener(
+      "phx:existingJournalEntrySaved_clearContent",
+      (e) => {
+        console.log("clearning content of new JE quill");
+        quill_newJE.setContents([]);
+      }
+    );
+
+    // existingJournalEntrySaved_clearContent;
   },
   updated() {
     console.log("U");
