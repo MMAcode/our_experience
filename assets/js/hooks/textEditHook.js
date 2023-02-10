@@ -52,12 +52,14 @@ export let TextEditor = {
     // console.log('miroPost:', miroPost);
 
     // let quill_newJE = new Quill(this.el, {
+    console.log(document.querySelector("#editor_for_new_journal_entry"));
     let quill_newJE = new Quill("#editor_for_new_journal_entry", {
       modules: {
         toolbar: toolbarOptions,
       },
       theme: "snow",
     });
+    console.log("quill_newJE", quill_newJE);
 
     activateSendingChangesToServer(quill_newJE, "text-editor");
 
