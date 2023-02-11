@@ -23,11 +23,12 @@ defmodule OurExperienceWeb.Pages.WelcomeLive do
       </.b_link>
       <.b_link to={~p"/admin/weekly_topics/"}>weekly_topics</.b_link>
       <.b_link to={~p"/my_experience/u_weekly_topics/"}>My weekly_topics</.b_link>
+      <.b_link to={~p"/c"}>Admin component gallery</.b_link>
       <ButtonComponents.button text="test it"/>
     </.admin_level>
     <InformationTexts.introduction />
-    <GJ_texts.public_introduction /> ÷ƒ
-    <.b_link to={~p"/strategies/themed_gratitude_journal/"}>
+    <GJ_texts.public_introduction />
+    <.b_link center  to={~p"/strategies/themed_gratitude_journal/"}>
       Start or learn more about Themed Gratitude Journal
     </.b_link>
     """

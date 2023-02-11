@@ -23,6 +23,7 @@ import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 
+
 // WYSIWYG
 let Hooks = {}
 Hooks.TextEditor = TextEditor

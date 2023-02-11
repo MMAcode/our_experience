@@ -24,6 +24,7 @@ defmodule OurExperienceWeb.Router do
     pipe_through :browser
     # does pipe through plugs
     live "/", Pages.WelcomeLive
+    live "/c", Pages.Public.AdminGallery
     get "/orig", PageController, :home
 
     scope "/strategies", Pages do

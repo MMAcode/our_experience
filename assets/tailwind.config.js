@@ -1,7 +1,7 @@
 // See the Tailwind configuration guide for advanced usage
 // https://tailwindcss.com/docs/configuration
 
-const plugin = require("tailwindcss/plugin")
+const plugin = require("tailwindcss/plugin");
 
 miroVariablesForBetterButtons = {
   shadow: {
@@ -21,7 +21,11 @@ miroVariablesForBetterButtons = {
 };
 
 module.exports = {
-  content: ["./js/**/*.js", "../lib/*_web.ex", "../lib/*_web/**/*.*ex"],
+  content: [
+    "./js/**/*.js",
+    "../lib/*_web.ex",
+    "../lib/*_web/**/*.*ex, './src/**/*.{html,js}', './node_modules/tw-elements/dist/js/**/*.js'",
+  ],
   theme: {
     extend: {
       miroVariablesForBetterButtons,
@@ -53,5 +57,6 @@ module.exports = {
         ".phx-change-loading &",
       ])
     ),
+    require("tw-elements/dist/plugin"), //I added this, after installing npm, probably not needed as all through cdn now; https://tailwind-elements.com/quick-start/
   ],
 };
