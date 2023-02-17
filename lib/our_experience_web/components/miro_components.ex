@@ -35,17 +35,16 @@ defmodule OurExperienceWeb.MiroComponents do
   attr :to, :string, required: true
   attr :class, :string, default: ""
   attr :center, :boolean, default: false
+
   def b_link(assigns) do
     ~H"""
     <%!-- # <.link navigate={~p"/strategies/themed_gratitude_journal/"}> --%>
     <div class={"#{if @center, do: "text-center" }"}>
-    <%!-- <div class={"#{if assigns[:center], do: "text-center" }"}> --%>
-    <.link navigate={@to} class={@class}>
-      <.button><%= render_slot(@inner_block) %></.button>
-    </.link>
+      <%!-- <div class={"#{if assigns[:center], do: "text-center" }"}> --%>
+      <.link navigate={@to} class={@class}>
+        <.button class="m-1"><%= render_slot(@inner_block) %></.button>
+      </.link>
     </div>
     """
   end
-
-
 end

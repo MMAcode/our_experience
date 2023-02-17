@@ -128,7 +128,7 @@ export let TextEditor = {
     window.addEventListener(
       "phx:existingJournalEntryIdForEditModalFromServer",
       ({ detail: { id } } = e) => {
-        console.log("quillForEditingModal", quillForEditingModal);
+        console.log("quillForEditingModal", id, quillForEditingModal);
         quillForEditingModal.setContents(existingJEs[id].getContents());
         document
           .querySelector(
