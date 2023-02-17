@@ -21,11 +21,7 @@ miroVariablesForBetterButtons = {
 };
 
 module.exports = {
-  content: [
-    "./js/**/*.js",
-    "../lib/*_web.ex",
-    "../lib/*_web/**/*.*ex, './src/**/*.{html,js}', './node_modules/tw-elements/dist/js/**/*.js'",
-  ],
+  content: ["./js/**/*.js", "../lib/*_web.ex", "../lib/*_web/**/*.*ex"],
   theme: {
     extend: {
       miroVariablesForBetterButtons,
@@ -57,6 +53,5 @@ module.exports = {
         ".phx-change-loading &",
       ])
     ),
-    require("tw-elements/dist/plugin"), //I added this, after installing npm, probably not needed as all through cdn now; https://tailwind-elements.com/quick-start/
   ],
 };
