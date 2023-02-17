@@ -18,7 +18,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   alias OurExperience.U_Strategies.U_Strategy
   alias OurExperience.Utilities.ForSocket
 
-
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_Journal_Entries.U_Journal_Entries,
     as: JEs
 
@@ -58,7 +57,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   def render(assigns) do
     ~H"""
     <div id="my_journal_wrapper">
-    <.hiddenModalTriggers />
+      <.hiddenModalTriggers />
       <h1>My Journal</h1>
 
       <%!-- button to view modal of current active weekly topic --%>
@@ -94,7 +93,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       <div id="existing_journal_entries_wrapper">
         <h2>History</h2>
 
-
         <div :for={existing_JE <- @journals} class="existing_journal_entry_wrapper">
           <%!-- <p><%= existing_JE.id %></p> --%>
           <p>Date: <%= existing_JE.inserted_at %></p>
@@ -125,7 +123,9 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
           </.button>
         </.modal>
         <.modal id="modal_for_existing_journal_entry_to_delete">
-          <div class="miroQuillContainer" />
+          <div class="miroQuillWrapper" id="wrapper_for_quill_in_delete_modal" phx-update="ignore">
+            <div class="miroQuillContainer" />
+          </div>
           <.button
             phx-click={
               JS.push("deleteExistingJEFinal")
@@ -160,7 +160,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
   # EDIT  ******************************************************************
   def handle_event("showEditJEModal", %{"id" => id}, socket) do
-  # def handle_event("showEditJEModal", %{"value" => id}, socket) do
+    # def handle_event("showEditJEModal", %{"value" => id}, socket) do
     #  id = String.to_integer(id)
 
     socket =
@@ -262,8 +262,8 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
         %{"text_content" => content, "journalEntryId" => id} = _att,
         socket
       ) do
-        dbg(["handle text-editor", id, content])
-        # id = String.to_integer(id)
+    dbg(["handle text-editor", id, content])
+    # id = String.to_integer(id)
     # dbg [socket.assigns[:edited_quill]]
     socket =
       case id do

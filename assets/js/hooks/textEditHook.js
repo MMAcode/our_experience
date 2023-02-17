@@ -111,8 +111,8 @@ export let TextEditor = {
       ({ detail: { id } }) => {
         console.log("id", id);
         // console.log("existingJEs", existingJEs[id].getText());
-        deleteModalQuill.enable(false);
         deleteModalQuill.setContents(existingJEs[id].getContents());
+        deleteModalQuill.enable(false);
 
         document
           .querySelector(
