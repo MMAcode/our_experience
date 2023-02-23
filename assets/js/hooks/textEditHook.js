@@ -49,41 +49,36 @@ export let TextEditor = {
       }
     );
 
-    console.log("Miro - in Mounted");
-    // const activateSendingChangesToServer = (quill, eventName, id = null) => {
-    //   quill.on("text-change", (delta, oldDelta, source) => {
-    //     if (source == "api") {
-    //       console.log("An API call triggered this change.");
-    //     } else if (source == "user") {
-    //       // this.pushEventTo("#new_journal_entry", eventName, {
-    //       thisHook.pushEventTo("#my_journal_wrapper", eventName, {
-    //         text_content: quill.getContents(),
-    //         journalEntryId: id,
-    //       });
-    //     }
-    //   });
-    // };
+    // console.log("Miro - in Mounted");
+    let timer;
+
+    let after2secondsOfInactivityPushTo = (source, quillContent, id) => {
+      if (source == "api") {
+        console.log("An API call triggered this change.");
+      } else if (source == "user") {
+        if (timer !== null) {
+          clearTimeout(timer);
+        }
+        timer = setTimeout(function () {
+          thisHook.pushEventTo("#my_journal_wrapper", "text-editor", {
+            text_content: quillContent,
+            journalEntryId: id,
+          });
+          timer = null;
+        }, 2000);
+      }
+    };
+
     quill_newJE.on("text-change", (delta, oldDelta, source) => {
-      if (source == "api") {
-        console.log("An API call triggered this change.");
-      } else if (source == "user") {
-        // this.pushEventTo("#new_journal_entry", eventName, {
-        thisHook.pushEventTo("#my_journal_wrapper", "text-editor", {
-          text_content: quill_newJE.getContents(),
-          journalEntryId: null,
-        });
-      }
+      after2secondsOfInactivityPushTo(source, quill_newJE.getContents(), null);
     });
+
     quillForEditingModal.on("text-change", (delta, oldDelta, source) => {
-      if (source == "api") {
-        console.log("An API call triggered this change.");
-      } else if (source == "user") {
-        // this.pushEventTo("#new_journal_entry", eventName, {
-        thisHook.pushEventTo("#my_journal_wrapper", "text-editor", {
-          text_content: quillForEditingModal.getContents(),
-          journalEntryId: currentlyEditedJEid,
-        });
-      }
+      after2secondsOfInactivityPushTo(
+        source,
+        quillForEditingModal.getContents(),
+        currentlyEditedJEid
+      );
     });
 
     // activateSendingChangesToServer(quill_newJE, "text-editor");

@@ -18,13 +18,13 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
   def mount(_params, _session, %{assigns: %{current_user: user, live_action: action}} = socket) do
     # set new u_strategy and topics, if needed:
     user_fromDb = Users.get_user_for_TGJ(user.id)
-    user_wStrategy =user_with_existing_active_TGJ_strategy_and_topics(user_fromDb)
+    user_wStrategy = user_with_existing_active_TGJ_strategy_and_topics(user_fromDb)
     socket = assign(socket, current_user: user_wStrategy)
 
     # nav to weeklyTopics or Journal:
     socket =
       case action do
-        :index -> default_path(socket, user_wStrategy)
+        :index -> set_default_path_to(socket, user_wStrategy)
         # :journal -> assign(socket, render_journal: true)
         :weekly_topics -> assign(socket, render_weekly_topics: true)
       end
@@ -32,13 +32,14 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
     {:ok, socket}
   end
 
-  defp default_path(socket, user_wStrategy) do
+  defp set_default_path_to(socket, user_wStrategy) do
     case get_active_weekly_topic(user_wStrategy) do
       nil -> assign(socket, render_weekly_topics: true)
       _topic -> assign(socket, render_journal: true)
     end
   end
 
+  @impl true
   def render(assigns) do
     ~H"""
     <%!-- <% dbg @live_action == :index %> --%>
@@ -52,12 +53,13 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
       id="u_weekly_topics"
       current_user={@current_user}
     />
-    <.live_component
+    <%!-- <.live_component
       :if={assigns[:render_journal]}
       module={Journal}
       id="journal"
       current_user={@current_user}
-    />
+    /> --%>
+    <%= if assigns[:render_journal], do: live_render(@socket, Journal, id: "journal") %>
     """
   end
 
@@ -109,5 +111,25 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
       end
     end)
     |> Enum.at(0)
+  end
+
+  # def handle_info(:clear_saving_state_to_display, socket) do
+  #   dbg(["clear_saving_state_to_display --parent"])
+
+  #   send_update(
+  #     OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal,
+  #     # assign(socket, saving_state_to_display: "aa") |> assign(:current_user, nil)
+  #     id: "my_journal_wrapper",
+  #     current_user: nil
+  #   )
+
+  #   {:noreply, socket}
+  # end
+
+  @impl true
+  def handle_info({:joural_liveview_pid, journal_pid}, socket) do
+    dbg(["joural_liveview_pid --parent - assKeys:", Map.keys(socket.assigns)])
+    send(journal_pid, {:assigns_from_parent, socket.assigns})
+    {:noreply, socket}
   end
 end

@@ -1,6 +1,7 @@
 defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   # use Phoenix.Component
-  use Phoenix.LiveComponent
+  # use Phoenix.LiveComponent
+  use OurExperienceWeb, :live_view
   alias Phoenix.LiveView.JS
   use OurExperienceWeb, :verified_routes
   # to be able to use ~p sigil:
@@ -17,6 +18,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   alias OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate, as: TGJ
   alias OurExperience.U_Strategies.U_Strategy
   alias OurExperience.Utilities.ForSocket
+  alias Phoenix.Socket
 
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_Journal_Entries.U_Journal_Entries,
     as: JEs
@@ -25,27 +27,20 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
 
   @impl true
-  def mount(socket) do
-    {:ok, socket}
-  end
+  def mount(_params, _session, socket) do
+    send(socket.parent_pid, {:joural_liveview_pid, self()})
+    dbg(["bbbbb", socket.assigns])
 
-  @impl true
-  def update(%{current_user: u} = assigns, socket) do
-    socket =
-      socket
-      |> ForSocket.addFromListToSocket(journals(u), &pushJE/2)
-      |> assign(assigns)
-      |> assign(:journals, journals(u))
-      |> assign(:user, u)
-      |> assign(:quill, nil)
-      |> assign(:edited_quill, nil)
-      |> assign(
-        :current_weekly_topic,
-        U_Strategy.current_weekly_topic(strategy(u))
-      )
+    socket = assign(socket, wait_for_parent_assigns: true)
 
     {:ok, socket}
   end
+
+  # @impl true
+  # # def update(%{current_user: u} = assigns, socket) do
+  # def update(assigns, socket) do
+  #   {:ok, socket}
+  # end
 
   defp pushJE(socket, item) do
     push_event(socket, "existingJournalEntryFromServer", %{
@@ -56,7 +51,8 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   @impl true
   def render(assigns) do
     ~H"""
-    <div id="my_journal_wrapper">
+    <div :if={@wait_for_parent_assigns} class="text-center mt-11">loading...</div>
+    <div :if={!@wait_for_parent_assigns} id="my_journal_wrapper">
       <.hiddenModalTriggers />
       <h1>My Journal</h1>
 
@@ -65,7 +61,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
         <.b_link to={~p"/my_experience/strategies/themed_gratitude_journal/u_weekly_topics/"}>
           All Weekly Themes ->
         </.b_link>
-        <.button phx-click={show_modal("current_weekly_topic")} type="button" phx-target={@myself}>
+        <.button phx-click={show_modal("current_weekly_topic")} type="button">
           <p>Current theme -></p>
           <p class="text-xs">(<%= @current_weekly_topic.title %>)</p>
         </.button>
@@ -84,9 +80,13 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
           <div id="editor_for_new_journal_entry" />
           <%!-- id="journal_entry" to link js event to this live component --%>
         </div>
-        <.button phx-click="saveNewJE" phx-target={@myself}>
+        <.button phx-click="saveNewJE">
           Save
         </.button>
+        <.button phx-click="saveNewJEWithoutReload">
+          Save without reload
+        </.button>
+        <span><%= @saving_state_to_display %></span>
         <%!-- phx-disable-with="Saving..."  --%>
       </div>
 
@@ -98,11 +98,11 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
           <p>Date: <%= existing_JE.inserted_at %></p>
           <div id={"content_of_existing_journal_entry_id_#{existing_JE.id}"} phx-update="ignore" />
           <div class="existingJEoptions">
-            <%!-- <.button phx-click="showEditJEModal" value={existing_JE.id} phx-target={@myself}> --%>
-            <.button phx-click="showEditJEModal" phx-value-id={existing_JE.id} phx-target={@myself}>
+            <%!-- <.button phx-click="showEditJEModal" value={existing_JE.id} > --%>
+            <.button phx-click="showEditJEModal" phx-value-id={existing_JE.id}>
               Edit
             </.button>
-            <.button phx-click="showDeleteJEModal" phx-value-id={existing_JE.id} phx-target={@myself}>
+            <.button phx-click="showDeleteJEModal" phx-value-id={existing_JE.id}>
               Delete
             </.button>
           </div>
@@ -113,10 +113,9 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
           </div>
           <.button
             phx-click={
-              JS.push("editExistingJEFinal")
+              JS.push("saveExistingJE")
               |> hide_modal("modal_for_existing_journal_entry_to_edit")
             }
-            phx-target={@myself}
             class="confirm_action_button"
           >
             Save changes
@@ -131,14 +130,13 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
               JS.push("deleteExistingJEFinal")
               |> hide_modal("modal_for_existing_journal_entry_to_delete")
             }
-            phx-target={@myself}
             class="confirm_action_button"
           >
             confirm Delete
           </.button>
         </.modal>
       </div>
-      <div id="editor_trigger" phx-hook="TextEditor" phx-target={@myself} />
+      <div id="editor_trigger" phx-hook="TextEditor" />
     </div>
     """
   end
@@ -170,49 +168,22 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     {:noreply, socket}
   end
 
-  def handle_event("editExistingJEFinal", %{"je_id_to_edit" => id}, socket) do
+  def handle_event("saveExistingJE", %{"je_id_to_edit" => id}, socket) do
     id = String.to_integer(id)
-    dbg(["editExistingJEFinal", id])
+    dbg(["saveExistingJE", id])
 
-    editedJE = socket.assigns.edited_quill |> dbg
+    editedJE = socket.assigns.edited_quill
 
     origEntry =
       journals(socket.assigns.user)
       |> JEs.L.get_JE_by_id(id)
 
     if !editedJE || editedJE.id != id do
-      dbg(["editExistingJEFinal", "ERROR - ids do not match. journal entry NOT SAVED"])
+      dbg(["saveExistingJE", "ERROR - ids do not match. journal entry NOT SAVED"])
       {:noreply, socket}
     else
       dbg(editedJE)
-
-      case JEs.update_u__journal__entry(origEntry, %{content: editedJE.content}) do
-        {:ok, updatedJE} ->
-          dbg(["journal entry UPDATED", updatedJE])
-          # u = dbUser(socket)
-          user = socket.assigns.user
-
-          newJournals =
-            Enum.map(journals(user), fn je ->
-              if je.id == updatedJE.id, do: updatedJE, else: je
-            end)
-
-          u = update_user_journals_localy(user, newJournals)
-
-          {:noreply,
-           socket
-           |> put_flash(:info, "Journal entry edited successfully")
-           |> assign(:user, u)
-           |> assign(:journals, journals(u))
-           |> ForSocket.addFromListToSocket([updatedJE], &pushJE/2)}
-
-        {:error, %Ecto.Changeset{} = changeset} ->
-          dbg("ERROR - journal entry NOT SAVED")
-
-          {:noreply,
-           socket
-           |> put_flash(:error, "Journal entry not saved.")}
-      end
+      {:noreply, updateExistingJEAndSocket(socket, origEntry, editedJE)}
     end
 
     # {:noreply, socket}
@@ -265,11 +236,24 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     dbg(["handle text-editor", id, content])
     # id = String.to_integer(id)
     # dbg [socket.assigns[:edited_quill]]
+
+    socket = assign(socket, :saving_state_to_display, "saving...")
+
     socket =
       case id do
         # new JE edited
-        nil -> assign(socket, quill: content)
-        id -> socket |> assign(edited_quill: %{id: String.to_integer(id), content: content})
+        nil ->
+          socket = assign(socket, quill: content)
+
+          # _socket = handle_event("saveNewJE", nil, socket) |> elem(1)
+          # save new JE without reload
+          createNewJEAndUpdateSocketWithoutReload(socket)
+
+        # socket
+
+        id ->
+          socket
+          |> assign(edited_quill: %{id: String.to_integer(id), content: content})
       end
 
     {:noreply, socket}
@@ -286,7 +270,27 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   # NEW ******************************************************************
   def handle_event("saveNewJE", _params, socket) do
     dbg(["handle save", socket.assigns.quill])
+    {:noreply, createNewJEAndUpdateSocketAndList(socket)}
+  end
 
+  def handle_event("saveNewJEWithoutReload", _params, socket) do
+    dbg(["handle save, don't update list ", socket.assigns.quill])
+
+    # distinguish if new JE was already saved; if yes, update
+
+    case socket.assigns.newJE do
+      nil ->
+        # createJE
+        nil
+
+      je ->
+        nil
+        # updateJE
+    end
+  end
+
+  # private ******************************************************************
+  defp createNewJEAndUpdateSocketAndList(socket) do
     case JEs.create_in(strategy(socket.assigns.user), %{content: socket.assigns.quill}) do
       {:ok, newJE} ->
         user = socket.assigns.user
@@ -295,29 +299,106 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
         # update user localy
         u = update_user_journals_localy(user, [newJE | journals(user)])
 
-        {
-          :noreply,
-          socket
-          |> put_flash(:info, "Journal entry created successfully")
-          |> push_event("existingJournalEntrySaved_clearContent", %{})
-          |> assign(:user, u)
-          |> assign(:journals, journals(u))
-          |> ForSocket.addFromListToSocket([newJE], &pushJE/2)
-        }
+        socket
+        |> put_flash(:info, "Journal entry created successfully")
+        |> push_event("existingJournalEntrySaved_clearContent", %{})
+        |> assign(:user, u)
+        |> assign(:newJE, nil)
+        |> assign(:journals, journals(u))
+        |> ForSocket.addFromListToSocket([newJE], &pushJE/2)
 
       {:error, %Ecto.Changeset{} = changeset} ->
         dbg("ERROR - journal entry NOT SAVED")
 
-        {:noreply,
-         socket
-         |> put_flash(:error, "Journal entry not saved.")
-         |> assign(:changeset, changeset)}
+        socket
+        |> put_flash(:error, "Journal entry not saved.")
+        |> assign(:changeset, changeset)
     end
-
-    # {:noreply, socket}
   end
 
-  # private ******************************************************************
+  @spec createNewJEAndUpdateSocketWithoutReload(Socket.t()) :: Socket.t()
+  defp createNewJEAndUpdateSocketWithoutReload(socket) do
+    # Process.send_after(self(), :clear_saving_state_to_display, 1_000)
+
+    # Process.send_after(socket.assigns.myself, :clear_saving_state_to_display, 1_000)
+
+    socket =
+      case JEs.create_in(strategy(socket.assigns.user), %{content: socket.assigns.quill}) do
+        {:ok, newJE} ->
+          dbg("journal entry SAVED")
+
+          assign(socket, :newJE, newJE)
+          |> assign(:saving_state_to_display, "saved")
+
+        {:error, %Ecto.Changeset{} = changeset} ->
+          dbg("ERROR - journal entry NOT SAVED")
+
+          socket
+          |> put_flash(:error, "Journal entry not saved.")
+          |> assign(:changeset, changeset)
+          |> assign(:saving_state_to_display, "failed saving!!")
+      end
+
+    # socket2 = Map.update!(socket, :assigns, fn assigns -> Map.delete(assigns, :flash) end)
+    # socket = Map.update!(socket, :assigns, fn assigns -> Map.put(assigns, :flash, nil) end)
+    # socket2 = assign(socket, :saving_state_to_display, "saved")
+
+    dbg(["ssss", Map.keys(socket.assigns)])
+
+    send_update_after(
+      # OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal,
+      __MODULE__,
+      # socket2.assigns,
+      [id: "journal", saving_state_to_display: "saved"],
+      2000
+    )
+
+    socket
+  end
+
+  defp updateNewJEAndSocketWithoutReload(socket, origEntry, editedJE) do
+    case JEs.update_u__journal__entry(origEntry, %{content: editedJE.content}) do
+      {:ok, updatedJE} ->
+        socket
+        |> assign(:newJE, updatedJE)
+        |> ForSocket.addFromListToSocket([updatedJE], &pushJE/2)
+
+      {:error, %Ecto.Changeset{} = _changeset} ->
+        dbg("ERROR - journal entry NOT SAVED")
+
+        socket
+        |> put_flash(:error, "Journal entry not saved.")
+    end
+  end
+
+  defp updateExistingJEAndSocket(socket, origEntry, editedJE) do
+    case JEs.update_u__journal__entry(origEntry, %{content: editedJE.content}) do
+      {:ok, updatedJE} ->
+        dbg(["journal entry UPDATED", updatedJE])
+        # u = dbUser(socket)
+        user = socket.assigns.user
+
+        newJournals =
+          Enum.map(journals(user), fn je ->
+            if je.id == updatedJE.id, do: updatedJE, else: je
+          end)
+
+        u = update_user_journals_localy(user, newJournals)
+
+        socket
+        |> put_flash(:info, "Journal entry edited successfully")
+        |> assign(:user, u)
+        |> assign(:journals, journals(u))
+        |> ForSocket.addFromListToSocket([updatedJE], &pushJE/2)
+
+      {:error, %Ecto.Changeset{} = _changeset} ->
+        dbg("ERROR - journal entry NOT SAVED")
+
+        socket
+        |> put_flash(:error, "Journal entry not saved.")
+    end
+  end
+
   defp update_user_journals_localy(user, newJournals) do
     str = put_in(strategy(user)[:u_journal_entries], newJournals)
     # returns updated user
@@ -328,11 +409,36 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     U.gj_strategy(user)
   end
 
+  defp journals(nil), do: nil
+
   defp journals(user) do
+    dbg(["journals f running", user[:id]])
     strategy(user)[:u_journal_entries]
   end
 
   defp dbUser(socket) do
     Users.get_user_for_TGJ(socket.assigns.user.id)
+  end
+
+  @impl true
+  def handle_info({:assigns_from_parent, parent_assigns}, socket) do
+    dbg(["assigns_from_parent - keys:", Map.keys(parent_assigns)])
+    u = parent_assigns[:current_user]
+
+    socket =
+      socket
+      # |> assign(assigns)
+      |> ForSocket.addFromListToSocket(journals(u), &pushJE/2)
+      |> assign(:journals, journals(u))
+      |> assign(:user, u)
+      |> assign(:quill, nil)
+      |> assign(:newJE, nil)
+      |> assign(:edited_quill, nil)
+      # TODO:
+      |> assign(:saving_state_to_display, nil)
+      |> assign(:current_weekly_topic, U_Strategy.current_weekly_topic(strategy(u)))
+      |> assign(wait_for_parent_assigns: false)
+
+    {:noreply, socket}
   end
 end
