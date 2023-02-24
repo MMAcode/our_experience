@@ -85,10 +85,10 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
         <div class="relative">
           <div class="flex items-center justify-center w-full">
             <.button class="m-1" phx-click="saveNewJE">
-              Save
+              Save and clear
             </.button>
             <.button class="m-1" phx-click="saveNewJEWithoutReload">
-              Save without reload
+              Save
             </.button>
             <span class={"absolute right-0 transition duration-700 #{if @saving_state_to_display=="saved", do: "opacity-100", else: "opacity-0"}"}>
               Saved :-)
@@ -301,48 +301,20 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
   # NEW ******************************************************************
   def handle_event("saveNewJE", _params, socket) do
-    dbg(["handle save", socket.assigns.quill])
-
     socket =
-      push_event(socket, "getLatestQillDataOfNewQuill", %{})
+      socket
+      |> push_event("getLatestQillDataOfNewQuill", %{})
       |> assign(:reset_newJE, true)
 
     {:noreply, socket}
   end
 
   def handle_event("saveNewJEWithoutReload", _params, socket) do
-    dbg(["handle save, don't update list ", socket.assigns.quill])
     socket = push_event(socket, "getLatestQillDataOfNewQuill", %{})
     {:noreply, socket}
   end
 
   # private ******************************************************************
-  # defp createNewJEAndUpdateSocketAndList(socket, content) do
-  #   case JEs.create_in(strategy(socket.assigns.user), %{content: content}) do
-  #     {:ok, newJE} ->
-  #       user = socket.assigns.user
-  #       dbg("journal entry SAVED")
-  #       # u = dbUser(socket)
-  #       # update user localy
-  #       u = update_user_journals_localy(user, [newJE | journals(user)])
-
-  #       socket
-  #       |> put_flash(:info, "Journal entry created successfully")
-  #       |> push_event("existingJournalEntrySaved_clearContent", %{})
-  #       |> assign(:user, u)
-  #       |> assign(:newJE, nil)
-  #       |> assign(:journals, journals(u))
-  #       |> ForSocket.addFromListToSocket([newJE], &pushJE/2)
-
-  #     {:error, %Ecto.Changeset{} = changeset} ->
-  #       dbg("ERROR - journal entry NOT SAVED")
-
-  #       socket
-  #       |> put_flash(:error, "Journal entry not saved.")
-  #       |> assign(:changeset, changeset)
-  #   end
-  # end
-
   defp createNewJE(socket, content) do
     case JEs.create_in(strategy(socket.assigns.user), %{content: content}) do
       {:ok, newJE} ->
