@@ -52,7 +52,7 @@ export let TextEditor = {
     // console.log("Miro - in Mounted");
     let timer;
 
-    let after2secondsOfInactivityPushTo = (source, quillContent, id) => {
+    let afterXsecondsOfInactivityPushTo = (source, quillContent, id, delay) => {
       if (source == "api") {
         console.log("An API call triggered this change.");
       } else if (source == "user") {
@@ -65,19 +65,25 @@ export let TextEditor = {
             journalEntryId: id,
           });
           timer = null;
-        }, 2000);
+        }, delay);
       }
     };
 
     quill_newJE.on("text-change", (delta, oldDelta, source) => {
-      after2secondsOfInactivityPushTo(source, quill_newJE.getContents(), null);
+      afterXsecondsOfInactivityPushTo(
+        source,
+        quill_newJE.getContents(),
+        null,
+        2000
+      );
     });
 
     quillForEditingModal.on("text-change", (delta, oldDelta, source) => {
-      after2secondsOfInactivityPushTo(
+      afterXsecondsOfInactivityPushTo(
         source,
         quillForEditingModal.getContents(),
-        currentlyEditedJEid
+        currentlyEditedJEid,
+        2000
       );
     });
 
@@ -145,7 +151,23 @@ export let TextEditor = {
       }
     );
 
-    // existingJournalEntrySaved_clearContent;
+    // getLatestQillDataOfNewQuill
+    window.addEventListener("phx:getLatestQillDataOfNewQuill", (e) => {
+      console.log("requesting latest content of new JE quill");
+      // afterXsecondsOfInactivityPushTo(
+      //   source,
+      //   quill_newJE.getContents(),
+      //   null,
+      //   0
+      // );
+
+      thisHook.pushEventTo("#my_journal_wrapper", "text-editor", {
+        text_content: quill_newJE.getContents(),
+        journalEntryId: null,
+      });
+
+      // quill_newJE.setContents([]);
+    });
   },
   updated() {
     console.log("U");

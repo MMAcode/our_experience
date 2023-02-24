@@ -113,19 +113,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
     |> Enum.at(0)
   end
 
-  # def handle_info(:clear_saving_state_to_display, socket) do
-  #   dbg(["clear_saving_state_to_display --parent"])
-
-  #   send_update(
-  #     OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal,
-  #     # assign(socket, saving_state_to_display: "aa") |> assign(:current_user, nil)
-  #     id: "my_journal_wrapper",
-  #     current_user: nil
-  #   )
-
-  #   {:noreply, socket}
-  # end
-
   @impl true
   def handle_info({:joural_liveview_pid, journal_pid}, socket) do
     dbg(["joural_liveview_pid --parent - assKeys:", Map.keys(socket.assigns)])

@@ -80,14 +80,19 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
           <div id="editor_for_new_journal_entry" />
           <%!-- id="journal_entry" to link js event to this live component --%>
         </div>
-        <.button phx-click="saveNewJE">
-          Save
-        </.button>
-        <.button phx-click="saveNewJEWithoutReload">
-          Save without reload
-        </.button>
-        <span><%= @saving_state_to_display %></span>
-        <%!-- phx-disable-with="Saving..."  --%>
+        <div class="relative">
+          <div class="flex items-center justify-center w-full">
+            <.button class="m-1" phx-click="saveNewJE">
+              Save
+            </.button>
+            <.button class="m-1" phx-click="saveNewJEWithoutReload">
+              Save without reload
+            </.button>
+            <span class={"absolute right-0 transition duration-700 #{if @saving_state_to_display=="saved", do: "opacity-100", else: "opacity-0"}"}>
+              Saved :-)
+            </span>
+          </div>
+        </div>
       </div>
 
       <div id="existing_journal_entries_wrapper">
@@ -233,27 +238,40 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
         %{"text_content" => content, "journalEntryId" => id} = _att,
         socket
       ) do
-    dbg(["handle text-editor", id, content])
+    dbg(["handle text-editor   --> receiving quill data from UI ", id, content])
     # id = String.to_integer(id)
     # dbg [socket.assigns[:edited_quill]]
 
     socket = assign(socket, :saving_state_to_display, "saving...")
 
+    # case id do
+    #   # this is a new JE
+    #   nil ->
+    #     socket = assign(socket, quill: content)
+    #     case socket.assigns[:newJE] do
+    #       # this new JE was not yet saved
+    #       nil ->
+    #         _socket = createNewJEAndUpdateSocketWithoutReload(socket)
+    #       je ->
+    #         _socket = updateNewJEAndSocketWithoutReload(socket, je, content)
+    #     end
+    #   id ->
+    #     socket
+    #     |> assign(edited_quill: %{id: String.to_integer(id), content: content})
+    # end
+    newJE = socket.assigns[:newJE]
+
     socket =
-      case id do
-        # new JE edited
-        nil ->
-          socket = assign(socket, quill: content)
+      cond do
+        # this is a new JE
+        id == nil && newJE == nil ->
+          _socket = createNewJEAndUpdateSocketWithoutReload(socket, content)
 
-          # _socket = handle_event("saveNewJE", nil, socket) |> elem(1)
-          # save new JE without reload
-          createNewJEAndUpdateSocketWithoutReload(socket)
+        id == nil && newJE != nil ->
+          _socket = updateNewJEAndSocketWithoutReload(socket, newJE, content)
 
-        # socket
-
-        id ->
-          socket
-          |> assign(edited_quill: %{id: String.to_integer(id), content: content})
+        id != nil ->
+          socket |> assign(edited_quill: %{id: String.to_integer(id), content: content})
       end
 
     {:noreply, socket}
@@ -276,17 +294,23 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   def handle_event("saveNewJEWithoutReload", _params, socket) do
     dbg(["handle save, don't update list ", socket.assigns.quill])
 
+    socket = push_event(socket, "getLatestQillDataOfNewQuill", %{})
+
+    # socket = createNewJEAndUpdateSocketWithoutReload(socket)
+
     # distinguish if new JE was already saved; if yes, update
 
-    case socket.assigns.newJE do
-      nil ->
-        # createJE
-        nil
+    # case socket.assigns.newJE do
+    #   nil ->
+    #     # createJE
+    #     nil
 
-      je ->
-        nil
-        # updateJE
-    end
+    #   je ->
+    #     nil
+    #     # updateJE
+    # end
+
+    {:noreply, socket}
   end
 
   # private ******************************************************************
@@ -316,16 +340,15 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     end
   end
 
-  @spec createNewJEAndUpdateSocketWithoutReload(Socket.t()) :: Socket.t()
-  defp createNewJEAndUpdateSocketWithoutReload(socket) do
-    # Process.send_after(self(), :clear_saving_state_to_display, 1_000)
-
-    # Process.send_after(socket.assigns.myself, :clear_saving_state_to_display, 1_000)
+  # @spec createNewJEAndUpdateSocketWithoutReload(Socket.t()) :: Socket.t()
+  defp createNewJEAndUpdateSocketWithoutReload(socket, content) do
+    dbg("createNewJEAndUpdateSocketWithoutReload")
 
     socket =
-      case JEs.create_in(strategy(socket.assigns.user), %{content: socket.assigns.quill}) do
+      case JEs.create_in(strategy(socket.assigns.user), %{content: content}) do
         {:ok, newJE} ->
           dbg("journal entry SAVED")
+          Process.send_after(self(), {:saving_state_to_display, nil}, 1_000)
 
           assign(socket, :newJE, newJE)
           |> assign(:saving_state_to_display, "saved")
@@ -343,25 +366,32 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     # socket = Map.update!(socket, :assigns, fn assigns -> Map.put(assigns, :flash, nil) end)
     # socket2 = assign(socket, :saving_state_to_display, "saved")
 
-    dbg(["ssss", Map.keys(socket.assigns)])
+    # dbg(["ssss", Map.keys(socket.assigns)])
 
-    send_update_after(
-      # OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal,
-      __MODULE__,
-      # socket2.assigns,
-      [id: "journal", saving_state_to_display: "saved"],
-      2000
-    )
+    # send_update_after(
+    #   # OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal,
+    #   __MODULE__,
+    #   # socket2.assigns,
+    #   [id: "journal", saving_state_to_display: "saved"],
+    #   2000
+    # )
+    # send(socket.parent_pid, {:joural_liveview_pid, self()})
 
     socket
   end
 
-  defp updateNewJEAndSocketWithoutReload(socket, origEntry, editedJE) do
-    case JEs.update_u__journal__entry(origEntry, %{content: editedJE.content}) do
-      {:ok, updatedJE} ->
+  defp updateNewJEAndSocketWithoutReload(socket, origEntry, updatedContent) do
+    dbg("updateNewJEAndSocketWithoutReload")
+
+    case JEs.update_u__journal__entry(origEntry, %{content: updatedContent}) do
+      {:ok, _updatedJE} ->
+        Process.send_after(self(), {:saving_state_to_display, nil}, 1_000)
+
         socket
-        |> assign(:newJE, updatedJE)
-        |> ForSocket.addFromListToSocket([updatedJE], &pushJE/2)
+        |> assign(:saving_state_to_display, "saved")
+
+      # |> assign(:newJE, updatedJE)
+      # |> ForSocket.addFromListToSocket([updatedJE], &pushJE/2)
 
       {:error, %Ecto.Changeset{} = _changeset} ->
         dbg("ERROR - journal entry NOT SAVED")
@@ -416,9 +446,9 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     strategy(user)[:u_journal_entries]
   end
 
-  defp dbUser(socket) do
-    Users.get_user_for_TGJ(socket.assigns.user.id)
-  end
+  # defp dbUser(socket) do
+  #   Users.get_user_for_TGJ(socket.assigns.user.id)
+  # end
 
   @impl true
   def handle_info({:assigns_from_parent, parent_assigns}, socket) do
@@ -439,6 +469,14 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       |> assign(:current_weekly_topic, U_Strategy.current_weekly_topic(strategy(u)))
       |> assign(wait_for_parent_assigns: false)
 
+    {:noreply, socket}
+  end
+
+  #    Process.send_after(self(), {:saving_state_to_display, nil}, 1_000)
+
+  def handle_info({:saving_state_to_display, value}, socket) do
+    dbg(["handle_info saving_state_to_display: ", value])
+    socket = assign(socket, :saving_state_to_display, value)
     {:noreply, socket}
   end
 end
