@@ -246,7 +246,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
     socket = assign(socket, :saving_state_to_display, "saving...")
 
-    newJE = socket.assigns[:newJE]
+    newJE = socket.assigns[:newJE] |> dbg
     reset_newJE = socket.assigns[:reset_newJE]
 
     timeNowInSeconds = System.os_time() / 1_000_000_000
@@ -260,31 +260,51 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       timeSinceLastSaveWithClearingOfNewJE
     ])
 
+    saveJErequested = socket.assigns[:saveJErequested]
+
     socket =
       cond do
         # I did not thought this time stamp restriction thrrough too much, so hopefyll it is not going to be bugy!
-        timeSinceLastSaveWithClearingOfNewJE < 4 ->
+        timeSinceLastSaveWithClearingOfNewJE < 4 && !saveJErequested ->
+          dbg(00)
           socket
 
         # this is a new JE
         !id && !newJE && !reset_newJE ->
-          _socket = createNewJEAndUpdateSocketWithoutReload(socket, content)
+          dbg(01)
+          {_, socket, _} = createNewJE(socket, content)
+          socket
 
         !id && !newJE && reset_newJE ->
+          dbg(02)
+
           _socket =
             case createNewJE(socket, content) do
-              {:ok, socket, newJE} -> updateAssignsWithNewJEAsClearAll(socket, newJE)
-              {:error, socket} -> socket
+              {:ok, socket, newJE} -> updateAssignsWithNewJEAndClearAll(socket, newJE)
+              {:error, socket, _} -> socket
             end
 
         !id && newJE != nil && !reset_newJE ->
-          _socket = updateNewJEAndSocketWithoutReload(socket, newJE, content)
-
-        !id && newJE != nil && reset_newJE ->
-          # _socket = xx(socket, newJE, content)
+          dbg(03)
+          # _socket = updateNewJEAndSocketWithoutReload(socket, newJE, content)
+          {_, socket, _} = updateNewJE(socket, newJE, content)
           socket
 
+        !id && newJE != nil && reset_newJE ->
+          dbg(04)
+
+          _socket =
+            case updateNewJE(socket, newJE, content) do
+              {:ok, socket, updatedNewJE} ->
+                updateAssignsWithNewJEAndClearAll(socket, updatedNewJE)
+
+              {:error, socket, _} ->
+                socket
+            end
+
+        # editing normal existing JE:
         id != nil ->
+          dbg(05)
           socket |> assign(edited_quill: %{id: String.to_integer(id), content: content})
       end
 
@@ -305,12 +325,16 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       socket
       |> push_event("getLatestQillDataOfNewQuill", %{})
       |> assign(:reset_newJE, true)
+      |> assign(:saveJErequested, true)
 
     {:noreply, socket}
   end
 
   def handle_event("saveNewJEWithoutReload", _params, socket) do
-    socket = push_event(socket, "getLatestQillDataOfNewQuill", %{})
+    socket =
+      push_event(socket, "getLatestQillDataOfNewQuill", %{})
+      |> assign(:saveJErequested, true)
+
     {:noreply, socket}
   end
 
@@ -318,7 +342,16 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   defp createNewJE(socket, content) do
     case JEs.create_in(strategy(socket.assigns.user), %{content: content}) do
       {:ok, newJE} ->
-        # socket = updateAssignsWithNewJEAsClearAll(socket, newJE)
+        # socket = updateAssignsWithNewJEAndClearAll(socket, newJE)
+        Process.send_after(self(), {:saving_state_to_display, nil}, 1_000)
+
+        socket =
+          socket
+          |> assign(:newJE, newJE)
+          |> assign(:saving_state_to_display, "saved")
+          |> assign(:ignore2SecOfAutosavingQuillDataFrom, System.os_time() / 1_000_000_000)
+          |> assign(:saveJErequested, false)
+
         {:ok, socket, newJE}
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -327,13 +360,15 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
         socket =
           socket
           |> put_flash(:error, "Journal entry not saved.")
+          |> assign(:saving_state_to_display, "failed saving!!")
           |> assign(:changeset, changeset)
 
-        {:error, socket}
+        {:error, socket, nil}
     end
   end
 
-  defp updateAssignsWithNewJEAsClearAll(socket, newJE) do
+  defp updateAssignsWithNewJEAndClearAll(socket, newJE) do
+    dbg("updateAssignsWithNewJEAndClearAll")
     user = socket.assigns.user
     u = update_user_journals_localy(user, [newJE | journals(user)])
 
@@ -344,56 +379,60 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     |> assign(:newJE, nil)
     |> assign(:reset_newJE, false)
     |> assign(:journals, journals(u))
-    |> assign(:ignore2SecOfAutosavingQuillDataFrom, System.os_time() / 1_000_000)
     |> ForSocket.addFromListToSocket([newJE], &pushJE/2)
   end
 
-  # @spec createNewJEAndUpdateSocketWithoutReload(Socket.t()) :: Socket.t()
-  defp createNewJEAndUpdateSocketWithoutReload(socket, content) do
-    dbg("createNewJEAndUpdateSocketWithoutReload")
+  # defp updateNewJEAndSocketWithoutReload(socket, origEntry, updatedContent) do
+  #   dbg("updateNewJEAndSocketWithoutReload")
 
-    socket =
-      case JEs.create_in(strategy(socket.assigns.user), %{content: content}) do
-        {:ok, newJE} ->
-          dbg("journal entry SAVED")
-          Process.send_after(self(), {:saving_state_to_display, nil}, 1_000)
+  #   case JEs.update_u__journal__entry(origEntry, %{content: updatedContent}) do
+  #     {:ok, _updatedJE} ->
+  #       Process.send_after(self(), {:saving_state_to_display, nil}, 1_000)
 
-          assign(socket, :newJE, newJE)
-          |> assign(:saving_state_to_display, "saved")
+  #       socket
+  #       |> assign(:saving_state_to_display, "saved")
 
-        {:error, %Ecto.Changeset{} = changeset} ->
-          dbg("ERROR - journal entry NOT SAVED")
+  #     # |> assign(:newJE, updatedJE)
+  #     # |> ForSocket.addFromListToSocket([updatedJE], &pushJE/2)
 
-          socket
-          |> put_flash(:error, "Journal entry not saved.")
-          |> assign(:changeset, changeset)
-          |> assign(:saving_state_to_display, "failed saving!!")
-      end
+  #     {:error, %Ecto.Changeset{} = _changeset} ->
+  #       dbg("ERROR - journal entry NOT SAVED")
 
-    socket
-  end
+  #       socket
+  #       |> put_flash(:error, "Journal entry not saved.")
+  #   end
+  # end
 
-  defp updateNewJEAndSocketWithoutReload(socket, origEntry, updatedContent) do
-    dbg("updateNewJEAndSocketWithoutReload")
+  defp updateNewJE(socket, origEntry, updatedContent) do
+    dbg("updateNewJE")
 
     case JEs.update_u__journal__entry(origEntry, %{content: updatedContent}) do
-      {:ok, _updatedJE} ->
+      {:ok, updatedJE} ->
+        dbg("JE updated")
         Process.send_after(self(), {:saving_state_to_display, nil}, 1_000)
 
-        socket
-        |> assign(:saving_state_to_display, "saved")
+        socket =
+          socket
+          |> assign(:saving_state_to_display, "saved")
+          |> assign(:newJE, updatedJE)
+          |> assign(:ignore2SecOfAutosavingQuillDataFrom, System.os_time() / 1_000_000_000)
+          |> assign(:saveJErequested, false)
 
-      # |> assign(:newJE, updatedJE)
-      # |> ForSocket.addFromListToSocket([updatedJE], &pushJE/2)
+        {:ok, socket, updatedJE}
 
       {:error, %Ecto.Changeset{} = _changeset} ->
         dbg("ERROR - journal entry NOT SAVED")
 
-        socket
-        |> put_flash(:error, "Journal entry not saved.")
+        socket =
+          socket
+          |> put_flash(:error, "Journal entry not saved.")
+          |> assign(:saving_state_to_display, "failed saving!!")
+
+        {:error, socket, nil}
     end
   end
 
+  # this is for updating normal existing entry in modal
   defp updateExistingJEAndSocket(socket, origEntry, updated_content) do
     case JEs.update_u__journal__entry(origEntry, %{content: updated_content}) do
       {:ok, updatedJE} ->
@@ -463,6 +502,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       |> assign(wait_for_parent_assigns: false)
       |> assign(reset_newJE: false)
       |> assign(:ignore2SecOfAutosavingQuillDataFrom, System.os_time() / 1_000_000_000 - 5)
+      |> assign(:saveJErequested, false)
 
     {:noreply, socket}
   end
