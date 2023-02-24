@@ -246,21 +246,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
     socket = assign(socket, :saving_state_to_display, "saving...")
 
-    # case id do
-    #   # this is a new JE
-    #   nil ->
-    #     socket = assign(socket, quill: content)
-    #     case socket.assigns[:newJE] do
-    #       # this new JE was not yet saved
-    #       nil ->
-    #         _socket = createNewJEAndUpdateSocketWithoutReload(socket)
-    #       je ->
-    #         _socket = updateNewJEAndSocketWithoutReload(socket, je, content)
-    #     end
-    #   id ->
-    #     socket
-    #     |> assign(edited_quill: %{id: String.to_integer(id), content: content})
-    # end
     newJE = socket.assigns[:newJE]
     reset_newJE = socket.assigns[:reset_newJE]
 
@@ -274,19 +259,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       timeBeforeInSeconds,
       timeSinceLastSaveWithClearingOfNewJE
     ])
-
-    # socket =
-    #   cond do
-    #     # this is a new JE
-    #     id == nil && newJE == nil ->
-    #       _socket = createNewJEAndUpdateSocketWithoutReload(socket, content)
-
-    #     id == nil && newJE != nil ->
-    #       _socket = updateNewJEAndSocketWithoutReload(socket, newJE, content)
-
-    #     id != nil ->
-    #       socket |> assign(edited_quill: %{id: String.to_integer(id), content: content})
-    #   end
 
     socket =
       cond do
@@ -316,12 +288,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
           socket |> assign(edited_quill: %{id: String.to_integer(id), content: content})
       end
 
-    # if id == nil do
-
-    # else
-    #   socket |> assign(edited_quill: %{id: String.to_integer(id), content: content})
-    # end
-
     {:noreply, socket}
   end
 
@@ -346,23 +312,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
   def handle_event("saveNewJEWithoutReload", _params, socket) do
     dbg(["handle save, don't update list ", socket.assigns.quill])
-
     socket = push_event(socket, "getLatestQillDataOfNewQuill", %{})
-
-    # socket = createNewJEAndUpdateSocketWithoutReload(socket)
-
-    # distinguish if new JE was already saved; if yes, update
-
-    # case socket.assigns.newJE do
-    #   nil ->
-    #     # createJE
-    #     nil
-
-    #   je ->
-    #     nil
-    #     # updateJE
-    # end
-
     {:noreply, socket}
   end
 
@@ -420,6 +370,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     |> push_event("existingJournalEntrySaved_clearContent", %{})
     |> assign(:user, u)
     |> assign(:newJE, nil)
+    |> assign(:reset_newJE, false)
     |> assign(:journals, journals(u))
     |> assign(:ignore2SecOfAutosavingQuillDataFrom, System.os_time() / 1_000_000)
     |> ForSocket.addFromListToSocket([newJE], &pushJE/2)
