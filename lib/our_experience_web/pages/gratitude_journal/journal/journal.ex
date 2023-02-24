@@ -51,7 +51,9 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   @impl true
   def render(assigns) do
     ~H"""
-    <div :if={@wait_for_parent_assigns} class="text-center mt-11">loading...</div>
+    <div :if={@wait_for_parent_assigns} class="text-center mt-11">
+      loading... (Try refreshing/reloading this page if loading takes too long.)
+    </div>
     <div :if={!@wait_for_parent_assigns} id="my_journal_wrapper">
       <.hiddenModalTriggers />
       <h1>My Journal</h1>
@@ -188,7 +190,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       {:noreply, socket}
     else
       dbg(editedJE)
-      {:noreply, updateExistingJEAndSocket(socket, origEntry, editedJE)}
+      {:noreply, updateExistingJEAndSocket(socket, origEntry, editedJE.content)}
     end
 
     # {:noreply, socket}
@@ -260,19 +262,65 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     #     |> assign(edited_quill: %{id: String.to_integer(id), content: content})
     # end
     newJE = socket.assigns[:newJE]
+    reset_newJE = socket.assigns[:reset_newJE]
+
+    timeNowInSeconds = System.os_time() / 1_000_000_000
+    timeBeforeInSeconds = socket.assigns[:ignore2SecOfAutosavingQuillDataFrom]
+    timeSinceLastSaveWithClearingOfNewJE = timeNowInSeconds - timeBeforeInSeconds
+
+    dbg([
+      "timeSinceLastSaveWithClearingOfNewJE",
+      timeNowInSeconds,
+      timeBeforeInSeconds,
+      timeSinceLastSaveWithClearingOfNewJE
+    ])
+
+    # socket =
+    #   cond do
+    #     # this is a new JE
+    #     id == nil && newJE == nil ->
+    #       _socket = createNewJEAndUpdateSocketWithoutReload(socket, content)
+
+    #     id == nil && newJE != nil ->
+    #       _socket = updateNewJEAndSocketWithoutReload(socket, newJE, content)
+
+    #     id != nil ->
+    #       socket |> assign(edited_quill: %{id: String.to_integer(id), content: content})
+    #   end
 
     socket =
       cond do
+        # I did not thought this time stamp restriction thrrough too much, so hopefyll it is not going to be bugy!
+        timeSinceLastSaveWithClearingOfNewJE < 4 ->
+          socket
+
         # this is a new JE
-        id == nil && newJE == nil ->
+        !id && !newJE && !reset_newJE ->
           _socket = createNewJEAndUpdateSocketWithoutReload(socket, content)
 
-        id == nil && newJE != nil ->
+        !id && !newJE && reset_newJE ->
+          _socket =
+            case createNewJE(socket, content) do
+              {:ok, socket, newJE} -> updateAssignsWithNewJEAsClearAll(socket, newJE)
+              {:error, socket} -> socket
+            end
+
+        !id && newJE != nil && !reset_newJE ->
           _socket = updateNewJEAndSocketWithoutReload(socket, newJE, content)
+
+        !id && newJE != nil && reset_newJE ->
+          # _socket = xx(socket, newJE, content)
+          socket
 
         id != nil ->
           socket |> assign(edited_quill: %{id: String.to_integer(id), content: content})
       end
+
+    # if id == nil do
+
+    # else
+    #   socket |> assign(edited_quill: %{id: String.to_integer(id), content: content})
+    # end
 
     {:noreply, socket}
   end
@@ -288,7 +336,12 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   # NEW ******************************************************************
   def handle_event("saveNewJE", _params, socket) do
     dbg(["handle save", socket.assigns.quill])
-    {:noreply, createNewJEAndUpdateSocketAndList(socket)}
+
+    socket =
+      push_event(socket, "getLatestQillDataOfNewQuill", %{})
+      |> assign(:reset_newJE, true)
+
+    {:noreply, socket}
   end
 
   def handle_event("saveNewJEWithoutReload", _params, socket) do
@@ -314,30 +367,62 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   end
 
   # private ******************************************************************
-  defp createNewJEAndUpdateSocketAndList(socket) do
-    case JEs.create_in(strategy(socket.assigns.user), %{content: socket.assigns.quill}) do
-      {:ok, newJE} ->
-        user = socket.assigns.user
-        dbg("journal entry SAVED")
-        # u = dbUser(socket)
-        # update user localy
-        u = update_user_journals_localy(user, [newJE | journals(user)])
+  # defp createNewJEAndUpdateSocketAndList(socket, content) do
+  #   case JEs.create_in(strategy(socket.assigns.user), %{content: content}) do
+  #     {:ok, newJE} ->
+  #       user = socket.assigns.user
+  #       dbg("journal entry SAVED")
+  #       # u = dbUser(socket)
+  #       # update user localy
+  #       u = update_user_journals_localy(user, [newJE | journals(user)])
 
-        socket
-        |> put_flash(:info, "Journal entry created successfully")
-        |> push_event("existingJournalEntrySaved_clearContent", %{})
-        |> assign(:user, u)
-        |> assign(:newJE, nil)
-        |> assign(:journals, journals(u))
-        |> ForSocket.addFromListToSocket([newJE], &pushJE/2)
+  #       socket
+  #       |> put_flash(:info, "Journal entry created successfully")
+  #       |> push_event("existingJournalEntrySaved_clearContent", %{})
+  #       |> assign(:user, u)
+  #       |> assign(:newJE, nil)
+  #       |> assign(:journals, journals(u))
+  #       |> ForSocket.addFromListToSocket([newJE], &pushJE/2)
+
+  #     {:error, %Ecto.Changeset{} = changeset} ->
+  #       dbg("ERROR - journal entry NOT SAVED")
+
+  #       socket
+  #       |> put_flash(:error, "Journal entry not saved.")
+  #       |> assign(:changeset, changeset)
+  #   end
+  # end
+
+  defp createNewJE(socket, content) do
+    case JEs.create_in(strategy(socket.assigns.user), %{content: content}) do
+      {:ok, newJE} ->
+        # socket = updateAssignsWithNewJEAsClearAll(socket, newJE)
+        {:ok, socket, newJE}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         dbg("ERROR - journal entry NOT SAVED")
 
-        socket
-        |> put_flash(:error, "Journal entry not saved.")
-        |> assign(:changeset, changeset)
+        socket =
+          socket
+          |> put_flash(:error, "Journal entry not saved.")
+          |> assign(:changeset, changeset)
+
+        {:error, socket}
     end
+  end
+
+  defp updateAssignsWithNewJEAsClearAll(socket, newJE) do
+    user = socket.assigns.user
+    u = update_user_journals_localy(user, [newJE | journals(user)])
+
+    socket
+    |> put_flash(:info, "Journal entry created successfully")
+    |> push_event("existingJournalEntrySaved_clearContent", %{})
+    |> assign(:user, u)
+    |> assign(:newJE, nil)
+    |> assign(:journals, journals(u))
+    |> assign(:ignore2SecOfAutosavingQuillDataFrom, System.os_time() / 1_000_000)
+    |> ForSocket.addFromListToSocket([newJE], &pushJE/2)
   end
 
   # @spec createNewJEAndUpdateSocketWithoutReload(Socket.t()) :: Socket.t()
@@ -361,21 +446,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
           |> assign(:changeset, changeset)
           |> assign(:saving_state_to_display, "failed saving!!")
       end
-
-    # socket2 = Map.update!(socket, :assigns, fn assigns -> Map.delete(assigns, :flash) end)
-    # socket = Map.update!(socket, :assigns, fn assigns -> Map.put(assigns, :flash, nil) end)
-    # socket2 = assign(socket, :saving_state_to_display, "saved")
-
-    # dbg(["ssss", Map.keys(socket.assigns)])
-
-    # send_update_after(
-    #   # OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal,
-    #   __MODULE__,
-    #   # socket2.assigns,
-    #   [id: "journal", saving_state_to_display: "saved"],
-    #   2000
-    # )
-    # send(socket.parent_pid, {:joural_liveview_pid, self()})
 
     socket
   end
@@ -401,8 +471,8 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     end
   end
 
-  defp updateExistingJEAndSocket(socket, origEntry, editedJE) do
-    case JEs.update_u__journal__entry(origEntry, %{content: editedJE.content}) do
+  defp updateExistingJEAndSocket(socket, origEntry, updated_content) do
+    case JEs.update_u__journal__entry(origEntry, %{content: updated_content}) do
       {:ok, updatedJE} ->
         dbg(["journal entry UPDATED", updatedJE])
         # u = dbUser(socket)
@@ -468,6 +538,8 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       |> assign(:saving_state_to_display, nil)
       |> assign(:current_weekly_topic, U_Strategy.current_weekly_topic(strategy(u)))
       |> assign(wait_for_parent_assigns: false)
+      |> assign(reset_newJE: false)
+      |> assign(:ignore2SecOfAutosavingQuillDataFrom, System.os_time() / 1_000_000_000 - 5)
 
     {:noreply, socket}
   end
