@@ -131,11 +131,11 @@ export let TextEditor = {
       ({ detail: { id } } = e) => {
         console.log("quillForEditingModal", id, quillForEditingModal);
         quillForEditingModal.setContents(existingJEs[id].getContents());
-        document
-          .querySelector(
-            "#modal_for_existing_journal_entry_to_edit .confirm_action_button"
-          )
-          .setAttribute("phx-value-je_id_to_edit", id);
+        // document
+        //   .querySelector(
+        //     "#modal_for_existing_journal_entry_to_edit .confirm_action_button"
+        //   )
+        //   .setAttribute("phx-value-je_id_to_edit", id);
         triggerJSon("#hiddenTriggerForViewingEditModal");
         currentlyEditedJEid = id;
         // activateSendingChangesToServer(quillForEditingModal, "text-editor", id);
@@ -154,20 +154,23 @@ export let TextEditor = {
     // getLatestQillDataOfNewQuill
     window.addEventListener("phx:getLatestQillDataOfNewQuill", (e) => {
       console.log("requesting latest content of new JE quill");
-      // afterXsecondsOfInactivityPushTo(
-      //   source,
-      //   quill_newJE.getContents(),
-      //   null,
-      //   0
-      // );
-
       thisHook.pushEventTo("#my_journal_wrapper", "text-editor", {
         text_content: quill_newJE.getContents(),
         journalEntryId: null,
       });
-
-      // quill_newJE.setContents([]);
     });
+
+    // getLatestQillDataOfEditedQuill
+    window.addEventListener(
+      "phx:getLatestQillDataOfEditedQuill",
+      ({ detail: { id } } = e) => {
+        console.log("requesting latest content of new JE quill");
+        thisHook.pushEventTo("#my_journal_wrapper", "text-editor", {
+          text_content: quillForEditingModal.getContents(),
+          journalEntryId: id,
+        });
+      }
+    );
   },
   updated() {
     console.log("U");

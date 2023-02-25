@@ -2,6 +2,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   # use Phoenix.Component
   # use Phoenix.LiveComponent
   use OurExperienceWeb, :live_view
+  alias OurExperience.Strategies.Journals
   alias Phoenix.LiveView.JS
   use OurExperienceWeb, :verified_routes
   # to be able to use ~p sigil:
@@ -127,6 +128,9 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
           >
             Save changes
           </.button>
+          <span class={"absolute right-0 transition duration-700 #{if @saving_state_to_display=="saved", do: "opacity-100", else: "opacity-0"}"}>
+            Saved :-)
+          </span>
         </.modal>
         <.modal id="modal_for_existing_journal_entry_to_delete">
           <div class="miroQuillWrapper" id="wrapper_for_quill_in_delete_modal" phx-update="ignore">
@@ -163,76 +167,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     """
   end
 
-  # EDIT  ******************************************************************
-  def handle_event("showEditJEModal", %{"id" => id}, socket) do
-    # def handle_event("showEditJEModal", %{"value" => id}, socket) do
-    #  id = String.to_integer(id)
-
-    socket =
-      socket
-      |> push_event("existingJournalEntryIdForEditModalFromServer", %{id: id})
-
-    {:noreply, socket}
-  end
-
-  def handle_event("saveExistingJE", %{"je_id_to_edit" => id}, socket) do
-    id = String.to_integer(id)
-    dbg(["saveExistingJE", id])
-
-    editedJE = socket.assigns.edited_quill
-
-    origEntry =
-      journals(socket.assigns.user)
-      |> JEs.L.get_JE_by_id(id)
-
-    if !editedJE || editedJE.id != id do
-      dbg(["saveExistingJE", "ERROR - ids do not match. journal entry NOT SAVED"])
-      {:noreply, socket}
-    else
-      dbg(editedJE)
-      {:noreply, updateExistingJEAndSocket(socket, origEntry, editedJE.content)}
-    end
-
-    # {:noreply, socket}
-  end
-
-  # DELETE ******************************************************************
-  def handle_event("showDeleteJEModal", %{"id" => id}, socket) do
-    # dbg(["showDeleteJEModal", id])
-
-    socket =
-      socket
-      |> push_event("existingJournalEntryIdForDeleteModalFromServer", %{id: id})
-
-    {:noreply, socket}
-  end
-
-  def handle_event(
-        "deleteExistingJEFinal",
-        %{"je_id_to_delete" => id},
-        %{assigns: %{user: user}} = socket
-      ) do
-    id = String.to_integer(id)
-
-    socket =
-      case JEs.delete_using_id(id) do
-        {1, _} ->
-          dbg("deleted ok")
-          u = update_user_journals_localy(user, journals(user) |> Enum.filter(&(&1.id != id)))
-
-          socket
-          |> put_flash(:info, "deleted")
-          |> assign(:user, u)
-          |> assign(:journals, journals(u))
-
-        x ->
-          dbg(["issue deleting JE with id", id, "error?:", x])
-          put_flash(socket, :error, "error")
-      end
-
-    {:noreply, socket}
-  end
-
   # DATA ******************************************************************
   @impl true
   def handle_event(
@@ -246,7 +180,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
     socket = assign(socket, :saving_state_to_display, "saving...")
 
-    newJE = socket.assigns[:newJE] |> dbg
+    newJE = socket.assigns[:newJE]
     reset_newJE = socket.assigns[:reset_newJE]
 
     timeNowInSeconds = System.os_time() / 1_000_000_000
@@ -260,7 +194,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       timeSinceLastSaveWithClearingOfNewJE
     ])
 
-    saveJErequested = socket.assigns[:saveJErequested]
+    saveJErequested = socket.assigns[:saveJErequested] |> dbg
 
     socket =
       cond do
@@ -286,7 +220,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
         !id && newJE != nil && !reset_newJE ->
           dbg(03)
-          # _socket = updateNewJEAndSocketWithoutReload(socket, newJE, content)
           {_, socket, _} = updateNewJE(socket, newJE, content)
           socket
 
@@ -304,18 +237,14 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
         # editing normal existing JE:
         id != nil ->
-          dbg(05)
-          socket |> assign(edited_quill: %{id: String.to_integer(id), content: content})
+          # id = String.to_integer(id)
+          dbg([05, "editing normal existing JE; JE id: ", id])
+
+          socket
+          |> assign(edited_quill: %{id: id, content: content})
+          |> updateExistingJEAndSocket(id, content)
       end
 
-    {:noreply, socket}
-  end
-
-  @impl true
-  def handle_event("existingJE_as_text", %{"text_content" => content}, socket) do
-    dbg(content)
-    # socket = socket
-    # |> assign(:existingJES_as_text, )
     {:noreply, socket}
   end
 
@@ -338,7 +267,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     {:noreply, socket}
   end
 
-  # private ******************************************************************
   defp createNewJE(socket, content) do
     case JEs.create_in(strategy(socket.assigns.user), %{content: content}) do
       {:ok, newJE} ->
@@ -382,27 +310,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     |> ForSocket.addFromListToSocket([newJE], &pushJE/2)
   end
 
-  # defp updateNewJEAndSocketWithoutReload(socket, origEntry, updatedContent) do
-  #   dbg("updateNewJEAndSocketWithoutReload")
-
-  #   case JEs.update_u__journal__entry(origEntry, %{content: updatedContent}) do
-  #     {:ok, _updatedJE} ->
-  #       Process.send_after(self(), {:saving_state_to_display, nil}, 1_000)
-
-  #       socket
-  #       |> assign(:saving_state_to_display, "saved")
-
-  #     # |> assign(:newJE, updatedJE)
-  #     # |> ForSocket.addFromListToSocket([updatedJE], &pushJE/2)
-
-  #     {:error, %Ecto.Changeset{} = _changeset} ->
-  #       dbg("ERROR - journal entry NOT SAVED")
-
-  #       socket
-  #       |> put_flash(:error, "Journal entry not saved.")
-  #   end
-  # end
-
   defp updateNewJE(socket, origEntry, updatedContent) do
     dbg("updateNewJE")
 
@@ -432,13 +339,44 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     end
   end
 
+  # EDIT  ******************************************************************
+  # def handle_event("showEditJEModal", %{"id" => id}, socket) do
+  def handle_event("showEditJEModal", x, socket) do
+    dbg(["showEditJEModal", x])
+    id = x["id"]
+    # def handle_event("showEditJEModal", %{"value" => id}, socket) do
+    id = String.to_integer(id)
+    jeToEdit = getJEbyId(socket, id)
+
+    socket =
+      socket
+      |> assign(edited_quill: %{id: id, content: jeToEdit.content})
+      |> push_event("existingJournalEntryIdForEditModalFromServer", %{id: id})
+
+    {:noreply, socket}
+  end
+
+  def handle_event("saveExistingJE", _, socket) do
+    socket =
+      socket
+      |> push_event("getLatestQillDataOfEditedQuill", %{id: socket.assigns.edited_quill[:id]})
+      |> assign(:saveJErequested, true)
+
+    {:noreply, socket}
+  end
+
   # this is for updating normal existing entry in modal
-  defp updateExistingJEAndSocket(socket, origEntry, updated_content) do
+  defp updateExistingJEAndSocket(socket, origEntry_id, updated_content) do
+    origEntry = getJEbyId(socket, origEntry_id)
+
+    dbg(["updateExistingJEAndSocket", origEntry_id, origEntry, updated_content])
+
     case JEs.update_u__journal__entry(origEntry, %{content: updated_content}) do
       {:ok, updatedJE} ->
         dbg(["journal entry UPDATED", updatedJE])
         # u = dbUser(socket)
         user = socket.assigns.user
+        Process.send_after(self(), {:saving_state_to_display, nil}, 1_000)
 
         newJournals =
           Enum.map(journals(user), fn je ->
@@ -451,6 +389,9 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
         |> put_flash(:info, "Journal entry edited successfully")
         |> assign(:user, u)
         |> assign(:journals, journals(u))
+        |> assign(:saveJErequested, false)
+        |> assign(:saving_state_to_display, "saved")
+        |> assign(:ignore2SecOfAutosavingQuillDataFrom, System.os_time() / 1_000_000_000)
         |> ForSocket.addFromListToSocket([updatedJE], &pushJE/2)
 
       {:error, %Ecto.Changeset{} = _changeset} ->
@@ -458,8 +399,85 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
         socket
         |> put_flash(:error, "Journal entry not saved.")
+        |> assign(:saving_state_to_display, "failed saving!!")
     end
   end
+
+  # probably unused:
+  @impl true
+  def handle_event("existingJE_as_text", %{"text_content" => content}, socket) do
+    dbg(content)
+    # socket = socket
+    # |> assign(:existingJES_as_text, )
+    {:noreply, socket}
+  end
+
+  # DELETE ******************************************************************
+  def handle_event("showDeleteJEModal", %{"id" => id}, socket) do
+    # dbg(["showDeleteJEModal", id])
+
+    socket =
+      socket
+      |> push_event("existingJournalEntryIdForDeleteModalFromServer", %{id: id})
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "deleteExistingJEFinal",
+        %{"je_id_to_delete" => id},
+        %{assigns: %{user: user}} = socket
+      ) do
+    id = String.to_integer(id)
+
+    socket =
+      case JEs.delete_using_id(id) do
+        {1, _} ->
+          dbg("deleted ok")
+          u = update_user_journals_localy(user, journals(user) |> Enum.filter(&(&1.id != id)))
+
+          socket
+          |> put_flash(:info, "deleted")
+          |> assign(:user, u)
+          |> assign(:journals, journals(u))
+
+        x ->
+          dbg(["issue deleting JE with id", id, "error?:", x])
+          put_flash(socket, :error, "error")
+      end
+
+    {:noreply, socket}
+  end
+
+  # private ******************************************************************
+
+  # defp updateExistingJEAndSocket2(socket, origEntry, updated_content) do
+  #   case JEs.update_u__journal__entry(origEntry, %{content: updated_content}) do
+  #     {:ok, updatedJE} ->
+  #       dbg(["journal entry UPDATED", updatedJE])
+  #       # u = dbUser(socket)
+  #       user = socket.assigns.user
+
+  #       newJournals =
+  #         Enum.map(journals(user), fn je ->
+  #           if je.id == updatedJE.id, do: updatedJE, else: je
+  #         end)
+
+  #       u = update_user_journals_localy(user, newJournals)
+
+  #       socket
+  #       |> put_flash(:info, "Journal entry edited successfully")
+  #       |> assign(:user, u)
+  #       |> assign(:journals, journals(u))
+  #       |> ForSocket.addFromListToSocket([updatedJE], &pushJE/2)
+
+  #     {:error, %Ecto.Changeset{} = _changeset} ->
+  #       dbg("ERROR - journal entry NOT SAVED")
+
+  #       socket
+  #       |> put_flash(:error, "Journal entry not saved.")
+  #   end
+  # end
 
   defp update_user_journals_localy(user, newJournals) do
     str = put_in(strategy(user)[:u_journal_entries], newJournals)
@@ -513,5 +531,10 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     dbg(["handle_info saving_state_to_display: ", value])
     socket = assign(socket, :saving_state_to_display, value)
     {:noreply, socket}
+  end
+
+  defp getJEbyId(socket, id) do
+    journals(socket.assigns.user)
+    |> JEs.L.get_JE_by_id(id)
   end
 end
