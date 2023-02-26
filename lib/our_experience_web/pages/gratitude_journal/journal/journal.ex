@@ -28,7 +28,8 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
 
   @defaultNewEmptyQuillContent %{"ops" => [%{"insert" => "\n"}]}
-  @defaultSavingInterval 5
+  # 0 means save on every change, no waiting at all
+  @defaultSavingInterval 0
   @delayBeforeRequestingClearingSavingStateInUI 10
 
   @impl true
@@ -96,7 +97,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
               Save
             </.button>
             <span class={"text-sm text-gray-200 absolute right-0 transition duration-700 #{if @saving_state_to_display=="saved", do: "opacity-100", else: "opacity-0"}"}>
-              Saving continuosly :-)
+              Saving <br /> continuosly :-)
             </span>
           </div>
         </div>
@@ -207,9 +208,9 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
           socket
 
         # I did not thought this time stamp restriction thrrough too much, so hopefyll it is not going to be bugy!
-        timeSinceLastSaveWithClearingOfNewJE < 4 && !saveJErequested ->
-          dbg(0.2)
-          socket
+        # timeSinceLastSaveWithClearingOfNewJE < 4 && !saveJErequested ->
+        #   dbg(0.2)
+        #   socket
 
         # this is a new JE
         !id && !newJE && !reset_newJE ->
@@ -415,21 +416,24 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
         u = update_user_journals_localy(user, newJournals)
 
-        socket
-        |> put_flash(:info, "Journal entry edited successfully")
-        |> assign(:user, u)
-        |> assign(:journals, journals(u))
-        |> assign(:saveJErequested, false)
-        |> assign(:saving_state_to_display, "saved")
-        |> assign(:ignore2SecOfAutosavingQuillDataFrom, System.os_time() / 1_000_000_000)
-        |> assign(:JElastTimeSavedAt, System.os_time() / 1_000_000_000)
-        |> ForSocket.addFromListToSocket([updatedJE], &pushJE/2)
+        socket =
+          socket
+          |> put_flash(:info, "Journal entry edited successfully")
+          |> assign(:user, u)
+          |> assign(:journals, journals(u))
+          |> assign(:saveJErequested, false)
+          |> assign(:saving_state_to_display, "saved")
+          |> assign(:ignore2SecOfAutosavingQuillDataFrom, System.os_time() / 1_000_000_000)
+          |> assign(:JElastTimeSavedAt, System.os_time() / 1_000_000_000)
+          |> ForSocket.addFromListToSocket([updatedJE], &pushJE/2)
 
         Process.send_after(
           self(),
           {:saving_state_to_display, nil},
           @delayBeforeRequestingClearingSavingStateInUI
         )
+
+        socket
 
       {:error, %Ecto.Changeset{} = _changeset} ->
         dbg("ERROR - journal entry NOT SAVED")

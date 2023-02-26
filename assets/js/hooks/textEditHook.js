@@ -13,7 +13,7 @@ let triggerJSon = (querySelector) => {
   el = document.querySelector(querySelector);
   window.liveSocket.execJS(el, el.getAttribute("miro-js-to-trigger"));
 };
-quillContentSentToServerLastTimeAt = null;
+let quillContentSentToServerLastTimeAt = null;
 console.log("miro - outside of mounted, NA HLAVU!!:-(");
 export let TextEditor = {
   mounted() {
@@ -51,14 +51,21 @@ export let TextEditor = {
 
     let defaultsavingInterval = 5;
     let pushToServer = (content, id) => {
-      console.log("pushing to server", id, content);
-      quillContentSentToServerLastTimeAt;
       timeNow = Date.now() / 1000;
       let difInSeconds = timeNow - quillContentSentToServerLastTimeAt;
+      console.log(
+        "pushing to server",
+        id,
+        content,
+        difInSeconds,
+        defaultsavingInterval
+      );
       if (
         quillContentSentToServerLastTimeAt == null ||
-        difInSeconds > defaultsavingInterval
+        difInSeconds >= defaultsavingInterval
       ) {
+        quillContentSentToServerLastTimeAt = timeNow;
+
         thisHook.pushEventTo("#my_journal_wrapper", "text-editor", {
           text_content: content,
           journalEntryId: id,
