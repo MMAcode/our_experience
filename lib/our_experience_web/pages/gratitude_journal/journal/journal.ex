@@ -28,6 +28,8 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
 
   @defaultNewEmptyQuillContent %{"ops" => [%{"insert" => "\n"}]}
+  @defaultSavingInterval 5
+  @delayBeforeRequestingClearingSavingStateInUI 10
 
   @impl true
   def mount(_params, _session, socket) do
@@ -93,8 +95,8 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
             <.button class="m-1" phx-click="saveNewJEWithoutReload">
               Save
             </.button>
-            <span class={"absolute right-0 transition duration-700 #{if @saving_state_to_display=="saved", do: "opacity-100", else: "opacity-0"}"}>
-              Saved :-)
+            <span class={"text-sm text-gray-200 absolute right-0 transition duration-700 #{if @saving_state_to_display=="saved", do: "opacity-100", else: "opacity-0"}"}>
+              Saving continuosly :-)
             </span>
           </div>
         </div>
@@ -130,8 +132,8 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
           >
             Save changes
           </.button>
-          <span class={"pr-2 absolute right-0 transition duration-700 #{if @saving_state_to_display=="saved", do: "opacity-100", else: "opacity-0"}"}>
-            Saved :-)
+          <span class={"text-sm text-gray-200 pr-2 absolute right-0 transition duration-700 #{if @saving_state_to_display=="saved", do: "opacity-100", else: "opacity-0"}"}>
+            Saving continuosly :-)
           </span>
         </.modal>
         <.modal id="modal_for_existing_journal_entry_to_delete">
@@ -180,7 +182,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     # id = String.to_integer(id)
     # dbg [socket.assigns[:edited_quill]]
 
-    socket = assign(socket, :saving_state_to_display, "saving...")
+    # socket = assign(socket, :saving_state_to_display, "saving...")
 
     newJE = socket.assigns[:newJE]
     reset_newJE = socket.assigns[:reset_newJE]
@@ -287,7 +289,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     case JEs.create_in(strategy(socket.assigns.user), %{content: content}) do
       {:ok, newJE} ->
         # socket = updateAssignsWithNewJEAndClearAll(socket, newJE)
-        Process.send_after(self(), {:saving_state_to_display, nil}, 1_000)
 
         socket =
           socket
@@ -295,6 +296,13 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
           |> assign(:saving_state_to_display, "saved")
           |> assign(:ignore2SecOfAutosavingQuillDataFrom, System.os_time() / 1_000_000_000)
           |> assign(:saveJErequested, false)
+          |> assign(:JElastTimeSavedAt, System.os_time() / 1_000_000_000)
+
+        Process.send_after(
+          self(),
+          {:saving_state_to_display, nil},
+          @delayBeforeRequestingClearingSavingStateInUI
+        )
 
         {:ok, socket, newJE}
 
@@ -332,14 +340,20 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     case JEs.update_u__journal__entry(origEntry, %{content: updatedContent}) do
       {:ok, updatedJE} ->
         dbg("JE updated")
-        Process.send_after(self(), {:saving_state_to_display, nil}, 1_000)
 
         socket =
           socket
           |> assign(:saving_state_to_display, "saved")
           |> assign(:newJE, updatedJE)
           |> assign(:ignore2SecOfAutosavingQuillDataFrom, System.os_time() / 1_000_000_000)
+          |> assign(:JElastTimeSavedAt, System.os_time() / 1_000_000_000)
           |> assign(:saveJErequested, false)
+
+        Process.send_after(
+          self(),
+          {:saving_state_to_display, nil},
+          @delayBeforeRequestingClearingSavingStateInUI
+        )
 
         {:ok, socket, updatedJE}
 
@@ -393,7 +407,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
         dbg(["journal entry UPDATED", updatedJE])
         # u = dbUser(socket)
         user = socket.assigns.user
-        Process.send_after(self(), {:saving_state_to_display, nil}, 1_000)
 
         newJournals =
           Enum.map(journals(user), fn je ->
@@ -409,7 +422,14 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
         |> assign(:saveJErequested, false)
         |> assign(:saving_state_to_display, "saved")
         |> assign(:ignore2SecOfAutosavingQuillDataFrom, System.os_time() / 1_000_000_000)
+        |> assign(:JElastTimeSavedAt, System.os_time() / 1_000_000_000)
         |> ForSocket.addFromListToSocket([updatedJE], &pushJE/2)
+
+        Process.send_after(
+          self(),
+          {:saving_state_to_display, nil},
+          @delayBeforeRequestingClearingSavingStateInUI
+        )
 
       {:error, %Ecto.Changeset{} = _changeset} ->
         dbg("ERROR - journal entry NOT SAVED")
@@ -537,7 +557,9 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       |> assign(wait_for_parent_assigns: false)
       |> assign(reset_newJE: false)
       |> assign(:ignore2SecOfAutosavingQuillDataFrom, System.os_time() / 1_000_000_000 - 5)
+      |> assign(:JElastTimeSavedAt, System.os_time() / 1_000_000_000 - 5)
       |> assign(:saveJErequested, false)
+      |> push_event("setDefaultSavingInterval", %{interval: @defaultSavingInterval})
 
     # Process.send_after(self(), {:requestLatestQuillData, :forNewJE}, 1_000)
 
@@ -564,11 +586,26 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
   #    Process.send_after(self(), {:saving_state_to_display, nil}, 1_000)
 
-  def handle_info({:saving_state_to_display, value}, socket) do
-    dbg(["handle_info saving_state_to_display: ", value])
-    socket = assign(socket, :saving_state_to_display, value)
+  def handle_info({:saving_state_to_display, nil}, socket) do
+    dbg(["handle_info saving_state_to_display: ", nil])
+    lastSavedAt = socket.assigns[:JElastTimeSavedAt]
+    now = System.os_time() / 1_000_000_000
+    timeSinceLastTimeSaved = now - lastSavedAt
+    dbg(timeSinceLastTimeSaved)
+
+    socket =
+      if timeSinceLastTimeSaved > @delayBeforeRequestingClearingSavingStateInUI - 1,
+        do: assign(socket, :saving_state_to_display, nil),
+        else: socket
+
     {:noreply, socket}
   end
+
+  # def handle_info({:saving_state_to_display, value}, socket) do
+  #   dbg(["handle_info saving_state_to_display: ", value])
+  #   socket = assign(socket, :saving_state_to_display, value)
+  #   {:noreply, socket}
+  # end
 
   defp getJEbyId(socket, id) do
     journals(socket.assigns.user)

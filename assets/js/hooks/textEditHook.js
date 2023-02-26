@@ -49,12 +49,16 @@ export let TextEditor = {
       }
     );
 
+    let defaultsavingInterval = 5;
     let pushToServer = (content, id) => {
       console.log("pushing to server", id, content);
       quillContentSentToServerLastTimeAt;
       timeNow = Date.now() / 1000;
       let difInSeconds = timeNow - quillContentSentToServerLastTimeAt;
-      if (quillContentSentToServerLastTimeAt == null || difInSeconds > 5) {
+      if (
+        quillContentSentToServerLastTimeAt == null ||
+        difInSeconds > defaultsavingInterval
+      ) {
         thisHook.pushEventTo("#my_journal_wrapper", "text-editor", {
           text_content: content,
           journalEntryId: id,
@@ -131,6 +135,18 @@ export let TextEditor = {
       (e) => {
         console.log("clearning content of new JE quill");
         quill_newJE.setContents([]);
+      }
+    );
+
+    window.addEventListener(
+      "phx:setDefaultSavingInterval",
+      ({ detail: { interval } } = e) => {
+        console.log(
+          "setting default saving interval from to: ",
+          defaultsavingInterval,
+          interval
+        );
+        defaultsavingInterval = interval;
       }
     );
 
