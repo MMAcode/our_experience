@@ -27,6 +27,8 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   # alias Phoenix.LiveView.JS
   on_mount OurExperienceWeb.LiveviewPlugs.AddCurrentUserToAssigns
 
+  @defaultNewEmptyQuillContent %{"ops" => [%{"insert" => "\n"}]}
+
   @impl true
   def mount(_params, _session, socket) do
     send(socket.parent_pid, {:joural_liveview_pid, self()})
@@ -128,7 +130,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
           >
             Save changes
           </.button>
-          <span class={"absolute right-0 transition duration-700 #{if @saving_state_to_display=="saved", do: "opacity-100", else: "opacity-0"}"}>
+          <span class={"pr-2 absolute right-0 transition duration-700 #{if @saving_state_to_display=="saved", do: "opacity-100", else: "opacity-0"}"}>
             Saved :-)
           </span>
         </.modal>
@@ -198,9 +200,13 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
 
     socket =
       cond do
+        content == @defaultNewEmptyQuillContent ->
+          dbg([0.1, "quill has no content, so not saving"])
+          socket
+
         # I did not thought this time stamp restriction thrrough too much, so hopefyll it is not going to be bugy!
         timeSinceLastSaveWithClearingOfNewJE < 4 && !saveJErequested ->
-          dbg(00)
+          dbg(0.2)
           socket
 
         # this is a new JE
@@ -236,13 +242,17 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
             end
 
         # editing normal existing JE:
-        id != nil ->
+        id != nil && socket.assigns[:edited_quill][:content] != content ->
           # id = String.to_integer(id)
           dbg([05, "editing normal existing JE; JE id: ", id])
 
           socket
           |> assign(edited_quill: %{id: id, content: content})
           |> updateExistingJEAndSocket(id, content)
+
+        true ->
+          dbg([06, "not saving, because nothing changed"])
+          socket
       end
 
     {:noreply, socket}
@@ -268,6 +278,12 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   end
 
   defp createNewJE(socket, content) do
+    dbg([
+      "CREATING NEW JE:",
+      content,
+      @defaultNewEmptyQuillContent
+    ])
+
     case JEs.create_in(strategy(socket.assigns.user), %{content: content}) do
       {:ok, newJE} ->
         # socket = updateAssignsWithNewJEAndClearAll(socket, newJE)
@@ -347,6 +363,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     # def handle_event("showEditJEModal", %{"value" => id}, socket) do
     id = String.to_integer(id)
     jeToEdit = getJEbyId(socket, id)
+    # Process.send_after(self(), {:requestLatestQuillData, {:forExistingJE, id}}, 1_000)
 
     socket =
       socket
@@ -522,8 +539,28 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       |> assign(:ignore2SecOfAutosavingQuillDataFrom, System.os_time() / 1_000_000_000 - 5)
       |> assign(:saveJErequested, false)
 
+    # Process.send_after(self(), {:requestLatestQuillData, :forNewJE}, 1_000)
+
     {:noreply, socket}
   end
+
+  # def handle_info({:requestLatestQuillData, :forNewJE}, socket) do
+  #   dbg(["handle_info :requestLatestQuillData, :forNewJE: "])
+  #   # socket = assign(socket, :saving_state_to_display, value)
+  #   # Process.send_after(self(), {:requestLatestQuillData, :forNewJE}, 5_000)
+  #   socket = socket |> push_event("getLatestQillDataOfNewQuill", %{})
+  #   {:noreply, socket}
+  # end
+
+  # # Process.send_after(self(), {:requestLatestQuillData, {:forExistingJE, id}}, 1_000)
+  # def handle_info({:requestLatestQuillData, {:forExistingJE, id}}, socket) do
+  #   dbg(["handle_info :requestLatestQuillData, :forExistingJE", id])
+
+  #   # TODO: conditionally only if the quill is being edited
+  #   Process.send_after(self(), {:requestLatestQuillData, {:forExistingJE, id}}, 5_000)
+  #   socket = socket |> push_event("getLatestQillDataOfEditedQuill", %{id: id})
+  #   {:noreply, socket}
+  # end
 
   #    Process.send_after(self(), {:saving_state_to_display, nil}, 1_000)
 

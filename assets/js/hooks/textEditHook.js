@@ -13,7 +13,7 @@ let triggerJSon = (querySelector) => {
   el = document.querySelector(querySelector);
   window.liveSocket.execJS(el, el.getAttribute("miro-js-to-trigger"));
 };
-
+quillContentSentToServerLastTimeAt = null;
 console.log("miro - outside of mounted, NA HLAVU!!:-(");
 export let TextEditor = {
   mounted() {
@@ -49,42 +49,25 @@ export let TextEditor = {
       }
     );
 
-    // console.log("Miro - in Mounted");
-    let timer;
-
-    let afterXsecondsOfInactivityPushTo = (source, quillContent, id, delay) => {
-      if (source == "api") {
-        console.log("An API call triggered this change.");
-      } else if (source == "user") {
-        if (timer !== null) {
-          clearTimeout(timer);
-        }
-        timer = setTimeout(function () {
-          thisHook.pushEventTo("#my_journal_wrapper", "text-editor", {
-            text_content: quillContent,
-            journalEntryId: id,
-          });
-          timer = null;
-        }, delay);
+    let pushToServer = (content, id) => {
+      console.log("pushing to server", id, content);
+      quillContentSentToServerLastTimeAt;
+      timeNow = Date.now() / 1000;
+      let difInSeconds = timeNow - quillContentSentToServerLastTimeAt;
+      if (quillContentSentToServerLastTimeAt == null || difInSeconds > 5) {
+        thisHook.pushEventTo("#my_journal_wrapper", "text-editor", {
+          text_content: content,
+          journalEntryId: id,
+        });
       }
     };
 
     quill_newJE.on("text-change", (delta, oldDelta, source) => {
-      afterXsecondsOfInactivityPushTo(
-        source,
-        quill_newJE.getContents(),
-        null,
-        2000
-      );
+      pushToServer(quill_newJE.getContents(), null);
     });
 
     quillForEditingModal.on("text-change", (delta, oldDelta, source) => {
-      afterXsecondsOfInactivityPushTo(
-        source,
-        quillForEditingModal.getContents(),
-        currentlyEditedJEid,
-        2000
-      );
+      pushToServer(quillForEditingModal.getContents(), currentlyEditedJEid);
     });
 
     // activateSendingChangesToServer(quill_newJE, "text-editor");
@@ -130,6 +113,7 @@ export let TextEditor = {
       "phx:existingJournalEntryIdForEditModalFromServer",
       ({ detail: { id } } = e) => {
         console.log("quillForEditingModal", id, quillForEditingModal);
+        currentlyEditedJEid = id;
         quillForEditingModal.setContents(existingJEs[id].getContents());
         // document
         //   .querySelector(
@@ -137,7 +121,6 @@ export let TextEditor = {
         //   )
         //   .setAttribute("phx-value-je_id_to_edit", id);
         triggerJSon("#hiddenTriggerForViewingEditModal");
-        currentlyEditedJEid = id;
         // activateSendingChangesToServer(quillForEditingModal, "text-editor", id);
       }
     );
@@ -164,9 +147,17 @@ export let TextEditor = {
     window.addEventListener(
       "phx:getLatestQillDataOfEditedQuill",
       ({ detail: { id } } = e) => {
-        console.log("requesting latest content of new JE quill");
+        // (e) => {
+        console.log(
+          "requesting latest content of edited JE quill with id: "
+          // id,
+          // quillForEditingModal.getContents(),
+          // thisHook
+        );
+
         thisHook.pushEventTo("#my_journal_wrapper", "text-editor", {
           text_content: quillForEditingModal.getContents(),
+          // journalEntryId: id.toString(),
           journalEntryId: id,
         });
       }
@@ -175,4 +166,25 @@ export let TextEditor = {
   updated() {
     console.log("U");
   },
+  error(e) {
+    console.log("hook error captured:", e);
+  },
 };
+
+//
+// let afterXsecondsOfInactivityPushTo = (source, quillContent, id, delay) => {
+//   if (source == "api") {
+//     console.log("An API call triggered this change.");
+//   } else if (source == "user") {
+//     if (timer !== null) {
+//       clearTimeout(timer);
+//     }
+//     timer = setTimeout(function () {
+//       thisHook.pushEventTo("#my_journal_wrapper", "text-editor", {
+//         text_content: quillContent,
+//         journalEntryId: id,
+//       });
+//       timer = null;
+//     }, delay);
+//   }
+// };
