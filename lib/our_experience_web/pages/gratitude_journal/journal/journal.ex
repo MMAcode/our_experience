@@ -30,7 +30,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
   @defaultNewEmptyQuillContent %{"ops" => [%{"insert" => "\n"}]}
   # 0 means save on every change, no waiting at all
   @defaultSavingInterval 0
-  @delayBeforeRequestingClearingSavingStateInUI 10
+  @delayBeforeRequestingClearingSavingStateInUIInSeconds 5
 
   @impl true
   def mount(_params, _session, socket) do
@@ -302,7 +302,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
         Process.send_after(
           self(),
           {:saving_state_to_display, nil},
-          @delayBeforeRequestingClearingSavingStateInUI
+          @delayBeforeRequestingClearingSavingStateInUIInSeconds * 1000
         )
 
         {:ok, socket, newJE}
@@ -353,7 +353,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
         Process.send_after(
           self(),
           {:saving_state_to_display, nil},
-          @delayBeforeRequestingClearingSavingStateInUI
+          @delayBeforeRequestingClearingSavingStateInUIInSeconds * 1000
         )
 
         {:ok, socket, updatedJE}
@@ -430,7 +430,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
         Process.send_after(
           self(),
           {:saving_state_to_display, nil},
-          @delayBeforeRequestingClearingSavingStateInUI
+          @delayBeforeRequestingClearingSavingStateInUIInSeconds * 1000
         )
 
         socket
@@ -598,7 +598,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     dbg(timeSinceLastTimeSaved)
 
     socket =
-      if timeSinceLastTimeSaved > @delayBeforeRequestingClearingSavingStateInUI - 1,
+      if timeSinceLastTimeSaved > @delayBeforeRequestingClearingSavingStateInUIInSeconds - 1,
         do: assign(socket, :saving_state_to_display, nil),
         else: socket
 
