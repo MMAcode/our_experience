@@ -61,6 +61,19 @@ defmodule OurExperience.U_Strategies.U_Strategies do
 
   # u_strategy could be also create using User struct: preload all u_strategies association and then in changeset use cast_assoc and append new
 
+  def create_u__strategy_NGJ_without_changeset(
+        user_id,
+        status \\ CONSTANTS.u_strategies().status.on
+      ) do
+    u_s = %U_Strategy{
+      user_id: user_id,
+      strategy_id: OurExperience.Strategies.Strategies.get_strategy_normal_gratitude_journal().id,
+      status: status
+    }
+
+    Repo.insert!(u_s)
+  end
+
   def create_u__strategy_TGJ_without_changeset(
         user_id,
         status \\ CONSTANTS.u_strategies().status.on

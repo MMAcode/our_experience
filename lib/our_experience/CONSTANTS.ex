@@ -3,7 +3,8 @@ defmodule OurExperience.CONSTANTS do
   def strategies do
     %{
       name: %{
-        themed_gratitude_journal: "Themed Gratitude Journal"
+        themed_gratitude_journal: "Themed Gratitude Journal",
+        normal_gratitude_journal: "Gratitude Journal"
       }
     }
   end
@@ -21,8 +22,10 @@ defmodule OurExperience.CONSTANTS do
     %{
       stages: %{
         prepare: "prepare",
-        review: "review", #may be
-        partially_public_prototype: "partially_public_prototype", #may be
+        # may be
+        review: "review",
+        # may be
+        partially_public_prototype: "partially_public_prototype",
         public: "public"
       }
     }

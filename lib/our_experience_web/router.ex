@@ -28,6 +28,7 @@ defmodule OurExperienceWeb.Router do
     get "/orig", PageController, :home
 
     scope "/strategies", Pages do
+      live "gratitude_journal", NormalGratitudeJournal.NormalGratitudeJournalPublic
       live "themed_gratitude_journal", GratitudeJournal.ThemedGratitudeJournalPublic
     end
   end
@@ -49,7 +50,12 @@ defmodule OurExperienceWeb.Router do
       scope "/strategies/themed_gratitude_journal", Pages.GratitudeJournal do
         live "/", ThemedGratitudeJournalPrivate, :index, as: :ThemedGratitudeJournalPrivate
         # live "/u_weekly_topics", UWeeklyTopics.Index
-        live "/u_weekly_topics", ThemedGratitudeJournalPrivate, :weekly_topics, as: :ThemedGratitudeJournalPrivate
+        live "/u_weekly_topics", ThemedGratitudeJournalPrivate, :weekly_topics,
+          as: :ThemedGratitudeJournalPrivate
+      end
+
+      scope "/strategies/gratitude_journal", Pages.NormalGratitudeJournal do
+        live "/", NormalGratitudeJournalPrivate, :index, as: :NormalGratitudeJournalPrivate
       end
 
       # /my_experience/strategies/themed_gratitude_journal/weekly_topics

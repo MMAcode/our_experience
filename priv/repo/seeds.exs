@@ -4,4 +4,4 @@
 # and so on) as they will fail if something goes wrong.
 
 alias OurExperience.Seeds.StrategiesSeeds
-StrategiesSeeds.createStrategy()
+StrategiesSeeds.seeds_execution_trigger()

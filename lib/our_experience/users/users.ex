@@ -5,8 +5,11 @@ defmodule OurExperience.Users.Users do
   import Ecto.Query, warn: false
 
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.WeeklyTopics.WeeklyTopics
+
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_WeeklyTopics.U_WeeklyTopic
+
   alias OurExperience.Strategies.Journals.Gratitude.ThemedGratitudeJournal.U_Journal_Entries.U_Journal_Entry
+
   alias OurExperience.Repo
   alias OurExperience.Users.User
 
@@ -68,42 +71,61 @@ defmodule OurExperience.Users.Users do
     # |> Repo.preload(u_strategies: [:strategy])
   end
 
-  def get_user_for_TGJ(id) do
-      base_query =
+  def get_user_for_NGJ(id) do
+    base_query =
       from u in User,
         where: u.id == ^id,
-        left_join: u_s in assoc(u, :u_strategies), as: :u_s,
+        left_join: u_s in assoc(u, :u_strategies),
+        as: :u_s,
+        on: u_s.status == "on",
+        left_join: s in assoc(u_s, :strategy)
+
+    q_wJE =
+      from [u_s: us] in base_query,
+        left_join: je in assoc(us, :u_journal_entries),
+        order_by: [desc: je.inserted_at]
+
+    preloaded =
+      from [u, u_s, s, je] in q_wJE,
+        preload: [
+          u_strategies: {
+            u_s,
+            strategy: s, u_journal_entries: je
+          }
+        ]
+
+    Repo.one(preloaded)
+  end
+
+  def get_user_for_TGJ(id) do
+    base_query =
+      from u in User,
+        where: u.id == ^id,
+        left_join: u_s in assoc(u, :u_strategies),
+        as: :u_s,
         on: u_s.status == "on",
         left_join: s in assoc(u_s, :strategy),
         left_join: uwt in assoc(u_s, :u_weekly_topics)
 
-      q_wWT = from [..., anyNameForUWT] in base_query,
-              left_join: wt in assoc(anyNameForUWT, :weekly_topic)
+    q_wWT =
+      from [..., anyNameForUWT] in base_query,
+        left_join: wt in assoc(anyNameForUWT, :weekly_topic)
 
-      q_wJE = from [u_s: us] in q_wWT,
-              left_join: je in assoc(us, :u_journal_entries),
-              order_by: [desc: je.inserted_at]
+    q_wJE =
+      from [u_s: us] in q_wWT,
+        left_join: je in assoc(us, :u_journal_entries),
+        order_by: [desc: je.inserted_at]
 
+    preloaded =
+      from [u, u_s, s, uwt, wt, je] in q_wJE,
+        preload: [
+          u_strategies: {
+            u_s,
+            strategy: s, u_weekly_topics: {uwt, weekly_topic: wt}, u_journal_entries: je
+          }
+        ]
 
-
-      preloaded = from [u, u_s, s, uwt, wt, je] in q_wJE,
-                        preload: [u_strategies: {
-                          u_s,
-                          strategy: s,
-                          u_weekly_topics: {uwt, weekly_topic: wt},
-                          u_journal_entries: je
-                        }]
-
-     Repo.one(preloaded)
-
-
-
-
-
-
-
-
-
+    Repo.one(preloaded)
 
     # Repo.one(
     #   from u in User,
@@ -114,7 +136,6 @@ defmodule OurExperience.Users.Users do
     #     left_join: uwt in assoc(u_s, :u_weekly_topics), #not inner_joint because if there are no topics, it would not load user either
     #     preload: [u_strategies: {u_s, [strategy: s, u_weekly_topics: uwt]}]
     # )
-
 
     # Repo.one(
     #   from u in User,
@@ -127,49 +148,46 @@ defmodule OurExperience.Users.Users do
     #     left_join: uwt in assoc(u_s, :u_weekly_topics),
     #     left_join: wt in assoc(uwt, :weekly_topic),
     # original working time tested query with probably extra brackets:
-        # preload: [u_strategies: {u_s, [strategy: s, u_weekly_topics: {uwt, weekly_topic: wt}]}]
-        # preload: [u_strategies: {u_s, strategy: s, u_weekly_topics: {uwt, weekly_topic: wt}}]
+    # preload: [u_strategies: {u_s, [strategy: s, u_weekly_topics: {uwt, weekly_topic: wt}]}]
+    # preload: [u_strategies: {u_s, strategy: s, u_weekly_topics: {uwt, weekly_topic: wt}}]
     # )
-
 
     # with subsections:
 
-  #   base_query =
-  #     from u in User,
-  #       where: u.id == ^id,
-  #       left_join: u_s in assoc(u, :u_strategies),
-  #       # not 'where' because that would remove the row regardles the left join
-  #       on: u_s.status == "on",
-  #       left_join: s in assoc(u_s, :strategy),
-  #       # not inner_joint because if there are no topics, it would not load user either
-  #       left_join: uwt in assoc(u_s, :u_weekly_topics)
-  #       # left_join: wt in assoc(uwt, :weekly_topic),
-  #       # preload: [u_strategies: {u_s, strategy: s, u_weekly_topics: {uwt, weekly_topic: wt}}]
-  #       # preload: [u_strategies: {u_s, strategy: s, u_weekly_topics: uwt}]
+    #   base_query =
+    #     from u in User,
+    #       where: u.id == ^id,
+    #       left_join: u_s in assoc(u, :u_strategies),
+    #       # not 'where' because that would remove the row regardles the left join
+    #       on: u_s.status == "on",
+    #       left_join: s in assoc(u_s, :strategy),
+    #       # not inner_joint because if there are no topics, it would not load user either
+    #       left_join: uwt in assoc(u_s, :u_weekly_topics)
+    #       # left_join: wt in assoc(uwt, :weekly_topic),
+    #       # preload: [u_strategies: {u_s, strategy: s, u_weekly_topics: {uwt, weekly_topic: wt}}]
+    #       # preload: [u_strategies: {u_s, strategy: s, u_weekly_topics: uwt}]
 
-  #       # works:
-  # #  new_query = base_query
-  # #   |> join(:left, [u, u_s, s, uwt], wt in assoc(uwt, :weekly_topic))
-  # #   |> preload([u, u_s, s, uwt, wt], u_strategies: {u_s, strategy: s, u_weekly_topics: {uwt, weekly_topic: wt}})
+    #       # works:
+    # #  new_query = base_query
+    # #   |> join(:left, [u, u_s, s, uwt], wt in assoc(uwt, :weekly_topic))
+    # #   |> preload([u, u_s, s, uwt, wt], u_strategies: {u_s, strategy: s, u_weekly_topics: {uwt, weekly_topic: wt}})
 
-  # # also works:
-  #     new_query = from [u, u_s, s, uwt] in base_query,
-  #       left_join: wt in assoc(uwt, :weekly_topic),
-  #       preload: [u_strategies: {u_s, strategy: s, u_weekly_topics: {uwt, weekly_topic: wt}}]
+    # # also works:
+    #     new_query = from [u, u_s, s, uwt] in base_query,
+    #       left_join: wt in assoc(uwt, :weekly_topic),
+    #       preload: [u_strategies: {u_s, strategy: s, u_weekly_topics: {uwt, weekly_topic: wt}}]
 
-  #    Repo.one(new_query)
+    #    Repo.one(new_query)
 
-  # also works:
-  # !!! order of arguments matters, name of the argument does not (in 'from' statement)
+    # also works:
+    # !!! order of arguments matters, name of the argument does not (in 'from' statement)
     # q_wWT = from [..., anyNameForUWT] in base_query,
     #         left_join: wt in assoc(anyNameForUWT, :weekly_topic)
     # new_query = from [u, u_s, s, uwt, wt] in q_wWT,
     #                 preload: [u_strategies: {u_s, strategy: s, u_weekly_topics: {uwt, weekly_topic: wt}}]
     # Repo.one(new_query)
 
-
-
-# with journals, 2 trips to db due to 'function' call in preload:
+    # with journals, 2 trips to db due to 'function' call in preload:
     # base_query =
     #   from u in User,
     #     where: u.id == ^id,
@@ -193,25 +211,6 @@ defmodule OurExperience.Users.Users do
     #                     }]
     #  Repo.one(new_query)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     # as multiple queries
     # Repo.one(
     #   from u in User,
@@ -232,17 +231,18 @@ defmodule OurExperience.Users.Users do
       on its own ->
     """
 
-      WeeklyTopics.list_public_weekly_topics()
-      |> Enum.map(
-        &%U_WeeklyTopic{
-          active: false,
-          position: &1.default_position,
-          user_id: user_id,
-          u_strategy_id: u_strategy_id,
-          weekly_topic_id: &1.id
-        }
-      )
-      |> Enum.each(&Repo.insert!(&1))#may be better to use: |> Repo.insert_all()
+    WeeklyTopics.list_public_weekly_topics()
+    |> Enum.map(
+      &%U_WeeklyTopic{
+        active: false,
+        position: &1.default_position,
+        user_id: user_id,
+        u_strategy_id: u_strategy_id,
+        weekly_topic_id: &1.id
+      }
+    )
+    # may be better to use: |> Repo.insert_all()
+    |> Enum.each(&Repo.insert!(&1))
 
     # |> Enum.at(0)
 

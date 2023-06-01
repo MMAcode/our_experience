@@ -114,7 +114,7 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.ThemedGratitudeJournalPrivate 
   end
 
   @impl true
-  def handle_info({:joural_liveview_pid, journal_pid}, socket) do
+  def handle_info({:get_assigns_from_parent, journal_pid}, socket) do
     dbg(["joural_liveview_pid --parent - assKeys:", Map.keys(socket.assigns)])
     send(journal_pid, {:assigns_from_parent, socket.assigns})
     {:noreply, socket}

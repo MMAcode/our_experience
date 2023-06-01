@@ -38,6 +38,12 @@ defmodule OurExperience.Strategies.Strategies do
   def get_strategy!(id), do: Repo.get!(Strategy, id)
   def get_strategy_by_name(name), do: Repo.get_by(Strategy, name: name)
 
+  def get_strategy_normal_gratitude_journal,
+    do:
+      Repo.get_by(Strategy,
+        name: OurExperience.CONSTANTS.strategies().name.normal_gratitude_journal
+      )
+
   def get_strategy_themed_gratitude_journal,
     do:
       Repo.get_by(Strategy,

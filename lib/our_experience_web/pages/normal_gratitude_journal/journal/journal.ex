@@ -1,4 +1,4 @@
-defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
+defmodule OurExperienceWeb.Pages.NormalGratitudeJournal.Journal.Journal do
   # use Phoenix.Component
   # use Phoenix.LiveComponent
   alias OurExperience.Strategies.Journals
@@ -62,24 +62,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
     <div :if={!@wait_for_parent_assigns} id="my_journal_wrapper">
       <.hiddenModalTriggers />
       <h1>My Journal</h1>
-
-      <%!-- button to view modal of current active weekly topic --%>
-      <div class="flex justify-center">
-        <.b_link to={~p"/my_experience/strategies/themed_gratitude_journal/u_weekly_topics/"}>
-          All Weekly Themes ->
-        </.b_link>
-        <.button phx-click={show_modal("current_weekly_topic")} type="button">
-          <p>Current theme -></p>
-          <p class="text-xs">(<%= @current_weekly_topic.title %>)</p>
-        </.button>
-        <.weekly_topic_modal_component id="current_weekly_topic" weekly_topic={@current_weekly_topic}>
-          <div class="flex justify-center">
-            <.b_link to={~p"/my_experience/strategies/themed_gratitude_journal/u_weekly_topics"}>
-              <strong> Select different topic</strong>
-            </.b_link>
-          </div>
-        </.weekly_topic_modal_component>
-      </div>
 
       <div id="new_journal_entry_wrapper">
         <div id="editorWrapper" phx-update="ignore">
@@ -556,7 +538,6 @@ defmodule OurExperienceWeb.Pages.GratitudeJournal.Journal.Journal do
       |> assign(:edited_quill, nil)
       # TODO:
       |> assign(:saving_state_to_display, nil)
-      |> assign(:current_weekly_topic, U_Strategy.current_weekly_topic(strategy(u)))
       |> assign(wait_for_parent_assigns: false)
       |> assign(reset_newJE: false)
       |> assign(:ignore2SecOfAutosavingQuillDataFrom, System.os_time() / 1_000_000_000 - 5)
